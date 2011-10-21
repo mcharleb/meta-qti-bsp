@@ -1,0 +1,28 @@
+From 830fc8274f6871c76a6b81668444c1f61aa4bf82 Mon Sep 17 00:00:00 2001
+From: Jin Hong <jinh@codeaurora.org>
+Date: Tue, 30 Aug 2011 20:28:21 -0700
+Subject: [PATCH] HACK: kdev: change ramdisk addr to work with bootloader
+
+This bypass the assumption that device has 16MB as we only have 10MB
+continuous here.
+
+Change-Id: I6de25d7d6c8baf617178199f71864e45a3ae5164
+---
+ tools/mkbootimg/mkbootimg.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/tools/mkbootimg/mkbootimg.c b/tools/mkbootimg/mkbootimg.c
+index a518cc7..30881b8 100644
+--- a/tools/mkbootimg/mkbootimg.c
++++ b/tools/mkbootimg/mkbootimg.c
+@@ -157,7 +157,7 @@ int main(int argc, char **argv)
+         } else if(!strcmp(arg, "--base")) {
+             unsigned base = strtoul(val, 0, 16);
+             hdr.kernel_addr =  base + 0x00008000;
+-            hdr.ramdisk_addr = base + 0x01000000;
++            hdr.ramdisk_addr = base + 0x00600000;
+             hdr.second_addr =  base + 0x00F00000;
+             hdr.tags_addr =    base + 0x00000100;
+         } else if(!strcmp(arg, "--pagesize")) {
+--
+1.7.6

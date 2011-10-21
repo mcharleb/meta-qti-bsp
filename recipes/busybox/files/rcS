@@ -1,0 +1,21 @@
+#! /bin/sh
+
+/bin/mount -a
+/bin/busybox --install
+/bin/mount -t sysfs none /sys
+/bin/mount -t devpts devpts /dev/pts
+
+if [ -d /sys/class/android_usb/android0 ]
+then
+echo 0 > /sys/class/android_usb/android0/enable
+echo 0x9018 > /sys/class/android_usb/android0/idProduct
+echo 0x05C6 > /sys/class/android_usb/android0/idVendor
+echo diag > /sys/class/android_usb/android0/f_diag/clients
+echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
+echo diag,adb,serial,mass_storage > /sys/class/android_usb/android0/functions
+echo 1 > /sys/class/android_usb/android0/enable
+fi
+
+/sbin/mdev -s
+/bin/ifconfig lo up
+/sbin/adbd &
