@@ -24,6 +24,7 @@ IMAGE_INSTALL += "adbd"
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "diag"
 IMAGE_INSTALL += "qmi-framework"
+IMAGE_INSTALL += "kernel-tests"
 
 IMAGE_LINGUAS = ""
 
