@@ -16,7 +16,7 @@
 #
 
 # Install basic files only
-IMAGE_INSTALL = "base-files start-scripts"
+IMAGE_INSTALL = "base-files"
 IMAGE_INSTALL += "base-passwd"
 
 #add adbd package to the rootfs
@@ -27,6 +27,8 @@ IMAGE_INSTALL += "qmi-framework"
 IMAGE_INSTALL += "kernel-tests"
 IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "dnsmasq"
+IMAGE_INSTALL += "powerapp"
+IMAGE_INSTALL += "powerapp-reboot powerapp-shutdown"
 
 IMAGE_LINGUAS = ""
 
