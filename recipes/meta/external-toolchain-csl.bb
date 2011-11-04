@@ -10,8 +10,8 @@ INSANE_SKIP_gdbserver = "True"
 
 SRC_URI = "${@base_conditional('DL_TOOL', '1', 'https://sourcery.mentor.com/sgpp/lite/arm/portal/package8739/public/arm-none-linux-gnueabi/arm-2011.03-41-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2', '', d)} \
         file://SUPPORTED"
-SRC_URI[md5sum] = "1a6e88782f08b09a0e6cef545a1712ec"
-SRC_URI[sha256sum] = "0004b59223f8151d1af211894e5c76c142e4c0e4529b531bf8f5565ec7f08ae6"
+SRC_URI[md5sum] = "63d93a9f7fe9ff007bc69adfadc7c4ab"
+SRC_URI[sha256sum] = "4d4e9843aab1e92994901efce06f8b89f96a1b0c321750305c4058242d892d44"
 
 PROVIDES = "\
 	virtual/${TARGET_PREFIX}gcc \
