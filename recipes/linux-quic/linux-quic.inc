@@ -12,8 +12,6 @@ PACKAGES =+ "kernel-headers"
 INSTALL_HDR_PATH="${exec_prefix}/src/linux-${KERNEL_VERSION}"
 FILES_kernel-headers = ${INSTALL_HDR_PATH}
 
-EXTRA_OEMAKE="EXTRA_CFLAGS=-mno-unaligned-access"
-
 do_configure_prepend () {
     oe_runmake ${KERNEL_EXTRA_OEMAKE} ${KERNEL_DEFCONFIG}
 }
