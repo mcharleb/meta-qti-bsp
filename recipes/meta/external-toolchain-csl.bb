@@ -8,7 +8,7 @@ INSANE_SKIP_nscd = "True"
 INSANE_SKIP_glibc-utils = "True"
 INSANE_SKIP_gdbserver = "True"
 
-SRC_URI = "${@base_conditional('DL_TOOL', '1', 'https://sourcery.mentor.com/sgpp/lite/arm/portal/package8739/public/arm-none-linux-gnueabi/arm-2011.03-41-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2', '', d)} \
+SRC_URI = "${@base_conditional('DL_TOOL', '1', 'https://sourcery.mentor.com/sgpp/lite/arm/portal/package4571/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2', '', d)} \
         file://SUPPORTED"
 SRC_URI[md5sum] = "63d93a9f7fe9ff007bc69adfadc7c4ab"
 SRC_URI[sha256sum] = "4d4e9843aab1e92994901efce06f8b89f96a1b0c321750305c4058242d892d44"
