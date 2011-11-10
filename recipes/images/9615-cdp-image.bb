@@ -29,6 +29,7 @@ IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "powerapp"
 IMAGE_INSTALL += "powerapp-reboot powerapp-shutdown"
+IMAGE_INSTALL += "data"
 
 IMAGE_LINGUAS = ""
 
