@@ -4,7 +4,7 @@ DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 
 PV = "${GITVER}"
-PR = "r1"
+PR = "r2"
 PACKAGE_ARCH = ${BASE_PACKAGE_ARCH}
 
 S = "${WORKSPACE}/kernel"
@@ -14,6 +14,8 @@ KDIR = "/usr/src/linux"
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 INHIBIT_DEFAULT_DEPS = "1"
+# Until usr/src/linux/scripts can be correctly processed
+PACKAGE_STRIP = "no"
 
 PACKAGES = "kernel kernel-base"
 
