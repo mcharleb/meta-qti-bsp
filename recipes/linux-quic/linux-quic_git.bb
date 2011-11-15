@@ -17,7 +17,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 # Until usr/src/linux/scripts can be correctly processed
 PACKAGE_STRIP = "no"
 
-PACKAGES = "kernel kernel-base"
+PACKAGES = "kernel kernel-base kernel-module-bridge"
 
 PACKAGES =+ "kernel-image"
 FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}*"
@@ -31,8 +31,8 @@ FILES_kernel-vmlinux = "/boot/vmlinux*"
 PACKAGES =+ "kernel-headers"
 FILES_kernel-headers = "${KDIR}/usr/include"
 
-PACKAGES =+ "kernel-module-bridge"
-FILES_kernel-module-bridge = "${KDIR}"
+PACKAGES =+ "kernel-modbuild"
+FILES_kernel-modbuild = "${KDIR}"
 
 PACKAGES =+ "kernel-modules"
 FILES_kernel-modules = "/lib/modules"
