@@ -15,21 +15,8 @@
 # Maintainer: Martin Lund <mgl@doredevelopment.dk>
 #
 
-# Install basic files only
-IMAGE_INSTALL = "base-files"
-IMAGE_INSTALL += "base-passwd"
-
-#add adbd package to the rootfs
-IMAGE_INSTALL += "adbd"
-IMAGE_INSTALL += "glib-2.0"
-IMAGE_INSTALL += "diag"
-IMAGE_INSTALL += "qmi-framework"
-IMAGE_INSTALL += "kernel-tests"
-IMAGE_INSTALL += "bridge-utils"
-IMAGE_INSTALL += "dnsmasq"
-IMAGE_INSTALL += "powerapp"
-IMAGE_INSTALL += "powerapp-reboot powerapp-shutdown"
-IMAGE_INSTALL += "data"
+# List of packages installed onto the root file system
+require 9615-cdp-image.inc
 
 IMAGE_LINGUAS = ""
 
