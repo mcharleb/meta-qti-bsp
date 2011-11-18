@@ -22,6 +22,7 @@ PROVIDES = "\
 	virtual/${TARGET_PREFIX}libc-for-gcc \
 	virtual/${TARGET_PREFIX}libc-initial \
 	virtual/libc \
+	virtual/libstdc++ \
 	virtual/libintl \
 	virtual/libiconv \
 	glibc-thread-db \
@@ -98,14 +99,14 @@ FILES_glibc-thread-db = "/lib/libthread_db*"
 FILES_libgcc = "${base_libdir}/libgcc_s.so.1"
 FILES_libgcc-dev = "${base_libdir}/libgcc_s.so"
 
-FILES_libstdc++ = "${libdir}/libstdc++.so.*"
+FILES_libstdc++ = "/usr/${libdir}/libstdc++.so.*"
 FILES_libstdc++-dev = "\
-	${includedir}/c++/* \
-	${libdir}/libstdc++.so \
-	${libdir}/libstdc++.la \
-	${libdir}/libstdc++.a \
-	${libdir}/libsupc++.la \
-	${libdir}/libsupc++.a \
+	/usr/${includedir}/c++/* \
+	/usr/${libdir}/libstdc++.so \
+	/usr/${libdir}/libstdc++.la \
+	/usr/${libdir}/libstdc++.a \
+	/usr/${libdir}/libsupc++.la \
+	/usr/${libdir}/libsupc++.a \
 "
 
 FILES_linux-libc-headers = "\
