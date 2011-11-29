@@ -1,5 +1,3 @@
-PR = "r11"
-
 INHIBIT_DEFAULT_DEPS = "1"
 
 INSANE_SKIP_libgcc = "True"
@@ -8,11 +6,12 @@ INSANE_SKIP_nscd = "True"
 INSANE_SKIP_glibc-utils = "True"
 INSANE_SKIP_gdbserver = "True"
 
-SRC_URI = "${@base_conditional('DL_TOOL', '1', 'https://sourcery.mentor.com/sgpp/lite/arm/portal/package4571/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2', '', d)} \
-        file://SUPPORTED"
-SRC_URI[md5sum] = "63d93a9f7fe9ff007bc69adfadc7c4ab"
-SRC_URI[sha256sum] = "4d4e9843aab1e92994901efce06f8b89f96a1b0c321750305c4058242d892d44"
 
+SRC_URI = "https://sourcery.mentor.com/sgpp/lite/arm/portal/${packageid}/public/arm-none-linux-gnueabi/arm-${PV}-${PR}-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 \
+          file://SUPPORTED"
+
+
+WORKING_TOOLCHAIN_PATH = ${WORKDIR}/arm-${PV}
 PROVIDES = "\
 	virtual/${TARGET_PREFIX}gcc \
 	virtual/${TARGET_PREFIX}g++ \
@@ -48,6 +47,7 @@ PACKAGES = "\
 	glibc \
 	catchsegv \
 	sln \
+	sln-dbg \
 	nscd \
 	ldd \
 	localedef \
@@ -79,8 +79,8 @@ FILES_glibc = "\
 	/lib/libanl* \
 	/lib/libBrokenLocale* \
 	/sbin/ldconfig \
+	/thumb2 \
 "
-
 FILES_glibc-dev = "\
 	${includedir} \
 	${libdir}/*.o \
@@ -89,7 +89,7 @@ FILES_glibc-dev = "\
 	${libdir}/*.a \
 "
 
-FILES_glibc-dbg += " ${libdir}/gconv/.debug ${libexecdir}/*/.debug ${base_libdir}/.debug ${libdir}/.debug"
+FILES_glibc-dbg += " ${libdir}/gconv/.debug ${libexecdir}/*/.debug ${base_libdir}/.debug ${libdir}/.debug ${base_sbindir}/.debug/ldconfig"
 FILES_glibc-utils = "${bindir}/* ${sbindir}/*"
 FILES_glibc-extra-nss = "/lib/libnss*"
 FILES_glibc-gconv = "${libdir}/gconv/*"
@@ -99,17 +99,21 @@ FILES_glibc-thread-db = "/lib/libthread_db*"
 FILES_libgcc = "${base_libdir}/libgcc_s.so.1"
 FILES_libgcc-dev = "${base_libdir}/libgcc_s.so"
 
+# /usr needs to be prefixed for now until we can think about a "better" way to do this
+# as ${includedir} and ${libdir} reference /include and /lib respectively and libstdc++
+# resides in /usr/include and /usr/lib.
 FILES_libstdc++ = "/usr/${libdir}/libstdc++.so.*"
 FILES_libstdc++-dev = "\
 	/usr/${includedir}/c++/* \
 	/usr/${libdir}/libstdc++.so \
 	/usr/${libdir}/libstdc++.la \
-	/usr/${libdir}/libstdc++.a \
+	/urs/${libdir}/libstdc++.a \
 	/usr/${libdir}/libsupc++.la \
 	/usr/${libdir}/libsupc++.a \
 "
 
 FILES_linux-libc-headers = "\
+	/usr/${includedir}* \
 	${includedir}/asm* \
 	${includedir}/linux \
 	${includedir}/mtd \
@@ -126,6 +130,7 @@ RDEPENDS_catchsegv = "libsegfault"
 FILES_ldd = "${bindir}/ldd"
 FILES_nscd = "${sbindir}/nscd*"
 FILES_sln = "${base_sbindir}/sln"
+FILES_sln-dbg += "${base_sbindir}/.debug/sln"
 FILES_localedef = "${bindir}/localedef"
 FILES_gdbserver = "${bindir}/gdbserver"
 
@@ -139,26 +144,32 @@ DESCRIPTION_gdbserver = "gdb - GNU debugger"
 
 def csl_get_main_version(d):
 	import subprocess,os,bb
-	if os.path.exists(bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'):
-		return subprocess.Popen([bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc', '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[-1].rstrip(')')
+	gcc_cmd = bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'
+	if os.path.exists(gcc_cmd):
+		return subprocess.Popen([gcc_cmd, '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[-1].rstrip(')')
+	return None
 
 def csl_get_gcc_version(d):
 	import subprocess,os,bb
-	if os.path.exists(bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'):
-		return subprocess.Popen([bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc', '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[2]
+	gcc_cmd = bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'
+	if os.path.exists(gcc_cmd):
+		return subprocess.Popen([gcc_cmd, '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[2]
+	return None
 
 def csl_get_libc_version(d):
 	import os,bb
-	if os.path.exists(bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/lib/'):
-		for file in os.listdir(bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/lib/'):
+	libc_path = bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/lib/'
+	if os.path.exists(libc_path):
+		for file in os.listdir(libc_path):
 			if file.find('libc-') == 0:
-				return file[5:-3]
-		return None
+                               return file[5:-3]
+	return None
 
 def csl_get_kernel_version(d):
 	import os,bb
-	if os.path.exists(bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/'):
-		f = open(bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/usr/include/linux/version.h', 'r')
+	libc_path = bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/'
+	if os.path.exists(libc_path):
+		f = open(libc_path + '/usr/include/linux/version.h', 'r')
 		l = f.readlines();
 		f.close();
 		for s in l:
@@ -169,12 +180,12 @@ def csl_get_kernel_version(d):
 				min = ver / 256
 				ver = ver % 256
 				return str(maj)+'.'+str(min)+'.'+str(ver)
-		return None
+	return None
 
 def csl_get_gdb_version(d):
-	import subprocess,os,bb
-	if os.path.exists(bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb'):
-		return subprocess.Popen([bb.data.getVar('TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb', '-v'],stdout=subprocess.PIPE).communicate()[0].splitlines()[0].split()[-1]
+       import subprocess,os,bb
+       if os.path.exists(bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb'):
+               return subprocess.Popen([bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb', '-v'],stdout=subprocess.PIPE).communicate()[0].splitlines()[0].split()[-1]
 
 CSL_VER_MAIN := "${@csl_get_main_version(d)}"
 CSL_VER_GCC := "${@csl_get_gcc_version(d)}"
@@ -231,6 +242,19 @@ PKGV_libsegfault = "${CSL_VER_LIBC}"
 PKGV_linux-libc-headers = "${CSL_VER_KERNEL}"
 PKGV_gdbserver = "${CSL_VER_GDBSERVER}"
 
+
+# Do config for things by symlinking the chosen toolchain to a consistent
+# place within the sysroot for the same.  This allows us to set everything
+# needed for this package that needs to be set in local.conf, etc. before
+# this include for the recipes ever runs and expect it to just simply work
+# without simply and stupidly copying the entire unpack directory into that
+# same place.
+do_configure() {
+	install -d ${STAGING_DIR_TARGET}
+	rm -f ${STAGING_DIR_TARGET}/ext_toolchain
+	ln -s ${WORKING_TOOLCHAIN_PATH} ${STAGING_DIR_TARGET}/ext_toolchain
+}
+
 do_install() {
 	install -d ${D}${sysconfdir}
 	install -d ${D}${bindir}
@@ -240,15 +264,15 @@ do_install() {
 	install -d ${D}${base_libdir}
 	install -d ${D}${base_sbindir}
 	install -d ${D}${datadir}
+	install -d ${D}${includedir}
 	install -d ${D}/usr
 
-	cp -a ${TOOLCHAIN_PATH}/${TARGET_SYS}/libc/lib/* ${D}${base_libdir}
-	cp -a ${TOOLCHAIN_PATH}/${TARGET_SYS}/libc/etc/* ${D}${sysconfdir}
-	cp -a ${TOOLCHAIN_PATH}/${TARGET_SYS}/libc/sbin/* ${D}${base_sbindir} \
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/lib/* ${D}${base_libdir}
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/etc/* ${D}${sysconfdir}
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/sbin/* ${D}${base_sbindir} \
 		|| true
-	cp -a ${TOOLCHAIN_PATH}/${TARGET_SYS}/libc/usr/* ${D}/usr
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/usr/* ${D}/usr
 	${@base_conditional('PREFERRED_PROVIDER_linux-libc-headers', 'external-toolchain-csl', '', 'rm -rf ${D}/usr/include/linux', d)}
-	cp -a ${TOOLCHAIN_PATH}/${TARGET_SYS}/include/* ${D}/usr/include
 	${@base_conditional('PREFERRED_PROVIDER_gdbserver', 'external-toolchain-csl', '', 'rm -rf ${D}/usr/bin/gdbserver', d)}
 
 	rm -rf ${D}${sysconfdir}/rpc
@@ -259,6 +283,20 @@ do_install() {
 
 	sed -e "s# /lib# ../../lib#" -e "s# /usr/lib# .#g" ${D}${libdir}/libpthread.so.0 > ${D}${libdir}/temp
 	mv ${D}${libdir}/temp ${D}${libdir}/libpthread.so.0
+}
+
+do_populate_sysroot(){
+	install -d ${STAGING_DIR_TARGET}${base_libdir}
+	install -d ${STAGING_DIR_TARGET}${includedir}
+	install -d ${STAGING_DIR_TARGET}/usr/include
+	install -d ${STAGING_DIR_TARGET}/usr/lib
+	install -d ${STAGING_DIR_TARGET}/thumb2
+
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/lib/* ${STAGING_DIR_TARGET}${base_libdir}
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/thumb2/* ${STAGING_DIR_TARGET}/thumb2
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/usr/lib/* ${STAGING_DIR_TARGET}/usr/lib
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}${includedir}/* ${STAGING_DIR_TARGET}${includedir}
+	cp -a ${WORKING_TOOLCHAIN_PATH}/${TARGET_SYS}/libc/usr/include/* ${STAGING_DIR_TARGET}/usr/include
 }
 
 TMP_LOCALE="/tmp/locale${libdir}/locale"
@@ -477,5 +515,7 @@ python populate_packages_prepend () {
 		bb.data.setVar('PKG_libgcc-dev', 'libgcc1-dev', d)
 	bb.build.exec_func('package_do_split_gconvs', d)
 }
+
+
 
 NATIVE_INSTALL_WORKS = "1"
