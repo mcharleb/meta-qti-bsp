@@ -7,6 +7,7 @@ MY_PN = "mkbootimg"
 DESCRIPTION = "Boot image creation tool from Android"
 LICENSE = "BSD"
 HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
+PROVIDES = "mkbootimg-native"
 
 SRC_URI = "file://${WORKSPACE}/system/core/${MY_PN} \
 	   file://makefile"

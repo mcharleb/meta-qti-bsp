@@ -1,3 +1,5 @@
+# The mkbootimg production process..
+require 9615-cdp-bootimg.inc
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 
