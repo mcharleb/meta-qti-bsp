@@ -107,7 +107,7 @@ FILES_libstdc++-dev = "\
 	/usr/${includedir}/c++/* \
 	/usr/${libdir}/libstdc++.so \
 	/usr/${libdir}/libstdc++.la \
-	/urs/${libdir}/libstdc++.a \
+	/usr/${libdir}/libstdc++.a \
 	/usr/${libdir}/libsupc++.la \
 	/usr/${libdir}/libsupc++.a \
 "
