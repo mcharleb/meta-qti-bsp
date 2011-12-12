@@ -19,7 +19,7 @@ do_build_append() {
 
 	${STAGING_DIR_NATIVE}/bin/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/Image-${ver} \
 		--ramdisk /dev/null \
-		--cmdline "noinitrd root=/dev/mtdblock9 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom" \
+		--cmdline "noinitrd root=/dev/mtdblock8 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom" \
 		--base 0x40800000 \
 		--ramdisk_offset $kernelsize \
 		--output ${DEPLOY_DIR_IMAGE}/boot-oe-msm9615.img
