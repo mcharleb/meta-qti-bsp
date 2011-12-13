@@ -55,8 +55,26 @@ uses_modules () {
 do_configure () {
     mkdir -p ${O}
     oe_runmake ${KERNEL_DEFCONFIG} O=${O}
-    oe_runmake savedefconfig O=${O}
 }
+
+do_menuconfig() {
+        export TERMWINDOWTITLE="${PN} Configuration"
+        export SHELLCMDS="make ARCH=${ARCH} menuconfig O=${O}"
+        ${TERMCMDRUN}
+        if [ $? -ne 0 ]; then
+                oefatal "'${TERMCMD}' not found. Check TERMCMD variable."
+        fi
+}
+
+do_menuconfig[nostamp] = "1"
+addtask menuconfig after do_configure
+
+do_savedefconfig() {
+    oe_runmake savedefconfig O=${O}
+    mv ${O}/defconfig ${S}/arch/${ARCH}/configs/${KERNEL_DEFCONFIG}
+}
+
+addtask savedefconfig after do_configure
 
 do_compile () {
     oe_runmake ${KERNEL_IMAGETYPE} O=${O}
