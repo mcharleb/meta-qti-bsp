@@ -1,0 +1,10 @@
+#! /bin/sh
+# backlight        init.d script to turn on the screen back light on startup
+
+set -e
+
+echo -n "Turning on backlight: "
+echo 255 > /sys/class/leds/lcd-backlight/brightness
+echo "done"
+
+exit 0

@@ -1,0 +1,345 @@
+diff --git a/drivers/gpu/msm/kgsl.c b/drivers/gpu/msm/kgsl.c
+index e84d473..092e1ab 100644
+--- a/drivers/gpu/msm/kgsl.c
++++ b/drivers/gpu/msm/kgsl.c
+@@ -35,6 +35,7 @@
+ #undef MODULE_PARAM_PREFIX
+ #define MODULE_PARAM_PREFIX "kgsl."
+ 
++static int drm_inited = 0;
+ static int kgsl_pagetable_count = KGSL_PAGETABLE_COUNT;
+ static char *ksgl_mmu_type;
+ module_param_named(ptcount, kgsl_pagetable_count, int, 0);
+@@ -2064,6 +2065,7 @@ EXPORT_SYMBOL(kgsl_register_device);
+ int kgsl_device_platform_probe(struct kgsl_device *device,
+ 			       irqreturn_t (*dev_isr) (int, void*))
+ {
++   int result = 0;
+ 	int status = -EINVAL;
+ 	struct kgsl_memregion *regspace = NULL;
+ 	struct resource *res;
+@@ -2124,6 +2126,12 @@ int kgsl_device_platform_probe(struct kgsl_device *device,
+ 		device->id, regspace->mmio_phys_base,
+ 		regspace->sizebytes, regspace->mmio_virt_base);
+ 
++	if(!drm_inited) {
++		drm_inited = 1;
++		result = kgsl_drm_init(pdev);
++		if (result)
++			goto error_iounmap;
++	}
+ 
+ 	status = kgsl_register_device(device);
+ 	if (!status)
+@@ -2186,6 +2194,7 @@ static void kgsl_core_exit(void)
+ 	}
+ 
+ 	kgsl_drm_exit();
++	drm_inited = 0;
+ 	kgsl_cffdump_destroy();
+ 	kgsl_core_debugfs_close();
+ 	kgsl_sharedmem_uninit_sysfs();
+@@ -2259,8 +2268,6 @@ static int __init kgsl_core_init(void)
+ 			goto err;
+ 	}
+ 
+-	result = kgsl_drm_init(NULL);
+-
+ 	if (result)
+ 		goto err;
+ 
+diff --git a/drivers/gpu/msm/kgsl_drm.c b/drivers/gpu/msm/kgsl_drm.c
+index dba2dfc..e8ac9db 100644
+--- a/drivers/gpu/msm/kgsl_drm.c
++++ b/drivers/gpu/msm/kgsl_drm.c
+@@ -268,62 +268,89 @@ kgsl_gem_alloc_memory(struct drm_gem_object *obj)
+ {
+ 	struct drm_kgsl_gem_object *priv = obj->driver_private;
+ 	int index;
++    int result = 0;
+ 
+ 	/* Return if the memory is already allocated */
+ 
+ 	if (kgsl_gem_memory_allocated(obj) || TYPE_IS_FD(priv->type))
+ 		return 0;
+ 
++	if (priv->pagetable == NULL) {
++		priv->pagetable = kgsl_mmu_getpagetable(KGSL_MMU_GLOBAL_PT);
++
++		if (priv->pagetable == NULL) {
++			DRM_ERROR("Unable to get the GPU MMU pagetable\n");
++			return -EINVAL;
++		}
++	}
++
+ 	if (TYPE_IS_PMEM(priv->type)) {
+ 		int type;
+ 
+ 		if (priv->type == DRM_KGSL_GEM_TYPE_EBI ||
+ 		    priv->type & DRM_KGSL_GEM_PMEM_EBI)
++		{
+ 			type = PMEM_MEMTYPE_EBI1;
++			result = kgsl_sharedmem_ebimem_user(&priv->memdesc,
++						priv->pagetable,
++						obj->size * priv->bufcount, 0);
++			if(result)
++			{
++				DRM_ERROR("Unable to allocate PMEM memory\n");
++				return result;
++			}
++		}
+ 		else
+-			type = PMEM_MEMTYPE_SMI;
++			return -EINVAL;
+ 
+-		priv->memdesc.physaddr =
+-			pmem_kalloc(obj->size * priv->bufcount,
+-				    type | PMEM_ALIGNMENT_4K);
++		
++	} else if (TYPE_IS_MEM(priv->type)) {
+ 
+-		if (IS_ERR((void *) priv->memdesc.physaddr)) {
+-			DRM_ERROR("Unable to allocate PMEM memory\n");
+-			return -ENOMEM;
+-		}
++		if (priv->type == DRM_KGSL_GEM_TYPE_KMEM ||
++	  	  priv->type & DRM_KGSL_GEM_CACHE_MASK)
++			list_add(&priv->list, &kgsl_mem_list);
+ 
+-		priv->memdesc.size = obj->size * priv->bufcount;
+ 
+-	} else if (TYPE_IS_MEM(priv->type)) {
+-		priv->memdesc.hostptr =
+-			vmalloc_user(obj->size * priv->bufcount);
++      	result = kgsl_sharedmem_vmalloc_user(&priv->memdesc, 
++     	                           priv->pagetable, 
++     	                           obj->size * priv->bufcount, 0);
+ 
+-		if (priv->memdesc.hostptr == NULL) {
+-			DRM_ERROR("Unable to allocate vmalloc memory\n");
+-			return -ENOMEM;
+-		}
+-
+-		priv->memdesc.size = obj->size * priv->bufcount;
+-		priv->memdesc.ops = &kgsl_vmalloc_ops;
++    	if(result != 0)
++    	{
++     	   	DRM_ERROR("Unable to allocate Vmalloc user memory\n");
++				return result;
++	 	}
++                                
+ 	} else
+ 		return -EINVAL;
+ 
+-	for (index = 0; index < priv->bufcount; index++)
++	for (index = 0; index < priv->bufcount; index++) {
+ 		priv->bufs[index].offset = index * obj->size;
+-
++		priv->bufs[index].gpuaddr =
++			priv->memdesc.gpuaddr +
++			priv->bufs[index].offset;
++#if 0
++		printk("####### kgsl_gem_alloc_memory - priv->bufs[%d].offset = 0x%X .gpuaddr = 0x%X\n",
++				index, priv->bufs[index].offset, priv->bufs[index].gpuaddr);
++#endif
++	}
++	priv->flags |= DRM_KGSL_GEM_FLAG_MAPPED;
+ 
+ 	return 0;
+ }
+ 
+ static void
+-kgsl_gem_unmap(struct drm_gem_object *obj)
++kgsl_gem_free_memory(struct drm_gem_object *obj)
+ {
+ 	struct drm_kgsl_gem_object *priv = obj->driver_private;
+ 
+-	if (!priv->flags & DRM_KGSL_GEM_FLAG_MAPPED)
++	if (!kgsl_gem_memory_allocated(obj) || TYPE_IS_FD(priv->type))
+ 		return;
+ 
+-	kgsl_mmu_unmap(priv->pagetable, &priv->memdesc);
++	kgsl_gem_mem_flush(&priv->memdesc,  priv->type,
++			   DRM_KGSL_GEM_CACHE_OP_FROM_DEV);
++
++	kgsl_sharedmem_free(&priv->memdesc);
+ 
+ 	kgsl_mmu_putpagetable(priv->pagetable);
+ 	priv->pagetable = NULL;
+@@ -333,25 +360,7 @@ kgsl_gem_unmap(struct drm_gem_object *obj)
+ 		list_del(&priv->list);
+ 
+ 	priv->flags &= ~DRM_KGSL_GEM_FLAG_MAPPED;
+-}
+ 
+-static void
+-kgsl_gem_free_memory(struct drm_gem_object *obj)
+-{
+-	struct drm_kgsl_gem_object *priv = obj->driver_private;
+-
+-	if (!kgsl_gem_memory_allocated(obj) || TYPE_IS_FD(priv->type))
+-		return;
+-
+-	kgsl_gem_mem_flush(&priv->memdesc,  priv->type,
+-			   DRM_KGSL_GEM_CACHE_OP_FROM_DEV);
+-
+-	kgsl_gem_unmap(obj);
+-
+-	if (TYPE_IS_PMEM(priv->type))
+-		pmem_kfree(priv->memdesc.physaddr);
+-
+-	kgsl_sharedmem_free(&priv->memdesc);
+ }
+ 
+ int
+@@ -520,7 +529,7 @@ kgsl_gem_init_obj(struct drm_device *dev,
+ 
+ 	ret = drm_gem_handle_create(file_priv, obj, handle);
+ 
+-	drm_gem_object_handle_unreference(obj);
++	drm_gem_object_unreference(obj);
+ 	INIT_LIST_HEAD(&priv->wait_list);
+ 
+ 	for (i = 0; i < DRM_KGSL_HANDLE_WAIT_ENTRIES; i++) {
+@@ -695,109 +704,14 @@ int
+ kgsl_gem_unbind_gpu_ioctl(struct drm_device *dev, void *data,
+ 			struct drm_file *file_priv)
+ {
+-	struct drm_kgsl_gem_bind_gpu *args = data;
+-	struct drm_gem_object *obj;
+-	struct drm_kgsl_gem_object *priv;
+-
+-	obj = drm_gem_object_lookup(dev, file_priv, args->handle);
+-
+-	if (obj == NULL) {
+-		DRM_ERROR("Invalid GEM handle %x\n", args->handle);
+-		return -EBADF;
+-	}
+-
+-	mutex_lock(&dev->struct_mutex);
+-	priv = obj->driver_private;
+-
+-	if (--priv->bound == 0)
+-		kgsl_gem_unmap(obj);
+-
+-	drm_gem_object_unreference(obj);
+-	mutex_unlock(&dev->struct_mutex);
+ 	return 0;
+ }
+ 
+-static int
+-kgsl_gem_map(struct drm_gem_object *obj)
+-{
+-	struct drm_kgsl_gem_object *priv = obj->driver_private;
+-	int index;
+-	int ret = -EINVAL;
+-
+-	if (priv->flags & DRM_KGSL_GEM_FLAG_MAPPED)
+-		return 0;
+-
+-	/* Get the global page table */
+-
+-	if (priv->pagetable == NULL) {
+-		priv->pagetable = kgsl_mmu_getpagetable(KGSL_MMU_GLOBAL_PT);
+-
+-		if (priv->pagetable == NULL) {
+-			DRM_ERROR("Unable to get the GPU MMU pagetable\n");
+-			return -EINVAL;
+-		}
+-	}
+-
+-	priv->memdesc.pagetable = priv->pagetable;
+-
+-	ret = kgsl_mmu_map(priv->pagetable, &priv->memdesc,
+-			   GSL_PT_PAGE_RV | GSL_PT_PAGE_WV);
+-
+-	if (!ret) {
+-		for (index = 0; index < priv->bufcount; index++) {
+-			priv->bufs[index].gpuaddr =
+-				priv->memdesc.gpuaddr +
+-				priv->bufs[index].offset;
+-		}
+-	}
+-
+-	/* Add cached memory to the list to be cached */
+-
+-	if (priv->type == DRM_KGSL_GEM_TYPE_KMEM ||
+-	    priv->type & DRM_KGSL_GEM_CACHE_MASK)
+-		list_add(&priv->list, &kgsl_mem_list);
+-
+-	priv->flags |= DRM_KGSL_GEM_FLAG_MAPPED;
+-
+-	return ret;
+-}
+-
+ int
+ kgsl_gem_bind_gpu_ioctl(struct drm_device *dev, void *data,
+ 			struct drm_file *file_priv)
+ {
+-	struct drm_kgsl_gem_bind_gpu *args = data;
+-	struct drm_gem_object *obj;
+-	struct drm_kgsl_gem_object *priv;
+-	int ret = 0;
+-
+-	obj = drm_gem_object_lookup(dev, file_priv, args->handle);
+-
+-	if (obj == NULL) {
+-		DRM_ERROR("Invalid GEM handle %x\n", args->handle);
+-		return -EBADF;
+-	}
+-
+-	mutex_lock(&dev->struct_mutex);
+-	priv = obj->driver_private;
+-
+-	if (priv->bound++ == 0) {
+-
+-		if (!kgsl_gem_memory_allocated(obj)) {
+-			DRM_ERROR("Memory not allocated for this object\n");
+-			ret = -ENOMEM;
+-			goto out;
+-		}
+-
+-		ret = kgsl_gem_map(obj);
+-
+-		/* This is legacy behavior - use GET_BUFFERINFO instead */
+-		args->gpuptr = priv->bufs[0].gpuaddr;
+-	}
+-out:
+-	drm_gem_object_unreference(obj);
+-	mutex_unlock(&dev->struct_mutex);
+-	return ret;
++	return 0;
+ }
+ 
+ /* Allocate the memory and prepare it for CPU mapping */
+@@ -1608,7 +1522,7 @@ struct drm_ioctl_desc kgsl_drm_ioctls[] = {
+ };
+ 
+ static struct drm_driver driver = {
+-	.driver_features = DRIVER_USE_PLATFORM_DEVICE | DRIVER_GEM,
++	.driver_features = DRIVER_GEM,
+ 	.load = kgsl_drm_load,
+ 	.unload = kgsl_drm_unload,
+ 	.firstopen = kgsl_drm_firstopen,
+@@ -1644,7 +1558,7 @@ int kgsl_drm_init(struct platform_device *dev)
+ 	int i;
+ 
+ 	driver.num_ioctls = DRM_ARRAY_SIZE(kgsl_drm_ioctls);
+-	driver.platform_device = dev;
++	//driver.platform_device = dev;
+ 
+ 	INIT_LIST_HEAD(&kgsl_mem_list);
+ 
+@@ -1654,10 +1568,10 @@ int kgsl_drm_init(struct platform_device *dev)
+ 		gem_buf_fence[i].fence_id = ENTRY_EMPTY;
+ 	}
+ 
+-	return drm_init(&driver);
++	return drm_platform_init(&driver, dev);
+ }
+ 
+ void kgsl_drm_exit(void)
+ {
+-	drm_exit(&driver);
++	drm_platform_exit(&driver, driver.kdriver.platform_device);
+ }
