@@ -1,0 +1,33 @@
+From 073ce2f296ba377708d1c2f1cff41a7548a81d5e Mon Sep 17 00:00:00 2001
+From: Michael Vines <mvines@codeaurora.org>
+Date: Fri, 16 Dec 2011 20:11:10 -0800
+Subject: [PATCH] msm: diag: writes to /dev/diag now work due to removal of unnecessary input validation
+
+Change-Id: If959edb214ec3523129ddef4a01eaf641101c1ae
+---
+ drivers/char/diag/diagchar_core.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/drivers/char/diag/diagchar_core.c b/drivers/char/diag/diagchar_core.c
+index 0729753..33277c6 100644
+--- a/drivers/char/diag/diagchar_core.c
++++ b/drivers/char/diag/diagchar_core.c
+@@ -653,6 +653,7 @@ static int diagchar_write(struct file *file, const char __user *buf,
+ 	if (pkt_type == USER_SPACE_LOG_TYPE) {
+ 		err = copy_from_user(driver->user_space_data, buf + 4,
+ 							 payload_size);
++#if 0
+ 		/* Check masks for On-Device logging */
+ 		if (pkt_type == USER_SPACE_LOG_TYPE) {
+ 			if (!mask_request_validate((unsigned char *)buf)) {
+@@ -660,6 +661,7 @@ static int diagchar_write(struct file *file, const char __user *buf,
+ 				return -EFAULT;
+ 			}
+ 		}
++#endif
+ 		buf = buf + 4;
+ #ifdef DIAG_DEBUG
+ 		pr_debug("diag: user space data %d\n", payload_size);
+-- 
+1.7.3.3
+

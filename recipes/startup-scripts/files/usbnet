@@ -1,0 +1,28 @@
+#! /bin/sh
+#
+# usbnet        init.d script to enable usb network interface
+
+set -e
+
+case "$1" in
+  start)
+        echo -n "Enabling usb0 network interface:"
+        ifconfig usb0 192.168.1.2 up
+        echo "done"
+        ;;
+  stop)
+        echo -n "Disabling usb0 network interface:"
+        ifconfig usb0 down
+        echo "done"
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage usbnet { start | stop | restart}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
