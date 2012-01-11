@@ -3,6 +3,7 @@ HOMEPAGE = "http://developer.android.com/guide/developing/tools/adb.html"
 LICENSE = "Apache-2.0"
 
 SRC_URI = "file://${WORKSPACE}/system/core"
+SRC_URI += "file://start_adbd"
 
 inherit autotools
 
@@ -17,7 +18,7 @@ inherit update-rc.d
 
 do_install() {
         install -m 0755 ${WORKDIR}/core/adb/adbd -D ${D}/sbin/adbd
-        install -m 0755 ${WORKDIR}/core/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+        install -m 0755 ${WORKDIR}/start_adbd -D ${D}${sysconfdir}/init.d/adbd
 }
 
 pkg_postinst () {
