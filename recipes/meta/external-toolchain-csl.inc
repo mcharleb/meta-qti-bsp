@@ -142,21 +142,21 @@ DESCRIPTION_sln = "glibc: create symbolic links between files"
 DESCRIPTION_localedef = "glibc: compile locale definition files"
 DESCRIPTION_gdbserver = "gdb - GNU debugger"
 
-def csl_get_main_version(d):
+def caf_csl_get_main_version(d):
 	import subprocess,os,bb
 	gcc_cmd = bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'
 	if os.path.exists(gcc_cmd):
 		return subprocess.Popen([gcc_cmd, '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[-1].rstrip(')')
 	return None
 
-def csl_get_gcc_version(d):
+def caf_csl_get_gcc_version(d):
 	import subprocess,os,bb
 	gcc_cmd = bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gcc'
 	if os.path.exists(gcc_cmd):
 		return subprocess.Popen([gcc_cmd, '-v'], stderr=subprocess.PIPE).communicate()[1].splitlines()[-1].split()[2]
 	return None
 
-def csl_get_libc_version(d):
+def caf_csl_get_libc_version(d):
 	import os,bb
 	libc_path = bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/lib/'
 	if os.path.exists(libc_path):
@@ -165,7 +165,7 @@ def csl_get_libc_version(d):
                                return file[5:-3]
 	return None
 
-def csl_get_kernel_version(d):
+def caf_csl_get_kernel_version(d):
 	import os,bb
 	libc_path = bb.data.getVar('TOOLCHAIN_SYSPATH', d, 1)+'/libc/'
 	if os.path.exists(libc_path):
@@ -182,16 +182,16 @@ def csl_get_kernel_version(d):
 				return str(maj)+'.'+str(min)+'.'+str(ver)
 	return None
 
-def csl_get_gdb_version(d):
+def caf_csl_get_gdb_version(d):
        import subprocess,os,bb
        if os.path.exists(bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb'):
                return subprocess.Popen([bb.data.getVar('WORKING_TOOLCHAIN_PATH', d, 1)+'/bin/'+bb.data.getVar('TARGET_PREFIX', d, 1)+'gdb', '-v'],stdout=subprocess.PIPE).communicate()[0].splitlines()[0].split()[-1]
 
-CSL_VER_MAIN := "${@csl_get_main_version(d)}"
-CSL_VER_GCC := "${@csl_get_gcc_version(d)}"
-CSL_VER_LIBC := "${@csl_get_libc_version(d)}"
-CSL_VER_KERNEL := "${@csl_get_kernel_version(d)}"
-CSL_VER_GDBSERVER := "${@csl_get_gdb_version(d)}"
+CSL_VER_MAIN := "${@caf_csl_get_main_version(d)}"
+CSL_VER_GCC := "${@caf_csl_get_gcc_version(d)}"
+CSL_VER_LIBC := "${@caf_csl_get_libc_version(d)}"
+CSL_VER_KERNEL := "${@caf_csl_get_kernel_version(d)}"
+CSL_VER_GDBSERVER := "${@caf_csl_get_gdb_version(d)}"
 
 # Licenses set for main components of the toolchain:
 # (g)libc is always LGPL version 2 (or later)
@@ -205,9 +205,9 @@ CSL_VER_GDBSERVER := "${@csl_get_gdb_version(d)}"
 # gdb/gdbserver version 6.6 was the last one under GPL version 2 (or later), according
 #    to the release schedule - http://www.gnu.org/software/gdb/schedule/
 CSL_LIC_LIBC := "LGPLv2.1+"
-CSL_LIC_GCC := "${@["GPLv3+", "GPLv2+"][csl_get_gcc_version(d) <= "4.2.1"]}"
-CSL_LIC_RLE := "${@["GPLv3+ with GCC RLE", "GPLv2+ with GCC RLE"][csl_get_gcc_version(d) <= "4.3.3"]}"
-CSL_LIC_GDB := "${@["GPLv3+", "GPLv2+"][csl_get_gdb_version(d) <= "6.6"]}"
+CSL_LIC_GCC := "${@["GPLv3+", "GPLv2+"][caf_csl_get_gcc_version(d) <= "4.2.1"]}"
+CSL_LIC_RLE := "${@["GPLv3+ with GCC RLE", "GPLv2+ with GCC RLE"][caf_csl_get_gcc_version(d) <= "4.3.3"]}"
+CSL_LIC_GDB := "${@["GPLv3+", "GPLv2+"][caf_csl_get_gdb_version(d) <= "6.6"]}"
 
 LICENSE = "${CSL_LIC_LIBC}"
 LICENSE_ldd = "${CSL_LIC_LIBC}"
