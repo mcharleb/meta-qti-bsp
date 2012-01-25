@@ -22,6 +22,7 @@ IMAGE_INSTALL = "\
 
 IMAGE_INSTALL += "adbd start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
 
+IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "xeyes"
 IMAGE_INSTALL += "mm-core-oss mm-video-oss"
