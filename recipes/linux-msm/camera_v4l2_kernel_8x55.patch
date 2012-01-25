@@ -1,5 +1,5 @@
 diff --git a/arch/arm/configs/msm7630-perf_defconfig b/arch/arm/configs/msm7630-perf_defconfig
-index 2cd7b97..3f89751 100644
+index 97c2ac6..56b9ae19 100644
 --- a/arch/arm/configs/msm7630-perf_defconfig
 +++ b/arch/arm/configs/msm7630-perf_defconfig
 @@ -260,6 +260,7 @@ CONFIG_VIDEO_DEV=y
@@ -301,7 +301,7 @@ index 6f39576..d7aa7cb 100644
 -obj-$(CONFIG_MT9D113) += mt9d113.o mt9d113_reg.o
  obj-$(CONFIG_FB_MSM_WRITEBACK_MSM_PANEL) += wfd/
 diff --git a/drivers/media/video/msm/msm.c b/drivers/media/video/msm/msm.c
-index 251f12d..ae61eb6 100644
+index 251f12d..1ac68a9 100644
 --- a/drivers/media/video/msm/msm.c
 +++ b/drivers/media/video/msm/msm.c
 @@ -23,6 +23,8 @@
@@ -334,7 +334,20 @@ index 251f12d..ae61eb6 100644
  	return rc;
  }
  
-@@ -1480,6 +1482,9 @@ static int msm_open(struct file *f)
+@@ -1418,7 +1420,11 @@ static int msm_open(struct file *f)
+ 		pr_err("%s NULL pointer passed in!\n", __func__);
+ 		return rc;
+ 	}
+-	mutex_lock(&pcam->vid_lock);
++	if (0 == g_server_dev.use_count) {
++		D("%s: daemon not yet started, returning -1", __func__);
++		return -1;
++	}
++ 	mutex_lock(&pcam->vid_lock);
+ 	for (i = 0; i < MSM_DEV_INST_MAX; i++) {
+ 		if (pcam->dev_inst[i] == NULL)
+ 			break;
+@@ -1480,6 +1486,9 @@ static int msm_open(struct file *f)
  				__func__, rc);
  			return rc;
  		}
@@ -344,7 +357,7 @@ index 251f12d..ae61eb6 100644
  		rc = v4l2_device_register_subdev(&pcam->v4l2_dev,
  					pcam->mctl.isp_sdev->sd_vpe);
  		if (rc < 0) {
-@@ -1488,7 +1493,7 @@ static int msm_open(struct file *f)
+@@ -1488,7 +1497,7 @@ static int msm_open(struct file *f)
  				__func__, rc);
  			return rc;
  		}
@@ -353,6 +366,17 @@ index 251f12d..ae61eb6 100644
  		rc = msm_setup_v4l2_event_queue(&pcam_inst->eventHandle,
  							pcam->pvdev);
  		if (rc < 0) {
+@@ -1590,6 +1599,10 @@ static int msm_close(struct file *f)
+ 		pr_err("%s NULL pointer of camera device!\n", __func__);
+ 		return -EINVAL;
+ 	}
++	if (0 == g_server_dev.use_count) {
++		D("%s: use count = %d, returning 0", __func__, g_server_dev.use_count);
++		return 0;
++	}
+ 
+ 
+ 	mutex_lock(&pcam->vid_lock);
 diff --git a/drivers/media/video/msm/msm_io_vfe31.c b/drivers/media/video/msm/msm_io_vfe31.c
 index 1cd731c..60dc694 100644
 --- a/drivers/media/video/msm/msm_io_vfe31.c
