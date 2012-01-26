@@ -6,6 +6,8 @@ DESCRIPTION = "YAFFS (Yet Another Flash File System) provides a fast robust file
 HOMEPAGE = "http://www.yaffs.net/"
 LICENSE = "Apache-2.0"
 
+EXTRA_OECONF = "--with-core-includes=${WORKSPACE}/system/core/include"
+
 SRC_URI = "file://${WORKSPACE}/external/yaffs2"
 
 PR = "r1"
