@@ -6,8 +6,8 @@ PR = "r1"
 
 SRC_URI = "file://${WORKSPACE}/hardware/qcom/gps"
 DEPENDS = "qmi-framework glib-2.0 libhardware"
-EXTRA_OECONF = "--with-qmi-includes=${STAGING_INCDIR}/qmi-framework \
-                --with-qmi-libraries=${STAGING_LIBDIR} \
+EXTRA_OECONF = "--with-libhardware-includes=${STAGING_INCDIR} \
+                --with-core-includes=${WORKSPACE}/system/core/include \
                 --with-glib"
 
 S = "${WORKDIR}/gps"
