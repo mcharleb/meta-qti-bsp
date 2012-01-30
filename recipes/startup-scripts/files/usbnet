@@ -6,9 +6,24 @@ set -e
 
 case "$1" in
   start)
-        echo 0 > /sys/class/android_usb/android0/enable
-        echo diag,adb,serial,rmnet,mass_storage,rndis > /sys/class/android_usb/android0/functions
-        echo 1 > /sys/class/android_usb/android0/enable
+
+        case `uname -r` in
+          3.*)
+                if [ -d /sys/class/android_usb/android0 ]
+                then
+                        echo 0 > /sys/class/android_usb/android0/enable
+                        echo diag,adb,serial,rmnet,mass_storage,rndis > /sys/class/android_usb/android0/functions
+                        echo 1 > /sys/class/android_usb/android0/enable
+                fi
+                ;;
+          2.*)
+                echo 1 > /sys/class/usb_composite/rndis/enable
+                ;;
+          *)
+                # Some other version of kernel?
+                ;;
+        esac
+
         echo -n "Enabling usb0 network interface:"
         ifconfig usb0 192.168.1.2 up
         echo "done"

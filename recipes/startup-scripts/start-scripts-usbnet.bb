@@ -4,7 +4,7 @@ LICENSE = "BSD"
 
 SRC_URI ="file://usbnet"
 
-PR = "r2"
+PR = "r3"
 
 inherit update-rc.d
 
