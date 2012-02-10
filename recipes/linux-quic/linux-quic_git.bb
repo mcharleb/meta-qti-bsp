@@ -21,6 +21,7 @@ DEPENDS = "virtual/${TARGET_PREFIX}gcc"
 INHIBIT_DEFAULT_DEPS = "1"
 # Until usr/src/linux/scripts can be correctly processed
 PACKAGE_STRIP = "no"
+INHIBIT_PACKAGE_STRIP = "1"
 
 PACKAGES = "kernel kernel-base kernel-module-bridge"
 

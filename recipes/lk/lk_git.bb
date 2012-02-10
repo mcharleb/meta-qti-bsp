@@ -6,13 +6,14 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5a1abdab641eec675725c843f43f03af"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 PROVIDES = "virtual/bootloader"
 
-SRC_URI = "file://${WORKSPACE}/bootable/bootloader/lk"
+SRC_URI = "file://${WORKSPACE}/bootable/bootloader/lk \
+           file://mdm9615-ld.patch"
 
 S = "${WORKDIR}/${PN}"
 
 MY_TARGET = "mdm9615"
 
-EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET} LD=${TARGET_PREFIX}ld.bfd"
+EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 
 do_install() {
 	install	-d ${D}/boot

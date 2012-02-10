@@ -1,0 +1,25 @@
+From 44ea992e4323a916b1e08d513140d1ced0d32726 Mon Sep 17 00:00:00 2001
+From: Deepa Dinamani <deepad@codeaurora.org>
+Date: Thu, 9 Feb 2012 21:58:11 -0800
+Subject: [PATCH] mdm9615: Add support to build with older ld
+
+---
+ makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/makefile b/makefile
+index 4c31db2..8b2d026 100644
+--- a/makefile
++++ b/makefile
+@@ -149,7 +149,7 @@ DEPS := $(ALLOBJS:%o=%d)
+ # default to no ccache
+ CCACHE ?=
+ CC := $(CCACHE) $(TOOLCHAIN_PREFIX)gcc
+-LD := $(TOOLCHAIN_PREFIX)ld
++LD := $(TOOLCHAIN_PREFIX)ld.bfd
+ OBJDUMP := $(TOOLCHAIN_PREFIX)objdump
+ OBJCOPY := $(TOOLCHAIN_PREFIX)objcopy
+ CPPFILT := $(TOOLCHAIN_PREFIX)c++filt
+--
+1.7.8.3
+
