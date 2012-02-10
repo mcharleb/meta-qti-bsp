@@ -1,6 +1,7 @@
 DESCRIPTION = "Andriod Debug Bridge. It provides connectivity over USB for running a shell, transferring files etc."
 HOMEPAGE = "http://developer.android.com/guide/developing/tools/adb.html"
 LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://adb/NOTICE;md5=2ddb23e63b1f9c3c46aaa4195f819a6d"
 
 SRC_URI = "file://${WORKSPACE}/system/core"
 

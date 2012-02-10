@@ -2,6 +2,8 @@ DESCRIPTION = "Network Packet Capture Library"
 HOMEPAGE = "http://www.tcpdump.org/"
 SECTION = "libs/network"
 LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=1d4b0366557951c84a94fabe3529f867"
+
 DEPENDS = "flex-native bison-native"
 
 PR = "r3"

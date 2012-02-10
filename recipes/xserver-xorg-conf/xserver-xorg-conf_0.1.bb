@@ -1,5 +1,8 @@
 DESCRIPTION = "Machine specific xorg.conf files"
-LICENSE="BSD"
+# FIXME - This needs the licensing file somewhere so we can get a checksum!!
+# (Also...is this BSD or more MIT/X11 since this is an xorg file??)
+#LICENSE = "BSD"
+LICENSE = "CLOSED"
 PR = "r1"
 
 SRC_URI = "file://xorg.conf"

@@ -3,6 +3,7 @@ SECTION = "libs"
 PRIORITY = "required"
 HOMEPAGE = "http://www.gzip.org/zlib/"
 LICENSE = "zlib"
+LIC_FILES_CHKSUM = "file://README;md5=dbe6a74f09223d96e81d13a117e45e0e"
 INC_PR ="r7"
 
 # Below option is added to overcome the GCC bug on ARM 
@@ -13,7 +14,7 @@ CFLAGS_EXTRA_append_arm = " -fforward-propagate"
 CFLAGS_EXTRA_virtclass-native = ""
 CFLAGS_EXTRA_virtclass-sdk = ""
 
-BBCLASSEXTEND = "native sdk"
+BBCLASSEXTEND = "nativesdk"
 
 SRC_URI = "http://www.zlib.net/zlib-${PV}.tar.bz2"
 

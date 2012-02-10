@@ -1,10 +1,9 @@
-require recipes/xorg-driver/xorg-driver-video.inc
+require xorg-driver-common.inc
 
 DESCRIPTION = "X.Org X server -- MSM display driver"
 PE = "1"
 PV = "1.1.0+${PR}+gitr${SRCREV}"
 PR = "${INC_PR}.2"
-
 
 SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
 

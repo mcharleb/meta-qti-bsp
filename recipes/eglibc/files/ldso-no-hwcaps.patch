@@ -1,0 +1,84 @@
+--- libc/elf/dl-cache.c	2011-08-25 17:34:36.000000000 +0100
++++ libc/elf/dl-cache.c	2011-10-28 10:00:19.177344171 +0100
+@@ -181,6 +181,7 @@ const char *
+ internal_function
+ _dl_load_cache_lookup (const char *name)
+ {
++#if 0
+   int left, right, middle;
+   int cmpres;
+   const char *cache_data;
+@@ -291,6 +292,9 @@ _dl_load_cache_lookup (const char *name)
+     _dl_debug_printf ("  trying file=%s\n", best);
+ 
+   return best;
++#else
++  return NULL;
++#endif
+ }
+ 
+ #ifndef MAP_COPY
+--- libc/elf/dl-load.c	2011-08-25 17:34:36.000000000 +0100
++++ libc/elf/dl-load.c	2011-10-28 10:13:06.064980276 +0100
+@@ -976,8 +976,7 @@ _dl_map_object_from_fd (const char *name
+   else
+     {
+       phdr = alloca (maplength);
+-      __lseek (fd, header->e_phoff, SEEK_SET);
+-      if ((size_t) __libc_read (fd, (void *) phdr, maplength) != maplength)
++      if ((size_t) __libc_pread (fd, (void *) phdr, maplength, header->e_phoff) != maplength)
+ 	{
+ 	  errstring = N_("cannot read file data");
+ 	  goto call_lose_errno;
+@@ -1733,8 +1732,7 @@ open_verify (const char *name, struct fi
+       else
+ 	{
+ 	  phdr = alloca (maplength);
+-	  __lseek (fd, ehdr->e_phoff, SEEK_SET);
+-	  if ((size_t) __libc_read (fd, (void *) phdr, maplength) != maplength)
++	  if ((size_t) __libc_pread (fd, (void *) phdr, maplength, ehdr->e_phoff) != maplength)
+ 	    {
+ 	    read_error:
+ 	      errval = errno;
+@@ -1754,8 +1752,7 @@ open_verify (const char *name, struct fi
+ 	    else
+ 	      {
+ 		abi_note = alloca (size);
+-		__lseek (fd, ph->p_offset, SEEK_SET);
+-		if (__libc_read (fd, (void *) abi_note, size) != size)
++		if (__libc_pread (fd, (void *) abi_note, size, ph->p_offset) != size)
+ 		  goto read_error;
+ 	      }
+ 
+--- libc/elf/dl-sysdep.c	2011-08-25 17:34:36.000000000 +0100
++++ libc/elf/dl-sysdep.c	2011-10-27 18:32:29.500451987 +0100
+@@ -345,6 +345,23 @@ _dl_show_auxv (void)
+     }
+ }
+ 
++#if 1
++const struct r_strlenpair *
++internal_function
++_dl_important_hwcaps (const char *platform, size_t platform_len, size_t *sz,
++		      size_t *max_capstrlen)
++{
++  static struct r_strlenpair result;
++  static char buf[1];
++
++  result.str = buf;	/* Does not really matter.  */
++  result.len = 0;
++
++  *sz = 1;
++  return &result;
++}
++
++#else
+ 
+ /* Return an array of useful/necessary hardware capability names.  */
+ const struct r_strlenpair *
+@@ -592,3 +609,5 @@ _dl_important_hwcaps (const char *platfo
+ 
+   return result;
+ }
++
++#endif

@@ -8,6 +8,7 @@ provides a fairly complete POSIX environment for any small or embedded \
 system."
 HOMEPAGE = "http://www.busybox.net"
 LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=de10de48642ab74318e893a61105afbb"
 SECTION = "base"
 PRIORITY = "required"
 

@@ -1,7 +1,8 @@
 require busybox_1.1x.inc
 
 SRC_URI += "file://fix-iptunnel-location.patch \
-	    file://geninit \
+            file://0001-Include-sysinfo.h-in-libbb.h-and-remove-custom-sysin.patch \
+            file://geninit \
             file://profile \
             file://fstab \
             file://inittab \
