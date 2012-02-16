@@ -1,5 +1,6 @@
 require busybox_1.1x.inc
 
+prefix = ""
 SRC_URI += "file://fix-iptunnel-location.patch \
             file://0001-Include-sysinfo.h-in-libbb.h-and-remove-custom-sysin.patch \
             file://geninit \
