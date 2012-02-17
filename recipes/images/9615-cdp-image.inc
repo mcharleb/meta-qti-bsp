@@ -1,4 +1,4 @@
-# The mkbootimg production process..
+# The mkbootimg production process.
 require 9615-cdp-bootimg.inc
 
 # The OE-Core minimal boot image files.
@@ -6,12 +6,13 @@ IMAGE_INSTALL += task-core-boot
 IMAGE_INSTALL += ${ROOTFS_PKGMANAGE_BOOTSTRAP} 
 IMAGE_INSTALL += ${POKY_EXTRA_INSTALL}
 
-# The MSM Linux minimal boot image files..
+# The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "adbd"
 #IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "dnsmasq"
+DEPENDS += "gdb-cross"
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "glib-2.0"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
