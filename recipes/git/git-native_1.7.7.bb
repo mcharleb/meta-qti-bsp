@@ -1,4 +1,4 @@
-require ${TOP_DIR}/meta/recipes-devtools/git/git.inc
+require recipes-devtools/git/git.inc
 inherit native
 SRC_URI[md5sum] = "5d645884e688921e773186783b65ce33"
 SRC_URI[sha256sum] = "5a977bc01e4989b9928345e99aab15ce896cf5897c6e32eb449538574df377f6"
