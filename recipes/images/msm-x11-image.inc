@@ -20,7 +20,7 @@ IMAGE_INSTALL = "\
     ${SPLASH} \
     ${ANGSTROM_EXTRA_INSTALL}"
 
-IMAGE_INSTALL += "adbd start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
+IMAGE_INSTALL += "system-core-adbd start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
 
 IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"

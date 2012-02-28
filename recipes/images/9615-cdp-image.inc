@@ -9,7 +9,7 @@ IMAGE_INSTALL += ${POKY_EXTRA_INSTALL}
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "adbd"
+IMAGE_INSTALL += "system-core-adbd"
 #IMAGE_INSTALL += "bridge-utils"
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
