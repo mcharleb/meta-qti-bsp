@@ -1,11 +1,13 @@
-require xorg-driver-common.inc
+require recipes-graphics/xorg-driver/xorg-driver-common.inc
+
+inherit localgit
 
 DESCRIPTION = "X.Org X server -- MSM display driver"
-PE = "1"
-PV = "1.1.0+${PR}+gitr${SRCREV}"
-PR = "${INC_PR}.2"
+LIC_FILES_CHKSUM = "file://src/msm-driver.c;startline=3;endline=27;md5=a846f1e47dac625c7d4d059663c97627"
+PV = "git-${GITSHA}"
+PR = "r2"
 
-SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
+SRC_DIR = "${WORKSPACE}/xf86-video-msm"
 
 S = "${WORKDIR}/xf86-video-msm"
 
@@ -26,6 +28,9 @@ DEPENDS = "${RDEPENDS} \
 
 DEPENDS += "adreno200"
 DEPENDS += "virtual/kernel"
+
+#TODO: remove this once adreno200 symlinks are fixed
+INSANE_SKIP_${PN} = "dev-deps"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 

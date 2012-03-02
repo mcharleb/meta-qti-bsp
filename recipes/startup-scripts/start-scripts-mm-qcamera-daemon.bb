@@ -1,10 +1,11 @@
 DESCRIPTION = "Start up script for MM Camera Daemon"
 HOMEPAGE = "http://codeaurora.org"
 LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/start_mm-qcamera-daemon;startline=3;endline=28;md5=69b02bf5dd424a4c5bb80becc3368f11"
 
 SRC_URI +="file://start_mm-qcamera-daemon"
 
-PR = "r0"
+PR = "r1"
 
 inherit update-rc.d
 

@@ -1,10 +1,11 @@
 DESCRIPTION = "Backlight scripts"
 HOMEPAGE = "http://codeaurora.org"
 LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${WORKDIR}/backlight;startline=3;endline=28;md5=a11972dbdb00cc0eef5d10089eecee3a"
 
 SRC_URI +="file://backlight"
 
-PR = "r2"
+PR = "r3"
 
 inherit update-rc.d
 

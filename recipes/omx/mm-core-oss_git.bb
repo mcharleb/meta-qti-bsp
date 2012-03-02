@@ -1,9 +1,11 @@
 DESCRIPTION = "OpenMAX core for MSM chipsets"
 LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://omxcore/src/default/qc_registry_table.c;startline=1;endline=27;md5=a1a011a0f0b9d7f1d7c95a5fdd6e7a7e"
 
 SRC_URI = "file://${WORKSPACE}/mm-core-oss"
 
-PR = "r3"
+
+PR = "r4"
 
 S = "${WORKDIR}/mm-core-oss"
 

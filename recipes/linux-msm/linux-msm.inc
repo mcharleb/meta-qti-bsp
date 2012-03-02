@@ -1,12 +1,15 @@
 DESCRIPTION = "QuIC Linux Kernel"
 SECTION = "kernel"
 LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 # We don't want to pull in update-modules or depmod, like the base class does.
 DEPENDS := "virtual/${TARGET_PREFIX}gcc \
             virtual/${TARGET_PREFIX}gcc${KERNEL_CCSUFFIX}"
 
 inherit kernel
+
+KERNEL_VERSION = ${MACHINE_KERNEL_VERSION}
 
 PACKAGES =+ "kernel-headers"
 INSTALL_HDR_PATH=${STAGING_KERNEL_DIR}/usr
@@ -23,4 +26,4 @@ do_install_append() {
 do_savedefconfig() {
     oe_runmake savedefconfig
 }
-addtask savedefconfig after do_configure before do_compile
+addtask savedefconfig after do_configure
