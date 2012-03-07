@@ -1,19 +1,8 @@
-From bd61bc601e1e313db4aad19f74961564aa12588b Mon Sep 17 00:00:00 2001
-From: Michael Vines <mvines@codeaurora.org>
-Date: Fri, 4 Nov 2011 12:51:01 -0700
-Subject: [PATCH] msm7630/msm7627a defconfig: Add devtmpfs and devpts
-
-Change-Id: I24a4982f3cc01ce5dd14a1e7f16e1bc655392a9b
----
- arch/arm/configs/msm7627a-perf_defconfig |    3 +++
- arch/arm/configs/msm7630-perf_defconfig  |    4 ++++
- 2 files changed, 7 insertions(+), 0 deletions(-)
-
 diff --git a/arch/arm/configs/msm7627a-perf_defconfig b/arch/arm/configs/msm7627a-perf_defconfig
-index 4322baf..a359584 100644
+index 446423d..ffcdd7e 100644
 --- a/arch/arm/configs/msm7627a-perf_defconfig
 +++ b/arch/arm/configs/msm7627a-perf_defconfig
-@@ -326,3 +326,6 @@ CONFIG_EARLY_PRINTK=y
+@@ -342,3 +342,6 @@ CONFIG_EARLY_PRINTK=y
  CONFIG_CRYPTO_SHA256=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_CRC_CCITT=y
@@ -21,10 +10,10 @@ index 4322baf..a359584 100644
 +CONFIG_DEVTMPFS_MOUNT=y
 +CONFIG_UNIX98_PTYS=y
 diff --git a/arch/arm/configs/msm7630-perf_defconfig b/arch/arm/configs/msm7630-perf_defconfig
-index 202d117..288fb54 100644
+index e319f0d..ca8c07e 100644
 --- a/arch/arm/configs/msm7630-perf_defconfig
 +++ b/arch/arm/configs/msm7630-perf_defconfig
-@@ -371,3 +371,8 @@ CONFIG_CRYPTO_DEV_QCRYPTO=m
+@@ -381,3 +381,8 @@ CONFIG_CRYPTO_DEV_QCRYPTO=m
  CONFIG_CRYPTO_DEV_QCE=m
  CONFIG_CRYPTO_DEV_QCEDEV=m
  CONFIG_CRC_CCITT=y
@@ -33,6 +22,3 @@ index 202d117..288fb54 100644
 +CONFIG_UNIX98_PTYS=y
 +CONFIG_DRM=y
 +CONFIG_MSM_KGSL_DRM=y
--- 
-1.7.3.3
-
