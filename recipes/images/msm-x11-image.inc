@@ -23,7 +23,6 @@ IMAGE_INSTALL += "xeyes"
 IMAGE_INSTALL += "xset"
 IMAGE_INSTALL += "mm-video-oss"
 IMAGE_INSTALL += "mm-core-oss"
-IMAGE_INSTALL += "${@base_contains('MACHINE_FEATURES', 'mm-camera', 'start-scripts-mm-qcamera-daemon', '', d)}"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
