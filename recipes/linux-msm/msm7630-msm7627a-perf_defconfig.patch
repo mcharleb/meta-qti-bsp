@@ -1,19 +1,20 @@
 diff --git a/arch/arm/configs/msm7627a-perf_defconfig b/arch/arm/configs/msm7627a-perf_defconfig
-index 446423d..ffcdd7e 100644
+index 446423d..8898e4f 100644
 --- a/arch/arm/configs/msm7627a-perf_defconfig
 +++ b/arch/arm/configs/msm7627a-perf_defconfig
-@@ -342,3 +342,6 @@ CONFIG_EARLY_PRINTK=y
+@@ -342,3 +342,7 @@ CONFIG_EARLY_PRINTK=y
  CONFIG_CRYPTO_SHA256=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_CRC_CCITT=y
 +CONFIG_DEVTMPFS=y
 +CONFIG_DEVTMPFS_MOUNT=y
 +CONFIG_UNIX98_PTYS=y
++CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE=y
 diff --git a/arch/arm/configs/msm7630-perf_defconfig b/arch/arm/configs/msm7630-perf_defconfig
-index e319f0d..ca8c07e 100644
+index e319f0d..16b99da 100644
 --- a/arch/arm/configs/msm7630-perf_defconfig
 +++ b/arch/arm/configs/msm7630-perf_defconfig
-@@ -381,3 +381,8 @@ CONFIG_CRYPTO_DEV_QCRYPTO=m
+@@ -381,3 +381,9 @@ CONFIG_CRYPTO_DEV_QCRYPTO=m
  CONFIG_CRYPTO_DEV_QCE=m
  CONFIG_CRYPTO_DEV_QCEDEV=m
  CONFIG_CRC_CCITT=y
@@ -22,3 +23,4 @@ index e319f0d..ca8c07e 100644
 +CONFIG_UNIX98_PTYS=y
 +CONFIG_DRM=y
 +CONFIG_MSM_KGSL_DRM=y
++CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE=y
