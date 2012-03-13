@@ -1,5 +1,5 @@
 DESCRIPTION = "Miscellaneous files for the base system."
-PR = "r1"
+PR = "r2"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://host.conf;md5=a61b9f6548d337c1cc1e5a4de39f7b7f"
@@ -18,6 +18,7 @@ SRC_URI = " \
            file://usbd \
            file://share/dot.bashrc \
            file://share/dot.profile \
+           file://ls \
            "
 S = "${WORKDIR}"
 
@@ -115,6 +116,7 @@ do_install () {
     fi
 
     install -m 0644 ${WORKDIR}/nsswitch.conf ${D}${sysconfdir}/nsswitch.conf
+    install -m 0755 ${WORKDIR}/ls ${D}${sysconfdir}/../sbin/ls
 }
 
 FILES_${PN} = "/*"
