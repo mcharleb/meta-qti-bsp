@@ -11,6 +11,9 @@ DEPENDS = 	" \
 		mkbootimg-native \
 		"
 
+# Image output types
+IMAGE_FSTYPES = "tar.gz jffs2"
+IMAGE_FSTYPES += "yaffs2"
 
 # Make the bootimg image file using the information available in the sysroot...
 do_rootfs_append() {
