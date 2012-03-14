@@ -27,6 +27,7 @@ IMAGE_INSTALL += "mm-core-oss"
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
 IMAGE_INSTALL += "gdbserver"
+IMAGE_INSTALL += "strace"
 
 IMAGE_FEATURES += "x11-mini ssh-server-dropbear"
 

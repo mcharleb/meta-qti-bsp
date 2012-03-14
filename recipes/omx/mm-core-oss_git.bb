@@ -5,11 +5,13 @@ LIC_FILES_CHKSUM = "file://omxcore/src/default/qc_registry_table.c;startline=1;e
 SRC_URI = "file://${WORKSPACE}/mm-core-oss"
 
 
-PR = "r4"
+PR = "r5"
 
 S = "${WORKDIR}/mm-core-oss"
 
 LV = "1.0.0"
+
+LDFLAGS += "-ldl"
 
 do_compile() {
     oe_runmake LIBVER="${LV}" LDFLAGS_SO="${LDFLAGS}"
