@@ -10,7 +10,10 @@ def get_git_hash(path, d):
     if (path == "") :
 	bb.fatal("\n\nlocalgit.bbclass ERROR:\nYou *MUST* set 'SRC_DIR' to a usable path!\n")
     else :
-    	return oe_run(d, ["git", "rev-parse", "HEAD"], cwd=path).rstrip()
+        if os.path.exists(path) :
+            return oe_run(d, ["git", "rev-parse", "HEAD"], cwd=path).rstrip()
+        else :
+            return "invalidgit"
 
 # This grabs the SHA of tip in the directory specified, presumes that SRC_DIR is properly set.
 SRC_DIR ?= ""
