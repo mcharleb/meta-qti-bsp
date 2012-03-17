@@ -51,13 +51,13 @@ case "$1" in
                 ;;
         esac
 
-        echo -n "Enabling usb0 network interface:"
-        ifconfig usb0 192.168.1.2 up
+        echo -n "Enabling rndis0 network interface:"
+        ifconfig rndis0 192.168.1.2 up
         echo "done"
         ;;
   stop)
-        echo -n "Disabling usb0 network interface:"
-        ifconfig usb0 down
+        echo -n "Disabling rndis0 network interface:"
+        ifconfig rndis0 down
         echo "done"
         ;;
   restart)

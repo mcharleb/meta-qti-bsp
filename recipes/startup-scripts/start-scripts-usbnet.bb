@@ -1,11 +1,11 @@
-DESCRIPTION = "USB network scripts"
+DESCRIPTION = "RNDIS network scripts"
 HOMEPAGE = "http://codeaurora.org"
 LIC_FILES_CHKSUM = "file://${WORKDIR}/usbnet;startline=3;endline=28;md5=0d8240c1ae415ce6552a67108edce7ad"
 LICENSE = "BSD"
 
 SRC_URI ="file://usbnet"
 
-PR = "r4"
+PR = "r5"
 
 inherit update-rc.d
 
