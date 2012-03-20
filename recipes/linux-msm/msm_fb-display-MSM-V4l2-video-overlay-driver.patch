@@ -1,4 +1,4 @@
-From 2f4768a70d051e772207915e4343e65548491c4d Mon Sep 17 00:00:00 2001
+From 106fb506d6c67f9f7dc59882ec461f39be597bc6 Mon Sep 17 00:00:00 2001
 From: Alhad Purnapatre <alhadp@codeaurora.org>
 Date: Tue, 28 Feb 2012 13:24:57 -0800
 Subject: [PATCH] msm_fb: display: MSM V4l2 video overlay driver
@@ -9,7 +9,7 @@ framebuffer.
 
 Signed-off-by: Alhad Purnapatre <alhadp@codeaurora.org>
 ---
- arch/arm/mach-msm/board-msm7627a-display.c |   48 ++
+ arch/arm/mach-msm/board-msm7627a-display.c |   47 ++
  arch/arm/mach-msm/board-msm7x30.c          |   46 ++
  arch/arm/mach-msm/include/mach/msm_fb.h    |    6 +
  drivers/media/video/msm/Kconfig            |    8 +
@@ -23,19 +23,19 @@ Signed-off-by: Alhad Purnapatre <alhadp@codeaurora.org>
  drivers/video/msm/msm_fb.c                 |   53 ++
  include/media/Kbuild                       |    1 +
  include/media/msm_v4l2_overlay.h           |   20 +
- 14 files changed, 1423 insertions(+), 27 deletions(-)
+ 14 files changed, 1422 insertions(+), 27 deletions(-)
  create mode 100644 drivers/media/video/msm/msm_v4l2_video.c
  create mode 100644 drivers/media/video/msm/msm_v4l2_video.h
  create mode 100644 include/media/msm_v4l2_overlay.h
 
 diff --git a/arch/arm/mach-msm/board-msm7627a-display.c b/arch/arm/mach-msm/board-msm7627a-display.c
-index 4e856b1..e65af4b 100644
+index bf1a4c5..3a676e0 100644
 --- a/arch/arm/mach-msm/board-msm7627a-display.c
 +++ b/arch/arm/mach-msm/board-msm7627a-display.c
-@@ -209,6 +209,14 @@ static struct resource msm_fb_resources[] = {
+@@ -208,6 +208,13 @@ static struct resource msm_fb_resources[] = {
+ 	}
  };
  
- #define PANEL_NAME_MAX_LEN      30
 +#ifdef CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE
 +static struct resource msm_v4l2_video_overlay_resources[] = {
 +	{
@@ -43,11 +43,10 @@ index 4e856b1..e65af4b 100644
 +	}
 +};
 +#endif
-+
  #define LCDC_TOSHIBA_FWVGA_PANEL_NAME   "lcdc_toshiba_fwvga_pt"
  #define MIPI_CMD_RENESAS_FWVGA_PANEL_NAME       "mipi_cmd_renesas_fwvga"
  
-@@ -267,6 +275,28 @@ static struct platform_device msm_fb_device = {
+@@ -268,6 +275,28 @@ static struct platform_device msm_fb_device = {
  	}
  };
  
@@ -76,7 +75,7 @@ index 4e856b1..e65af4b 100644
  #ifdef CONFIG_FB_MSM_MIPI_DSI
  static int mipi_renesas_set_bl(int level)
  {
-@@ -324,6 +354,9 @@ static struct platform_device *msm_fb_devices[] __initdata = {
+@@ -325,6 +354,9 @@ static struct platform_device *msm_fb_devices[] __initdata = {
  #ifdef CONFIG_FB_MSM_MIPI_DSI
  	&mipi_dsi_renesas_panel_device,
  #endif
@@ -86,7 +85,7 @@ index 4e856b1..e65af4b 100644
  };
  
  static struct platform_device *qrd_fb_devices[] __initdata = {
-@@ -336,6 +369,11 @@ static struct platform_device *evb_fb_devices[] __initdata = {
+@@ -337,6 +369,11 @@ static struct platform_device *evb_fb_devices[] __initdata = {
  	&mipi_dsi_NT35510_panel_device,
  };
  
@@ -98,7 +97,7 @@ index 4e856b1..e65af4b 100644
  void __init msm_msm7627a_allocate_memory_regions(void)
  {
  	void *addr;
-@@ -350,6 +388,16 @@ void __init msm_msm7627a_allocate_memory_regions(void)
+@@ -351,6 +388,16 @@ void __init msm_msm7627a_allocate_memory_regions(void)
  	msm_fb_resources[0].end = msm_fb_resources[0].start + fb_size - 1;
  	pr_info("allocating %lu bytes at %p (%lx physical) for fb\n", fb_size,
  						addr, __pa(addr));
@@ -116,10 +115,10 @@ index 4e856b1..e65af4b 100644
  
  static struct msm_panel_common_pdata mdp_pdata = {
 diff --git a/arch/arm/mach-msm/board-msm7x30.c b/arch/arm/mach-msm/board-msm7x30.c
-index 260c880..60a2e6c 100644
+index b750b7e..4956c4b 100644
 --- a/arch/arm/mach-msm/board-msm7x30.c
 +++ b/arch/arm/mach-msm/board-msm7x30.c
-@@ -3749,6 +3749,14 @@ static struct resource msm_fb_resources[] = {
+@@ -3770,6 +3770,14 @@ static struct resource msm_fb_resources[] = {
  	}
  };
  
@@ -134,7 +133,7 @@ index 260c880..60a2e6c 100644
  static int msm_fb_detect_panel(const char *name)
  {
  	if (machine_is_msm7x30_fluid()) {
-@@ -3782,6 +3790,27 @@ static struct platform_device msm_fb_device = {
+@@ -3803,6 +3811,27 @@ static struct platform_device msm_fb_device = {
  	}
  };
  
@@ -162,7 +161,7 @@ index 260c880..60a2e6c 100644
  static struct platform_device msm_migrate_pages_device = {
  	.name   = "msm_migrate_pages",
  	.id     = -1,
-@@ -5158,6 +5187,9 @@ static struct platform_device *devices[] __initdata = {
+@@ -5192,6 +5221,9 @@ static struct platform_device *devices[] __initdata = {
  #endif
  	&android_pmem_device,
  	&msm_fb_device,
@@ -172,7 +171,7 @@ index 260c880..60a2e6c 100644
  	&msm_migrate_pages_device,
  	&mddi_toshiba_device,
  	&lcdc_toshiba_panel_device,
-@@ -6970,6 +7002,10 @@ static void __init msm7x30_reserve(void)
+@@ -7013,6 +7045,10 @@ static void __init msm7x30_reserve(void)
  	msm_reserve();
  }
  
@@ -183,7 +182,7 @@ index 260c880..60a2e6c 100644
  static void __init msm7x30_allocate_memory_regions(void)
  {
  	void *addr;
-@@ -6981,6 +7017,16 @@ static void __init msm7x30_allocate_memory_regions(void)
+@@ -7024,6 +7060,16 @@ static void __init msm7x30_allocate_memory_regions(void)
  	msm_fb_resources[0].end = msm_fb_resources[0].start + size - 1;
  	pr_info("allocating %lu bytes at %p (%lx physical) for fb\n",
  		size, addr, __pa(addr));
@@ -217,10 +216,10 @@ index 339fa46..3bbaa25 100644
  
  #endif
 diff --git a/drivers/media/video/msm/Kconfig b/drivers/media/video/msm/Kconfig
-index e70a0a5..8605a9a 100644
+index a4b4b0d..fd6aa79 100644
 --- a/drivers/media/video/msm/Kconfig
 +++ b/drivers/media/video/msm/Kconfig
-@@ -237,3 +237,11 @@ config S5K3L1YX
+@@ -244,3 +244,11 @@ config S5K3L1YX
  		4 mipi lanes, preview config = 1984 * 1508 at 30 fps,
  		snapshot config = 4000 * 3000 at 20 fps,
  		hfr video at 60, 90 and 120 fps.
@@ -233,10 +232,10 @@ index e70a0a5..8605a9a 100644
 +	  apps to render overlaid video using Video4Linux2
 +	  APIs, by using /dev/videoX device
 diff --git a/drivers/media/video/msm/Makefile b/drivers/media/video/msm/Makefile
-index 8703669..76fde17 100644
+index 2843d30..f817561 100644
 --- a/drivers/media/video/msm/Makefile
 +++ b/drivers/media/video/msm/Makefile
-@@ -53,3 +53,4 @@ obj-$(CONFIG_MT9D112) += mt9d112.o mt9d112_reg.o
+@@ -52,3 +52,4 @@ obj-$(CONFIG_MT9D112) += mt9d112.o mt9d112_reg.o
  
  obj-$(CONFIG_MT9D113) += mt9d113.o mt9d113_reg.o
  obj-$(CONFIG_FB_MSM_WRITEBACK_MSM_PANEL) += wfd/
@@ -1250,10 +1249,10 @@ index 0000000..233c694
 +
 +#endif
 diff --git a/drivers/video/msm/mdp.h b/drivers/video/msm/mdp.h
-index 6c5a9f9..1550b0c 100644
+index 6dcc293..d44e19b 100644
 --- a/drivers/video/msm/mdp.h
 +++ b/drivers/video/msm/mdp.h
-@@ -779,4 +779,10 @@ static inline int mdp4_overlay_dsi_state_get(void)
+@@ -785,4 +785,10 @@ static inline int mdp4_overlay_dsi_state_get(void)
  }
  #endif
  
@@ -1265,10 +1264,10 @@ index 6c5a9f9..1550b0c 100644
 +
  #endif /* MDP_H */
 diff --git a/drivers/video/msm/mdp4.h b/drivers/video/msm/mdp4.h
-index f7f48e4..f5c5712 100644
+index c4f6a04..b1d3638 100644
 --- a/drivers/video/msm/mdp4.h
 +++ b/drivers/video/msm/mdp4.h
-@@ -723,4 +723,12 @@ void mdp4_init_writeback_buf(struct msm_fb_data_type *mfd, u32 mix_num);
+@@ -716,4 +716,12 @@ void mdp4_init_writeback_buf(struct msm_fb_data_type *mfd, u32 mix_num);
  void mdp4_free_writeback_buf(struct msm_fb_data_type *mfd, u32 mix_num);
  
  int mdp4_igc_lut_config(struct mdp_igc_lut_data *cfg);
@@ -1282,10 +1281,10 @@ index f7f48e4..f5c5712 100644
 +
  #endif /* MDP_H */
 diff --git a/drivers/video/msm/mdp4_overlay.c b/drivers/video/msm/mdp4_overlay.c
-index 4c89629..7f71c51 100644
+index a9c03ca..5ac69a9 100644
 --- a/drivers/video/msm/mdp4_overlay.c
 +++ b/drivers/video/msm/mdp4_overlay.c
-@@ -2679,3 +2679,109 @@ end:
+@@ -2711,3 +2711,109 @@ end:
  #endif
  	return ret;
  }
@@ -1586,10 +1585,10 @@ index 199e472..649b337 100644
 +	return ret;
 +}
 diff --git a/drivers/video/msm/msm_fb.c b/drivers/video/msm/msm_fb.c
-index 593f10b..1c5f096 100644
+index bacc085..591903c 100644
 --- a/drivers/video/msm/msm_fb.c
 +++ b/drivers/video/msm/msm_fb.c
-@@ -3496,4 +3496,57 @@ int __init msm_fb_init(void)
+@@ -3545,4 +3545,57 @@ int __init msm_fb_init(void)
  	return 0;
  }
  
