@@ -1,6 +1,6 @@
 require recipes/linux-msm/linux-msm.inc
 
-PR = "r15"
+PR = "r16"
 
 SRC_URI = "git://codeaurora.org/kernel/msm;protocol=git"
 SRCREV = "c6c98b112b695a0df202881afc51ee307433d736"

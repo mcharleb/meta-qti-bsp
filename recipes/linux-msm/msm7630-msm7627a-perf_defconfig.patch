@@ -1,14 +1,16 @@
 diff --git a/arch/arm/configs/msm7627a-perf_defconfig b/arch/arm/configs/msm7627a-perf_defconfig
-index 446423d..8898e4f 100644
+index 446423d..fbb007a 100644
 --- a/arch/arm/configs/msm7627a-perf_defconfig
 +++ b/arch/arm/configs/msm7627a-perf_defconfig
-@@ -342,3 +342,7 @@ CONFIG_EARLY_PRINTK=y
+@@ -342,3 +342,9 @@ CONFIG_EARLY_PRINTK=y
  CONFIG_CRYPTO_SHA256=y
  CONFIG_CRYPTO_TWOFISH=y
  CONFIG_CRC_CCITT=y
 +CONFIG_DEVTMPFS=y
 +CONFIG_DEVTMPFS_MOUNT=y
 +CONFIG_UNIX98_PTYS=y
++CONFIG_DRM=y
++CONFIG_MSM_KGSL_DRM=y
 +CONFIG_MSM_V4L2_VIDEO_OVERLAY_DEVICE=y
 diff --git a/arch/arm/configs/msm7630-perf_defconfig b/arch/arm/configs/msm7630-perf_defconfig
 index e319f0d..16b99da 100644
