@@ -30,12 +30,15 @@ do_install_append() {
    rm ${D}${bindir}/adbd
    install -m 0755 ${S}/adb/adbd -D ${D}/sbin/adbd
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+   install -m 0755 ${S}/start_usb -D ${D}${sysconfdir}/init.d/usb
 }
 
 pkg_postinst () {
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
         update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
+        update-rc.d $OPT -f usb remove
+        update-rc.d $OPT usb start 12 S .
 }
 
 
@@ -48,6 +51,9 @@ FILES_${PN}-libcutils-static = "${libdir}/libcutils.a"
 PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd"
 FILES_${PN}-adbd-dbg = "/sbin/.debug/adbd"
 FILES_${PN}-adbd     = "/sbin/adbd ${sysconfdir}/init.d/adbd"
+
+PACKAGES =+ "${PN}-usb"
+FILES_${PN}-usb     = "${sysconfdir}/init.d/usb"
 
 PACKAGES =+ "${PN}-liblog-dbg ${PN}-liblog ${PN}-liblog-dev ${PN}-liblog-static"
 FILES_${PN}-liblog-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
