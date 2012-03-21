@@ -36,3 +36,6 @@ export IMAGE_BASENAME = "msm-x11-image"
 # Image output types
 IMAGE_FSTYPES = "ext4"
 IMAGE_FSTYPES += "fastboot"
+
+# User space partition size
+IMAGE_ROOTFS_SIZE = 204800
