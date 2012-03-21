@@ -1,0 +1,13 @@
+diff --git a/arch/arm/mach-msm/board-msm7x27a.c b/arch/arm/mach-msm/board-msm7x27a.c
+index d059b8d..1690c93 100644
+--- a/arch/arm/mach-msm/board-msm7x27a.c
++++ b/arch/arm/mach-msm/board-msm7x27a.c
+@@ -58,7 +58,7 @@
+ #include "pm-boot.h"
+ #include "board-msm7627a.h"
+ 
+-#define PMEM_KERNEL_EBI1_SIZE	0x3A000
++#define PMEM_KERNEL_EBI1_SIZE	0x1200000
+ #define MSM_PMEM_AUDIO_SIZE	0x5B000
+ #define ADSP_RPC_PROG           0x3000000a
+ 
