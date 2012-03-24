@@ -27,7 +27,7 @@ IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "xeyes"
 IMAGE_INSTALL += "xset"
-IMAGE_INSTALL += "mm-video-oss"
+IMAGE_INSTALL += "${@base_contains('MACHINE_FEATURES', 'mm-video-oss', 'mm-video-oss', '', d)}"
 IMAGE_INSTALL += "mm-core-oss"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
