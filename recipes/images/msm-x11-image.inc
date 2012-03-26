@@ -15,7 +15,7 @@ XSERVER = "xserver-xorg \
 IMAGE_INSTALL += "${XSERVER}"
 IMAGE_INSTALL += "${POKY_BASE_INSTALL}"
 
-IMAGE_INSTALL += "system-core-adbd start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
+IMAGE_INSTALL += "system-core-adbd system-core-usb start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
 
 IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
