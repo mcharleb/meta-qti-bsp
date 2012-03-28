@@ -13,7 +13,7 @@ inherit autotools
 S = "${WORKDIR}/core"
 
 INITSCRIPT_NAME = "adbd"
-INITSCRIPT_PARAMS = "start 25 S 2 3 4 5 S . stop 80 0 1 6 ."
+INITSCRIPT_PARAMS = "start 42 S 2 3 4 5 S . stop 80 0 1 6 ."
 
 inherit update-rc.d
 
@@ -38,7 +38,7 @@ pkg_postinst () {
         update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
         update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
         update-rc.d $OPT -f usb remove
-        update-rc.d $OPT usb start 12 S .
+        update-rc.d $OPT usb start 41 S .
 }
 
 
