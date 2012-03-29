@@ -2,7 +2,7 @@ DESCRIPTION = "Inittab for sysvinit"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
-PR = "r6"
+PR = "r8"
 
 SRC_URI = "file://COPYING \
            file://inittab"
@@ -24,7 +24,7 @@ do_install() {
 	install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
     if [ ! -z "${SERIAL_CONSOLE}" ]; then
-        echo "S:2345:respawn:${base_sbindir}/getty ${SERIAL_CONSOLE}" >> ${D}${sysconfdir}/inittab
+        echo "S:2345:respawn:${base_sbindir}/getty -L ttyHSL0 ${SERIAL_CONSOLE}" >> ${D}${sysconfdir}/inittab
     fi
 
     idx=0
