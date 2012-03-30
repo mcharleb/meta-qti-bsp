@@ -15,8 +15,15 @@ XSERVER = "xserver-xorg \
 IMAGE_INSTALL += "${XSERVER}"
 IMAGE_INSTALL += "${POKY_BASE_INSTALL}"
 
-IMAGE_INSTALL += "system-core-adbd system-core-usb start-scripts-usbnet start-scripts-backlight alsa-utils-amixer alsa-utils-aplay alsa-utils-speakertest alsa-utils-midi"
-
+IMAGE_INSTALL += "system-core-adbd"
+IMAGE_INSTALL += "system-core-usb"
+IMAGE_INSTALL += "system-core-liblog"
+IMAGE_INSTALL += "start-scripts-usbnet"
+IMAGE_INSTALL += "start-scripts-backlight"
+IMAGE_INSTALL += "alsa-utils-amixer"
+IMAGE_INSTALL += "alsa-utils-aplay"
+IMAGE_INSTALL += "alsa-utils-speakertest"
+IMAGE_INSTALL += "alsa-utils-midi"
 IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "xeyes"
