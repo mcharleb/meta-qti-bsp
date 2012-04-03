@@ -5,12 +5,12 @@ LICENSE = "BSD"
 
 SRC_URI ="file://usbnet"
 
-PR = "r5"
+PR = "r6"
 
 inherit update-rc.d
 
 INITSCRIPT_NAME = "usbnet"
-INITSCRIPT_PARAMS = "start 26 S 2 3 4 5 S . stop 80 0 1 6 ."
+INITSCRIPT_PARAMS = "start 43 S 2 3 4 5 S . stop 80 0 1 6 ."
 
 
 do_install() {
@@ -21,5 +21,5 @@ pkg_postinst-${PN} () {
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         # remove all rc.d-links potentially created from alternatives
         update-rc.d $OPT -f usbnet remove
-        update-rd.d $OPT usbnet start 26 S 2 3 4 5 S . stop 80 0 1 6 .
+        update-rd.d $OPT usbnet start 43 S 2 3 4 5 S . stop 80 0 1 6 .
 }
