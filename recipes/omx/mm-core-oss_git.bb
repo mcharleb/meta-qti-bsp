@@ -4,19 +4,26 @@ LIC_FILES_CHKSUM = "file://omxcore/src/default/qc_registry_table.c;startline=1;e
 
 SRC_URI = "file://${WORKSPACE}/mm-core-oss"
 
+inherit autotools
 
-PR = "r5"
+PR = "r6"
 
 S = "${WORKDIR}/mm-core-oss"
 
 LV = "1.0.0"
 
-LDFLAGS += "-ldl"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-do_compile() {
-    oe_runmake LIBVER="${LV}" LDFLAGS_SO="${LDFLAGS}"
-}
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8655', ' --enable-target=msm7630', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm7627a', ' --enable-target=msm7627A', '', d)}"
+
+FILES_${PN} = "\
+    /usr/lib/* \
+    /usr/bin/*"
+
+#Skips check for .so symlinks
+INSANE_SKIP_${PN} = "dev-so"
 
 do_install() {
-    oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
+	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
 }
