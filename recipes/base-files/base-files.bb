@@ -1,5 +1,5 @@
 DESCRIPTION = "Miscellaneous files for the base system."
-PR = "r2"
+PR = "r3"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://host.conf;md5=a61b9f6548d337c1cc1e5a4de39f7b7f"
@@ -11,7 +11,7 @@ SRC_URI = " \
            file://host.conf \
            file://profile \
            file://profile.d \
-           file://fstab \
+           file://${MACHINE}/fstab \
            file://filesystems \
            file://issue.net \
            file://issue \
@@ -100,7 +100,7 @@ do_install () {
             install -m 0644 ${WORKDIR}/issue.net ${D}${sysconfdir}/issue.net
         fi
 
-        install -m 0644 ${WORKDIR}/fstab ${D}${sysconfdir}/fstab
+        install -m 0644 ${WORKDIR}/${MACHINE}/fstab ${D}${sysconfdir}/fstab
         install -m 0644 ${WORKDIR}/filesystems ${D}${sysconfdir}/filesystems
         install -m 0644 ${WORKDIR}/usbd ${D}${sysconfdir}/default/usbd
         install -m 0644 ${WORKDIR}/profile ${D}${sysconfdir}/profile
