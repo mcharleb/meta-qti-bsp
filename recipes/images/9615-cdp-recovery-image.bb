@@ -11,4 +11,6 @@ IMAGE_DEV_MANAGER = "busybox-static-mdev"
 IMAGE_INIT_MANAGER = "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS = ""
 
+require 9615-cdp-ota-target-image.inc
+
 inherit core-image
