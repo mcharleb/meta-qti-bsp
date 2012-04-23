@@ -23,6 +23,7 @@ IMAGE_INSTALL += "glib-2.0"
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
 IMAGE_INSTALL += "iptables"
+IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "loc-api"
 IMAGE_INSTALL += "openssl"
