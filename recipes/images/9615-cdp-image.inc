@@ -12,7 +12,7 @@ IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
-#IMAGE_INSTALL += "bridge-utils"
+IMAGE_INSTALL += "system-core-liblog"
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
 DEPENDS += "gdb-cross"
@@ -21,7 +21,6 @@ IMAGE_INSTALL += "glib-2.0"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
-#IMAGE_INSTALL += "initscripts-msm"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "libstdc++"
@@ -35,4 +34,3 @@ IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
 IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
-
