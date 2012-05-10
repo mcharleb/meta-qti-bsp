@@ -3,7 +3,7 @@ inherit linux-kernel-base localgit
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(9615-cdp)"
+COMPATIBLE_MACHINE = "(9615-cdp|mdm9625)"
 
 # Moved to here from the distro.conf file because it really kind of belongs
 # here and we're moving more to being a BSP with the MSM linux distro...
@@ -13,7 +13,7 @@ PACKAGE_ARCH = ${MACHINE_ARCH}
 KDIR = "/usr/src/linux"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r2"
+PR = "r3"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
