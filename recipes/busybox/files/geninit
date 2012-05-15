@@ -14,7 +14,7 @@ dir proc 0700 0 0
 dir sys 0700 0 0
 slink sbin bin 0755 0 0
 dir bin 0755 0 0
-file bin/busybox image/bin/busybox 0755 0 0
+file bin/busybox ${IMAGE_ROOTFS}/bin/busybox 0755 0 0
 slink bin/sh busybox 0755 0 0
 slink bin/echo busybox 0755 0 0
 slink bin/mount busybox 0755 0 0
@@ -31,4 +31,4 @@ file etc/profile profile 644 0 0
 file etc/inittab inittab 644 0 0
 file etc/fstab fstab 644 0 0
 file etc/init.d/rcS rcS 755 0 0
-file sbin/adbd ${WORKSPACE}/build/tmp/work/armv7-none-linux-gnueabi/adbd-git-r1/image/sbin/adbd 755 0 0
+file sbin/adbd ${IMAGE_ROOTFS}/sbin/adbd 755 0 0
