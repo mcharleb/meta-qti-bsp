@@ -42,6 +42,9 @@ echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fs
 
 #Copy contents of userdata rootfs
 cp -r ${TMPDIR}/rootfs/9615-cdp-usr-image/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
+#Remove fota dir and ipth_dme binary from userdata. We dont want to update them
+rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/fota
+rm ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
