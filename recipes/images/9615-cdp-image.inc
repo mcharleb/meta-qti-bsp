@@ -21,6 +21,7 @@ IMAGE_INSTALL += "glib-2.0"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
+IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "libstdc++"
