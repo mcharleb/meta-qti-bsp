@@ -23,10 +23,12 @@ do_rootfs_append() {
 	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_DIR_TARGET}/usr/src/linux/include/generated/utsrelease.h`
 	kernelsize=`awk --non-decimal-data '/ _end/ {end="0x" $1} /_stext/ {beg="0x" $1} END {size1=end-beg+4096; size=and(size1,compl(4095)); printf("%#x",size)}' ${STAGING_DIR_TARGET}/boot/System.map-${ver}`
 
-	${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/Image-${ver} \
+        ${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 1024 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}.dts
+        cat ${STAGING_DIR_TARGET}/boot/zImage-${ver} ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}.dtb > ${STAGING_DIR_TARGET}/boot/dtb-zImage-${ver}
+	${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/dtb-zImage-${ver} \
 		--ramdisk ${DEPLOY_DIR_IMAGE}/${PN}-${MACHINE}.cpio.gz \
-		--cmdline "noinitrd root=/dev/mtdblock14 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom" \
-		--base 0x40800000 \
+                --cmdline "initrd=0x81000000 root=/dev/ram rwb console=ttyHSL0,115200,n8 androidboot.hardware=qcom" \
+		--base 0x80200000 \
 		--ramdisk_offset $kernelsize \
 		--output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
 }
