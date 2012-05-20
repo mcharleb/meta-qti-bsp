@@ -13,7 +13,7 @@ FILES_${PN}-dbg += "\
         /usr/local/sbin/.debug \
         "
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS = "openssl"
 
@@ -41,6 +41,7 @@ do_configure() {
 }
 
 do_compile() {
+    make -C src/crypto/
     make -C hostapd/
     make -C wpa_supplicant/
 }
