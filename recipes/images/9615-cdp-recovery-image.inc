@@ -1,5 +1,6 @@
 # The mkbootimg production process.
 require 9615-cdp-recovery-bootimg.inc
+DEPENDS += "fsconfig-native"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += task-core-boot
