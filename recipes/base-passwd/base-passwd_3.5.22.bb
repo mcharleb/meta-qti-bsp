@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 SRC_URI = "${DEBIAN_MIRROR}/main/b/base-passwd/base-passwd_${PV}.tar.gz \
            file://nobash.patch \
            file://root-home.patch \
-           file://add-hash.patch"
+           file://add-hash.patch \
+           file://add-diag-user.patch \
+           file://add-sdcard-diag-groups.patch"
 
 SRC_URI[md5sum] = "47f22ab6b572d0133409ff6ad1fab402"
 SRC_URI[sha256sum] = "d34acb35a9f9f221e7e4f642b9ef4b22083dd77bb2fc7216756f445316d842fc"
