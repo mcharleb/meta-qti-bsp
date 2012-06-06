@@ -19,6 +19,7 @@ SRC_URI = " \
            file://share/dot.bashrc \
            file://share/dot.profile \
            file://ls \
+           file://set-console \
            "
 S = "${WORKDIR}"
 
@@ -117,6 +118,7 @@ do_install () {
 
     install -m 0644 ${WORKDIR}/nsswitch.conf ${D}${sysconfdir}/nsswitch.conf
     install -m 0755 ${WORKDIR}/ls ${D}${sysconfdir}/../sbin/ls
+    install -m 0755 ${WORKDIR}/set-console ${D}${sysconfdir}/../sbin/set-console
 }
 
 FILES_${PN} = "/*"
