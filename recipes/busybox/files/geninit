@@ -14,7 +14,7 @@ dir proc 0700 0 0
 dir sys 0700 0 0
 slink sbin bin 0755 0 0
 dir bin 0755 0 0
-file bin/busybox ${IMAGE_ROOTFS}/bin/busybox 0755 0 0
+file bin/busybox bin/busybox 0755 0 0
 slink bin/sh busybox 0755 0 0
 slink bin/echo busybox 0755 0 0
 slink bin/mount busybox 0755 0 0
@@ -27,8 +27,8 @@ dir usr/sbin 0755 0 0
 # Simple initrd.
 dir etc 0755 0 0
 dir etc/init.d 0755 0 0
-file etc/profile profile 644 0 0
-file etc/inittab inittab 644 0 0
-file etc/fstab fstab 644 0 0
-file etc/init.d/rcS rcS 755 0 0
-file sbin/adbd ${IMAGE_ROOTFS}/sbin/adbd 755 0 0
+file etc/profile etc/profile 644 0 0
+file etc/inittab etc/inittab 644 0 0
+file etc/fstab etc/fstab 644 0 0
+file etc/init.d/rcS etc/init.d/rcS 755 0 0
+file sbin/adbd sbin/adbd 755 0 0
