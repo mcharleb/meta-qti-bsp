@@ -1,3 +1,5 @@
+require mdm-ramdisk.inc
+
 # Force a few additional dependencies in the mix so that we get the needed
 # recipes to build in the right order so we can make the bootimg file and
 # our yaffs2 image...
@@ -11,15 +13,16 @@ DEPENDS = 	" \
 		mkbootimg-native \
 		"
 
+
 # Image output types
 IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
 
 # Make the bootimg image file using the information available in the sysroot...
 do_rootfs_append() {
-	gencpio="${STAGING_KERNEL_DIR}/usr/gen_init_cpio"
-	geninit="${COREBASE}/meta-msm/recipes/busybox/files/geninit"
-	$gencpio $geninit | gzip -n -9 > ${DEPLOY_DIR_IMAGE}/${PN}-initrd.gz
+        # Make ramdisk
+        do_ramdisk_create
 
+        # Make bootimage
 	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_DIR_TARGET}/usr/src/linux/include/generated/utsrelease.h`
 	kernelsize=`awk --non-decimal-data '/ _end/ {end="0x" $1} /_stext/ {beg="0x" $1} END {size1=end-beg+4096; size=and(size1,compl(4095)); printf("%#x",size)}' ${STAGING_DIR_TARGET}/boot/System.map-${ver}`
 
