@@ -54,5 +54,5 @@ pkg_postinst_${PN}-powerconfig () {
 pkg_postinst () {
     [ -n "$D" ] && OPT="-r $D" || OPT="-s"
     update-rc.d $OPT -f reset_reboot_cookie remove
-    update-rc.d $OPT reset_reboot_cookie start 55 S 2 3 4 5 .
+    update-rc.d $OPT reset_reboot_cookie start 55 2 3 4 5 .
 }
