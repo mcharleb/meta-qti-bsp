@@ -1,5 +1,5 @@
-PRINC = "1"
+PRINC = "3"
 
 FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
 
-SRC_URI += "file://remove-60-persistent-storage-rules.patch"
+SRC_URI += "file://do-not-install-unnecessary-udev-rules.patch"
