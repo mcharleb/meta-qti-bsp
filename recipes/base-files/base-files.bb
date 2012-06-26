@@ -119,6 +119,8 @@ do_install () {
     install -m 0644 ${WORKDIR}/nsswitch.conf ${D}${sysconfdir}/nsswitch.conf
     install -m 0755 ${WORKDIR}/ls ${D}${sysconfdir}/../sbin/ls
     install -m 0755 ${WORKDIR}/set-console ${D}${sysconfdir}/../sbin/set-console
+
+    ln -s /media/card ${D}/sdcard
 }
 
 FILES_${PN} = "/*"
