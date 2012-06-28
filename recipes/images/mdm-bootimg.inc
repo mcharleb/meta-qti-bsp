@@ -11,6 +11,7 @@ DEPENDS = 	" \
 		gettext-native \
 		yaffs2-utils-native \
 		mkbootimg-native \
+		kernel-tests \
 		"
 
 
