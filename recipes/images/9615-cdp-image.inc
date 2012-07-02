@@ -2,9 +2,11 @@
 require 9615-cdp-bootimg.inc
 
 # The OE-Core minimal boot image files.
-IMAGE_INSTALL += task-core-boot
-IMAGE_INSTALL += ${ROOTFS_PKGMANAGE_BOOTSTRAP}
-IMAGE_INSTALL += ${POKY_EXTRA_INSTALL}
+IMAGE_INSTALL += "task-core-boot"
+IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
+IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
+# In a future update, this POKY reference is changed, leaving it commented out
+#IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-intf"

@@ -16,7 +16,7 @@ SRC_URI = " \
 "
 
 inherit autotools
-ac_cv_linux_vers=${ac_cv_linux_vers=2}
+ac_cv_linux_vers = "${ac_cv_linux_vers=2}"
 
 EXTRA_OECONF = "--without-crypto \
 		${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6', '--disable-ipv6', d)}"

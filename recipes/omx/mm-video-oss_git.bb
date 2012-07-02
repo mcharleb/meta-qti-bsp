@@ -22,10 +22,10 @@ inherit autotools
 EXTRA_OECONF_append = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
 EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)}"
 
-CPPFLAGS += -I"${STAGING_INCDIR}/glib-2.0"
-CPPFLAGS += -I"${STAGING_LIBDIR}/glib-2.0/include"
+CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
+CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
 
-LDFLAGS += -lglib-2.0
+LDFLAGS += "-lglib-2.0"
 
 FILES_${PN} = "\
     /usr/lib/* \

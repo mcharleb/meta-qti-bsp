@@ -21,8 +21,8 @@ SRC_URI = "file://${WORKSPACE}/external/hostap"
 
 S = "${WORKDIR}/hostap"
 
-SUPPLICANT_CONFIG = ${S}/wpa_supplicant/.config
-HOSTAPD_CONFIG = ${S}/hostapd/.config
+SUPPLICANT_CONFIG = "${S}/wpa_supplicant/.config"
+HOSTAPD_CONFIG = "${S}/hostapd/.config"
 
 do_configure() {
     echo "CFLAGS += -I${STAGING_INCDIR}" >> ${SUPPLICANT_CONFIG}

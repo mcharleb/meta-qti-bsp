@@ -9,11 +9,11 @@ DEPENDS := "virtual/${TARGET_PREFIX}gcc \
 
 inherit kernel
 
-KERNEL_VERSION = ${MACHINE_KERNEL_VERSION}
+KERNEL_VERSION = "${MACHINE_KERNEL_VERSION}"
 
 PACKAGES =+ "kernel-headers"
-INSTALL_HDR_PATH=${STAGING_KERNEL_DIR}/usr
-FILES_kernel-headers += ${INSTALL_HDR_PATH}
+INSTALL_HDR_PATH="${STAGING_KERNEL_DIR}/usr"
+FILES_kernel-headers += "${INSTALL_HDR_PATH}"
 
 do_configure_prepend () {
     oe_runmake ${KERNEL_EXTRA_OEMAKE} ${KERNEL_DEFCONFIG}

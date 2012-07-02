@@ -18,8 +18,8 @@ SRC_URI = "file://${WORKSPACE}/wlan"
 
 S = "${WORKDIR}/wlan/host"
 
-ATH_BUILD_TYPE=mdm9x15
-ATH_BUS_TYPE=SDIO
+ATH_BUILD_TYPE="mdm9x15"
+ATH_BUS_TYPE="SDIO"
 
 EXTRA_OEMAKE = "\
     ATH_LINUXPATH=${STAGING_DIR_HOST}${base_libdir}/modules/${KERNEL_VERSION}/build \
@@ -38,8 +38,8 @@ EXTRA_OEMAKE = "\
     ATH_BUILD_FTM=no \
     "
 
-ATH_IMAGE_DIR = ${S}/.output/${ATH_BUILD_TYPE}-${ATH_BUS_TYPE}/image
-ATH_MODULE_DIR = ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/wireless
+ATH_IMAGE_DIR = "${S}/.output/${ATH_BUILD_TYPE}-${ATH_BUS_TYPE}/image"
+ATH_MODULE_DIR = "${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/wireless"
 
 do_compile() {
     unset LDFLAGS

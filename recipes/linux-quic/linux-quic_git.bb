@@ -9,7 +9,7 @@ COMPATIBLE_MACHINE = "(9615-cdp|mdm9625)"
 # here and we're moving more to being a BSP with the MSM linux distro...
 KERNEL_IMAGETYPE = "${@base_conditional('MACHINE', '9615-cdp', 'Image', 'zImage', d)}"
 
-PACKAGE_ARCH = ${MACHINE_ARCH}
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/usr/src/linux"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
