@@ -15,7 +15,7 @@ FILES_${PN}-dbg += "\
 
 PR = "r1"
 
-DEPENDS = "openssl"
+DEPENDS = "openssl qmi"
 
 SRC_URI = "file://${WORKSPACE}/external/hostap"
 
