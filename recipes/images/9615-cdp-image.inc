@@ -40,6 +40,7 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "hostap"
 IMAGE_INSTALL += "wlan"
 IMAGE_INSTALL += "open-source-kernel-tests"
+IMAGE_INSTALL += "reboot-daemon"
 IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
 IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
 
