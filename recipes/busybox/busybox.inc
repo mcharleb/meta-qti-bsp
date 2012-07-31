@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=de10de48642ab74318e893a61105afbb"
 SECTION = "base"
 PRIORITY = "required"
 
-INC_PR = "r44"
+INC_PR = "r45"
 
 SRC_URI = "\
   file://busybox-cron \
@@ -120,7 +120,7 @@ do_prepare_config () {
 	sed -e 's#@DATADIR@#${datadir}#g' \
 		< ${WORKDIR}/defconfig > ${S}/.config
 	sed -i -e '/CONFIG_STATIC/d' .config
-	echo "CONFIG_STATIC=y" >> .config
+	echo "# CONFIG_STATIC is not set" >> .config
 	for i in 'CROSS' 'DISTRO FEATURES'; do echo "### $i"; done >> \
 		${S}/.config
 	sed -i -e '${configmangle}' ${S}/.config
