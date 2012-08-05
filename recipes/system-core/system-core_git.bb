@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://adb/NOTICE;md5=2ddb23e63b1f9c3c46aaa4195f819a6d"
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
-PR = "r2"
+PR = "r3"
 
 inherit autotools
 
@@ -33,11 +33,9 @@ do_install_append() {
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
    install -m 0755 ${S}/usb/usb_composition -D ${D}${bindir}/
    install -d ${D}${bindir}/usb/compositions/
-   install -m 0755 ${S}/usb/boot_hsusb -D ${D}${bindir}/usb
-   install -m 0755 ${S}/usb/boot_hsic -D ${D}${bindir}/usb
    install -m 0755 ${S}/usb/compositions/* -D ${D}${bindir}/usb/compositions/
-   ln -s /usr/bin/usb/compositions/9025 ${D}${bindir}/usb/boot_composition
-   ln -s /usr/bin/usb/boot_hsusb ${D}${bindir}/usb/usb_init
+   ln -s /usr/bin/usb/compositions/9025 ${D}${bindir}/usb/boot_hsusb_composition
+   ln -s /usr/bin/usb/compositions/empty ${D}${bindir}/usb/boot_hsic_composition
 }
 
 pkg_postinst () {
