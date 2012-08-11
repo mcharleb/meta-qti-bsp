@@ -22,6 +22,7 @@ EXTRA_OEMAKE += "ARCH=${TARGET_ARCH} CROSS_COMPILE=${TARGET_PREFIX}"
 
 EXTRA_OECONF = "--prefix=/usr/kernel-tests \
                 --with-kernel=${STAGING_KERNEL_DIR} \
+                --disable-sps \
                 --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
 
 FILES_${PN}-dbg = "${prefix}/kernel-tests/*/.debug/* ${prefix}/src/debug/*"
