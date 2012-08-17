@@ -48,8 +48,8 @@ rm ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
-cp   ${TMPDIR}/work/armv7a-vfp-neon-oe-linux-gnueabi/recovery-git-r1/image/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
-cp   ${TMPDIR}/work/armv7a-vfp-neon-oe-linux-gnueabi/recovery-git-r1/image/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
+cp   ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
+cp   ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
 cp ${WORKSPACE}/Innopath/FOTA/ipth_dua/ipth_dua ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
 
 # copy contents of META folder
