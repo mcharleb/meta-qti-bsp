@@ -1,6 +1,7 @@
 # The mkbootimg production process.
 require mdm-recovery-bootimg.inc
 
+DEPENDS = "bzip2"
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += task-core-boot
 IMAGE_INSTALL += ${ROOTFS_PKGMANAGE_BOOTSTRAP}

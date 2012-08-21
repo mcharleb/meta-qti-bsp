@@ -20,9 +20,9 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM
 
 # copy the boot\recovery images
-cp ${DEPLOY_DIR_IMAGE}/boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
+cp ${DEPLOY_DIR_IMAGE}/mdm-image-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
 
-cp ${DEPLOY_DIR_IMAGE}/recovery-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
+cp ${DEPLOY_DIR_IMAGE}/mdm-image-boot-recovery-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
 
 # copy the contents of system rootfs
 cp -r ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/mdm-image-1.0-r0/rootfs/. ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM/.
@@ -37,9 +37,6 @@ echo /cache    yaffs2  cache >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fst
 echo /data     yaffs2  userdata >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
 echo /recovery mtd     recovery >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
 echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
-
-#Copy contents of userdata rootfs
-cp -r ${TMPDIR}/rootfs/${MACHINE}-usr-image/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
