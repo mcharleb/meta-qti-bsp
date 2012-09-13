@@ -11,7 +11,7 @@ SRC_URI = "file://${WORKSPACE}/bootable/bootloader/lk \
 
 S = "${WORKDIR}/${PN}"
 
-MY_TARGET = "mdm9615"
+MY_TARGET = ${@base_conditional('MACHINE', '9615-cdp', 'mdm9615', '${MACHINE}', d)}
 
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 
