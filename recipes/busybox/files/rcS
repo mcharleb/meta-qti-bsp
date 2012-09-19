@@ -19,7 +19,7 @@ then
     echo 1 > /sys/class/android_usb/android0/enable
 fi
 
-#/sbin/mdev -s
+/sbin/mdev -s
 /bin/ifconfig lo up
 /sbin/mknod /dev/null c 1 3
 /sbin/chmod 666 /dev/null
