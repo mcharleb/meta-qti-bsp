@@ -27,9 +27,9 @@ do_rootfs_append() {
 	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_DIR_TARGET}/usr/src/linux/include/generated/utsrelease.h`
 
 	# Make Device tree blobs for various hardware configurations
-	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 1024 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-rumi.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-rumi.dts
-	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 1024 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-cdp.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-cdp.dts
-	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 1024 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-mtp.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-mtp.dts
+	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-rumi.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-rumi.dts
+	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-cdp.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-cdp.dts
+	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-mtp.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-mtp.dts
 
 	# Create three separate images with dtb appended to zImage for RUMI support.
 	cat ${STAGING_DIR_TARGET}/boot/zImage-${ver} ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-rumi.dtb > ${STAGING_DIR_TARGET}/boot/dtb-zImage-${ver}-rumi
@@ -41,7 +41,7 @@ do_rootfs_append() {
 	${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
 		--dt ${STAGING_DIR_TARGET}/boot/masterDTB \
 		--ramdisk /dev/null \
-		--cmdline "noinitrd root=/dev/mtdblock0 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom mem=29M@0x00200000 mem=10M@0x07600000" \
+		--cmdline "noinitrd root=/dev/mtdblock16 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom mem=29M@0x00200000 mem=10M@0x07600000" \
 		--base 0x00200000 \
                 --tags-addr 0x07600000 \  
                 --ramdisk_offset 0x0 \
