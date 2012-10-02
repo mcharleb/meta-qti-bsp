@@ -43,6 +43,7 @@ do_rootfs_append() {
 		--ramdisk /dev/null \
 		--cmdline "noinitrd root=/dev/mtdblock16 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom" \
 		--base 0x00200000 \
-		--ramdisk_offset $kernelsize \
+                --tags-addr 0x07600000 \  
+                --ramdisk_offset $kernelsize \
 		--output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
 }

@@ -1,6 +1,6 @@
 inherit native
 
-PR = "r2"
+PR = "r3"
 
 MY_PN = "mkbootimg"
 
