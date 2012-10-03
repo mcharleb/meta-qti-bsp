@@ -10,10 +10,10 @@ COMPATIBLE_MACHINE = "(9615-cdp|mdm9625)"
 KERNEL_IMAGETYPE = "${@base_conditional('MACHINE', '9615-cdp', 'Image', 'zImage', d)}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-KDIR = "/usr/src/linux"
+KDIR = "/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r3"
+PR = "r4"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
