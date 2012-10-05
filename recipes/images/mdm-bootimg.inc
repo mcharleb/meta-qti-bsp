@@ -24,7 +24,7 @@ do_rootfs_append() {
 	# Make ramdisk
 	do_ramdisk_create
 	# Make bootimage
-	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_DIR_TARGET}/usr/src/linux/include/generated/utsrelease.h`
+	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
 
 	# Make Device tree blobs for various hardware configurations
 	${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${MACHINE_DTS_NAME}-rumi.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${MACHINE_DTS_NAME}-rumi.dts
