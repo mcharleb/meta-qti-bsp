@@ -12,9 +12,10 @@ SRC_DIR = "${WORKSPACE}/xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
 
 EXTRA_OECONF_append += "--with-c2d=${STAGING_DIR_TARGET}/usr"
+EXTRA_OECONF_append += "--with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include"
 
 RDEPENDS += "xserver-xorg"
-RDEPENDS += "adreno-subdriver-x11"
+#RDEPENDS += "adreno-subdriver-x11"
 
 DEPENDS = "${RDEPENDS} \
            fontsproto \
@@ -26,7 +27,7 @@ DEPENDS = "${RDEPENDS} \
            glproto \
            xproto"
 
-DEPENDS += "adreno200"
+#DEPENDS += "adreno200"
 DEPENDS += "virtual/kernel"
 
 #TODO: remove this once adreno200 symlinks are fixed
@@ -36,5 +37,4 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 ARM_INSTRUCTION_SET = "arm"
 
-CFLAGS += " -I${STAGING_INCDIR}/xorg -I${STAGING_KERNEL_DIR}/include"
 CFLAGS += " -Wno-error "
