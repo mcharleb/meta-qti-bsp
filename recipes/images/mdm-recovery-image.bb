@@ -1,5 +1,5 @@
 # List of FOSS packages installed onto the root file system as specified by the user.
-require ${MACHINE}-recovery-image.inc
+include ${MACHINE}-recovery-image.inc
 
 IMAGE_LINGUAS = ""
 
