@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c54ce9345727175ff66d17b67ff51f58"
 
 SRC_URI = "file://${WORKSPACE}/qcom-opensource/kernel/kernel-tests"
 
-DEPENDS = "linux-quic"
+DEPENDS = "virtual/kernel"
 
 PR = "r0"
 
