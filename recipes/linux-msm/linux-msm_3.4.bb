@@ -25,16 +25,26 @@ INHIBIT_DEFAULT_DEPS = "1"
 PACKAGE_STRIP = "no"
 INHIBIT_PACKAGE_STRIP = "1"
 
-PACKAGES = "kernel kernel-base kernel-module-bridge \
+PACKAGES = "kernel \
+  kernel-base \
+  kernel-module-bridge \
+  kernel-module-input \
   kernel-module-ip-tables \
-  kernel-module-iptable-nat \
-  kernel-module-iptable-filter \
   kernel-module-ipt-masquerade \
-  kernel-module-x-tables \
-  kernel-module-nf-defrag-ipv4 \
+  kernel-module-iptable-filter \
+  kernel-module-iptable-nat \
+  kernel-module-ipv6 \
   kernel-module-nf-conntrack \
   kernel-module-nf-conntrack-ipv4 \
-  kernel-module-nf-nat"
+  kernel-module-nf-defrag-ipv4 \
+  kernel-module-nf-nat \
+  kernel-module-nls-utf8 \
+  kernel-module-rtc-dev \
+  kernel-module-rtc-proc \
+  kernel-module-rtc-sysfs \
+  kernel-module-uinput \
+  kernel-module-unix \
+  kernel-module-x-tables"
 
 PACKAGES =+ "kernel-image"
 FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}*"
