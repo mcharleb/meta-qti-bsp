@@ -16,7 +16,7 @@ PROVIDES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"
 
 inherit autotools
 
-PR = "r2"
+PR = "r3"
 
 S = "${WORKDIR}/powerapp"
 
