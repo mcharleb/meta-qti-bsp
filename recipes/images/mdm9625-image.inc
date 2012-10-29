@@ -8,6 +8,7 @@ IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-intf"
+IMAGE_INSTALL += "pimd"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "system-core-adbd"
