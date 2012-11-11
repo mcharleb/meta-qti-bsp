@@ -10,7 +10,7 @@ def get_git_hash(path, d):
     if (path == "") :
 	bb.fatal("\n\nlocalgit.bbclass ERROR:\nYou *MUST* set 'SRC_DIR' to a usable path!\n")
     else :
-        if os.path.exists(path) :
+        if os.path.exists(path + '/.git') :
             return oe_run(d, ["git", "rev-parse", "HEAD"], cwd=path).rstrip()
         else :
             return "invalidgit"
