@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# Copyright (c) 2012, The Linux Foundation. All rights reserved.
+
+#Starts the WLAN over SDIO
+
+export KERNEL=`uname -r`
+export MODULE_BASE=/lib/modules/$KERNEL/updates
+export SDCC_SLOT=3
+
+case "$1" in
+    start)
+        set -e
+        echo "Starting WLAN..."
+        c=1
+        insmod $MODULE_BASE/compat/compat.ko
+        insmod $MODULE_BASE/net/wireless/cfg80211.ko
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_sdio.ko
+        echo 1 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
+        set +e
+        ifconfig wlan0 up 2>  /dev/null
+        rc=$?
+        while [ $rc -ne 0 -a $c -le 3 ]
+        do
+            sleep 1
+            ifconfig wlan0 up 2> /dev/null
+            rc=$?
+            c=`expr $c + 1`
+        done
+        echo 0 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
+        ;;
+
+    stop)
+        echo "Stopping WLAN..."
+        rmmod ath6kl_sdio
+        rmmod ath6kl_core
+        rmmod cfg80211
+        rmmod compat
+        echo 0 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
+        ;;
+
+    restart)
+        $0 stop
+        $0 start
+        ;;
+
+    *)
+        echo "Usage $0 {start | stop | restart}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
