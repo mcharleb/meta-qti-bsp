@@ -5,17 +5,15 @@ inherit localgit
 DESCRIPTION = "X.Org X server -- MSM display driver"
 LIC_FILES_CHKSUM = "file://src/msm-driver.c;startline=3;endline=27;md5=a846f1e47dac625c7d4d059663c97627"
 PV = "git-${GITSHA}"
-PR = "r2"
+PR = "r3"
 
 SRC_DIR = "${WORKSPACE}/xf86-video-msm"
 
 S = "${WORKDIR}/xf86-video-msm"
 
-EXTRA_OECONF_append += "--with-c2d=${STAGING_DIR_TARGET}/usr"
 EXTRA_OECONF_append += "--with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include"
 
 RDEPENDS += "xserver-xorg"
-#RDEPENDS += "adreno-subdriver-x11"
 
 DEPENDS = "${RDEPENDS} \
            fontsproto \
@@ -27,7 +25,6 @@ DEPENDS = "${RDEPENDS} \
            glproto \
            xproto"
 
-#DEPENDS += "adreno200"
 DEPENDS += "virtual/kernel"
 
 #TODO: remove this once adreno200 symlinks are fixed
