@@ -1,6 +1,6 @@
 DESCRIPTION = "Installing audio init script"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://../files/init_qcom_audio;md5=c94d9416e5527b4ab02ef2ac32cffd94"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 PR = "r1"
 
 SRC_URI = "file://files/init_qcom_audio"
