@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://adb/NOTICE;md5=2ddb23e63b1f9c3c46aaa4195f819a6d"
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
-PR = "r3"
+PR = "r4"
 
 inherit autotools
 
