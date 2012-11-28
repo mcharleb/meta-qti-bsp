@@ -8,7 +8,7 @@ SRC_URI = "file://${WORKSPACE}/qcom-opensource/kernel/kernel-tests"
 
 DEPENDS = "virtual/kernel"
 
-PR = "r0"
+PR = "r1"
 
 S = "${WORKDIR}/kernel-tests"
 CFLAGS_pn-${PN} = ""
@@ -24,6 +24,9 @@ EXTRA_OECONF = "--prefix=/usr/kernel-tests \
                 --with-kernel=${STAGING_KERNEL_DIR} \
                 --disable-sps \
                 --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
+
+EXTRA_OECONF_append_msm7627a = " --disable-ion"
+EXTRA_OECONF_append_msm7627a = " --disable-ocmem"
 
 FILES_${PN}-dbg = "${prefix}/kernel-tests/*/.debug/* ${prefix}/src/debug/*"
 FILES_${PN} = "${prefix}/kernel-tests/* ${prefix}/src/*"
