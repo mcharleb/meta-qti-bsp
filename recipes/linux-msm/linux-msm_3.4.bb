@@ -15,7 +15,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r1"
+PR = "r2"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
