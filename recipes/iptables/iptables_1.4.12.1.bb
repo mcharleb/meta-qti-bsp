@@ -7,7 +7,7 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263\
                     file://iptables/iptables.c;firstline=13;endline=25;md5=f1028f2401da1c120df27594b2be50ef"
 
-PR = "r0"
+PR = "r1"
 
 RRECOMMENDS_${PN} = "kernel-module-x-tables \
                      kernel-module-ip-tables \
@@ -21,10 +21,16 @@ RRECOMMENDS_${PN} = "kernel-module-x-tables \
 FILES_${PN} =+ "${libdir}/xtables/"
 FILES_${PN}-dbg =+ "${libdir}/xtables/.debug"
 
-SRC_URI = "http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.bz2"
+SRC_URI = " \
+	http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.bz2 \
+	file://103-ubicom32-nattype_lib.patch \
+"
 
 SRC_URI[md5sum] = "b08a1195ec2c1ebeaf072db3c55fdf43"
 SRC_URI[sha256sum] = "77e6581f21f15946a814fa311236e5f3f7c6593180f9d695cea06aa95e464aba"
+
+
+CFLAGS += "-I${STAGING_KERNEL_DIR}/source/include/linux/netfilter_ipv4"
 
 inherit autotools
 
