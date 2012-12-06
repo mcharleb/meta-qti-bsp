@@ -1,8 +1,6 @@
 # List of packages to be installed by mxm-x11-image
 
 XSERVER = "xserver-xorg \
-           xserver-xorg-extension-dri \
-           xserver-xorg-extension-dri2 \
            xf86-input-evdev \
            xf86-video-msm \
            xcb-util \
@@ -11,6 +9,9 @@ XSERVER = "xserver-xorg \
            libxcb-shape \
            libx11-xcb \
            xserver-xf86-config "
+
+#           xserver-xorg-extension-dri \
+#           xserver-xorg-extension-dri2 \
 
 IMAGE_INSTALL += "${XSERVER}"
 IMAGE_INSTALL += "${POKY_BASE_INSTALL}"
