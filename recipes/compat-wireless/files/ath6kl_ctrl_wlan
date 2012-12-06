@@ -11,11 +11,12 @@ export SDCC_SLOT=3
 case "$1" in
     start)
         set -e
-        echo "Starting WLAN..."
+        shift
+        echo "Starting WLAN... $@"
         c=1
         insmod $MODULE_BASE/compat/compat.ko
         insmod $MODULE_BASE/net/wireless/cfg80211.ko
-        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
         insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_sdio.ko
         echo 1 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
         set +e
@@ -29,6 +30,10 @@ case "$1" in
             c=`expr $c + 1`
         done
         echo 0 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
+        ;;
+
+    start_ftm)
+        $0 start testmode=2
         ;;
 
     stop)
