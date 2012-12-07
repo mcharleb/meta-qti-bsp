@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=de10de48642ab74318e893a61105afbb"
 SECTION = "base"
 PRIORITY = "required"
 
-INC_PR = "r44"
+INC_PR = "r45"
 
 SRC_URI = "\
   file://busybox-cron \
