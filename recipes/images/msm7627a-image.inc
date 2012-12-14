@@ -17,6 +17,7 @@ IMAGE_INSTALL += "mm-core-oss"
 DEPENDS += "gdb-cross"
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "strace"
+IMAGE_INSTALL += "msm7k"
 
 # Image output types
 IMAGE_FSTYPES = "ext4"
