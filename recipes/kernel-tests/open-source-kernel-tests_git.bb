@@ -8,7 +8,7 @@ SRC_URI = "file://${WORKSPACE}/qcom-opensource/kernel/kernel-tests"
 
 DEPENDS = "virtual/kernel"
 
-PR = "r1"
+PR = "r2"
 
 S = "${WORKDIR}/kernel-tests"
 CFLAGS_pn-${PN} = ""
@@ -27,9 +27,9 @@ EXTRA_OECONF = "--prefix=/usr/kernel-tests \
 
 EXTRA_OECONF_append_msm7627a = " --disable-ion"
 EXTRA_OECONF_append_msm7627a = " --disable-ocmem"
+EXTRA_OECONF_append_msm7627a = " --enable-v4l2apps"
 
 FILES_${PN}-dbg = "${prefix}/kernel-tests/*/.debug/* ${prefix}/src/debug/*"
+FILES_${PN}-dbg += "${libdir}/*.so ${libdir}/.debug/*"
 FILES_${PN} = "${prefix}/kernel-tests/* ${prefix}/src/*"
-
-
-
+FILES_${PN} += "${datadir}/pixmaps/* ${libdir}/*"
