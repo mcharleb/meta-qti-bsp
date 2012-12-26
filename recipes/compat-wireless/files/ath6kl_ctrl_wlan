@@ -7,12 +7,24 @@
 export KERNEL=`uname -r`
 export MODULE_BASE=/lib/modules/$KERNEL/updates
 export SDCC_SLOT=3
+export RETRY_LIMIT=3
+export start_ap1=0
 
 case "$1" in
     start)
-        set -e
-        shift
         echo "Starting WLAN... $@"
+        shift
+        if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ]; then
+            start_ap1=1
+            shift
+        elif [ "$1" == "ap" ]; then
+            shift
+        elif [ "$1" == "ap,sta" ]; then
+            $0 help
+            exit
+        fi
+
+        set -e
         c=1
         insmod $MODULE_BASE/compat/compat.ko
         insmod $MODULE_BASE/net/wireless/cfg80211.ko
@@ -22,7 +34,7 @@ case "$1" in
         set +e
         ifconfig wlan0 up 2>  /dev/null
         rc=$?
-        while [ $rc -ne 0 -a $c -le 3 ]
+        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]
         do
             sleep 1
             ifconfig wlan0 up 2> /dev/null
@@ -30,6 +42,17 @@ case "$1" in
             c=`expr $c + 1`
         done
         echo 0 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
+
+        if [ $c -ge $RETRY_LIMIT ]; then
+            echo "WLAN bring-up failed!"
+            exit
+        fi
+
+        if [ $start_ap1 -eq 1 ]; then
+            echo "Adding second AP interface(wlan1)"
+            iw dev wlan0 interface add wlan1 type __ap
+            ifconfig wlan1 up > /dev/null
+        fi
         ;;
 
     start_ftm)
@@ -47,11 +70,12 @@ case "$1" in
 
     restart)
         $0 stop
-        $0 start
+        shift
+        $0 start $@
         ;;
 
     *)
-        echo "Usage $0 {start | stop | restart}" >&2
+        echo "Usage $0 {start | stop | restart} <ap | ap,ap | sta,ap>" >&2
         exit 1
         ;;
 esac
