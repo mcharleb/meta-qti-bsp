@@ -1,0 +1,35 @@
+inherit autotools
+
+DESCRIPTION = "Ethernet bridge tables - Linux Ethernet filter for the Linux bridge"
+HOMEPAGE = "http://ebtables.sourceforge.net/"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=53b4a999993871a28ab1488fdbd2e73e"
+SECTION = "console/network"
+PRIORITY = "optional"
+
+PR = "r0"
+
+TARGET_CC_ARCH += "${LDFLAGS}"
+
+SRC_URI = " \
+        http://sourceforge.net/projects/ebtables/files/ebtables/ebtables-2-0-10-4/ebtables-${PV}.tar.gz \
+        file://Makefile.patch \
+"
+SRC_URI[md5sum] = "506742a3d44b9925955425a659c1a8d0"
+SRC_URI[sha256sum] = "dc6f7b484f207dc712bfca81645f45120cb6aee3380e77a1771e9c34a9a4455d"
+
+ac_cv_linux_vers = "${ac_cv_linux_vers=2}"
+
+CFLAGS += -I${STAGING_KERNEL_DIR}/source/include
+
+EXTRA_OECONF = "--without-crypto \
+        ${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6', '--disable-ipv6', d)}"
+
+FILES_${PN} += "${libdir}/lib*.so"
+FILES_${PN} += "${sbindir}/*"
+
+PACKAGES = "${PN}"
+
+do_configure() {
+        :
+}
