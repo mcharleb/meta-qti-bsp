@@ -28,7 +28,7 @@ case "$1" in
         c=1
         insmod $MODULE_BASE/compat/compat.ko
         insmod $MODULE_BASE/net/wireless/cfg80211.ko
-        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko ath6kl_wifi_mac="00:11:22:33:44:55" $@
         insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_sdio.ko
         echo 1 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
         set +e
