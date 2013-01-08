@@ -9,8 +9,6 @@ DEPENDS := "virtual/${TARGET_PREFIX}gcc \
 
 inherit kernel
 
-KERNEL_VERSION = "${MACHINE_KERNEL_VERSION}"
-
 PACKAGES =+ "kernel-headers"
 INSTALL_HDR_PATH="${STAGING_KERNEL_DIR}/usr"
 FILES_kernel-headers += "${INSTALL_HDR_PATH}"
