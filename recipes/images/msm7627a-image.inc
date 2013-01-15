@@ -26,4 +26,3 @@ IMAGE_FSTYPES += "fastboot"
 
 # User space partition size
 IMAGE_ROOTFS_SIZE = "204800"
-
