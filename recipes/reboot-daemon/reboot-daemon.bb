@@ -1,7 +1,7 @@
 DESCRIPTION = "Rebooter daemon"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://reboot-daemon.c;startline=1;endline=28;md5=1b281a0dce72d4076361d50e798a5f05"
-PR = "r1"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r2"
 
 SRC_URI = "file://${WORKSPACE}/reboot-daemon"
 
