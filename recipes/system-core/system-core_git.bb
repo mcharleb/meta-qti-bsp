@@ -1,12 +1,12 @@
 DESCRIPTION = "Android system/core components"
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://adb/NOTICE;md5=2ddb23e63b1f9c3c46aaa4195f819a6d"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
-PR = "r5"
+PR = "r6"
 
 inherit autotools
 

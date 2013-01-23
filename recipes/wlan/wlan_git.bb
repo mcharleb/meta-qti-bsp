@@ -1,8 +1,8 @@
 inherit autotools linux-kernel-base
 
 DESCRIPTION = "Qualcomm Atheros WLAN"
-LICENSE = "ISC License"
-LIC_FILES_CHKSUM = "file://wlan/src/wlan_node.c;startline=1;endline=19;md5=cf8a6befd751b967e3855098016af46c"
+LICENSE = "ISC"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
 KERNEL_VERSION = "${@get_kernelversion('${STAGING_KERNEL_DIR}')}"
 
@@ -10,7 +10,7 @@ FILES_${PN} += "\
     ${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/wireless/ar6000.ko \
     "
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS = "virtual/kernel wireless-tools"
 

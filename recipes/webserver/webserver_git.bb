@@ -1,7 +1,7 @@
 DESCRIPTION = "Reference Webserver"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://webserver.c;startline=2;endline=27;md5=a92553d6d84b89f8abc82e7e8ee5cac5"
-PR = "r1"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r2"
 
 SRC_URI = "file://${WORKSPACE}/webserver"
 
