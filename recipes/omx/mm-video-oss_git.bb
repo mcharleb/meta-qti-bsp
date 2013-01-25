@@ -1,10 +1,10 @@
 DESCRIPTION = "OpenMAX video for MSM chipsets"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://vidc/vdec/src/omx_vdec.cpp;startline=2;endline=26;md5=65b7d3b6a7a1c9bca13e70c4ca5a161c"
-
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r7"
+PR = "r8"
 
 DEPENDS = "virtual/kernel mm-core-oss"
 DEPENDS += "glib-2.0"

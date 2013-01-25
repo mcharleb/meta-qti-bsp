@@ -1,13 +1,13 @@
 inherit native
 
-PR = "r3"
+PR = "r4"
 
 MY_PN = "mkbootimg"
 
 DESCRIPTION = "Boot image creation tool from Android"
 LICENSE = "Apache-2.0"
-# The license declaration's in the source for the command...
-LIC_FILES_CHKSUM = "file://bootimg.h;startline=1;endline=3;md5=f59c7a8f3dd40789f94737fe8c36dad0"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
 PROVIDES = "mkbootimg-native"
 

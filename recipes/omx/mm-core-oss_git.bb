@@ -1,12 +1,13 @@
 DESCRIPTION = "OpenMAX core for MSM chipsets"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://omxcore/src/default/qc_registry_table.c;startline=1;endline=27;md5=a1a011a0f0b9d7f1d7c95a5fdd6e7a7e"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 SRC_URI = "file://${WORKSPACE}/mm-core-oss"
 
 inherit autotools
 
-PR = "r6"
+PR = "r7"
 
 S = "${WORKDIR}/mm-core-oss"
 

@@ -2,13 +2,14 @@ inherit autotools linux-kernel-base
 
 DESCRIPTION = "Open Source kernel tests"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://COPYING;md5=c54ce9345727175ff66d17b67ff51f58"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 SRC_URI = "file://${WORKSPACE}/qcom-opensource/kernel/kernel-tests"
 
 DEPENDS = "virtual/kernel"
 
-PR = "r1"
+PR = "r2"
 
 S = "${WORKDIR}/kernel-tests"
 CFLAGS_pn-${PN} = ""

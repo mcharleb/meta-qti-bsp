@@ -1,8 +1,8 @@
 DESCRIPTION = "Powerapp tools"
 HOMEPAGE = "http://codeaurora.org/"
 LICENSE = "Apache-2.0"
-# FIXME - This uses the source file itself since the license grant's THERE...
-LIC_FILES_CHKSUM = "file://powerapp.c;md5=b78e5d904624347defb9b7e888cf3a7f"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 SRC_URI = "file://${WORKSPACE}/system/core/powerapp"
 
@@ -16,7 +16,7 @@ PROVIDES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"
 
 inherit autotools
 
-PR = "r4"
+PR = "r5"
 
 S = "${WORKDIR}/powerapp"
 
