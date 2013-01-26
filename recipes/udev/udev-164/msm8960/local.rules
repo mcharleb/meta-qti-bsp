@@ -17,6 +17,10 @@
 KERNEL=="mmcblk[1-9]*", SUBSYSTEM=="block", ACTION=="add"    RUN+="/etc/udev/scripts/mount.sh"
 KERNEL=="mmcblk[1-9]*", SUBSYSTEM=="block", ACTION=="remove" RUN+="/etc/udev/scripts/mount.sh"
 
+# Block device symlinks
+ENV{DEVTYPE}=="partition", SUBSYSTEM=="block", SYMLINK+="block/platform/msm_sdcc.1/by-name/$env{PARTNAME}"
+ENV{DEVTYPE}=="partition", SUBSYSTEM=="block", SYMLINK+="block/platform/msm_sdcc.1/by-num/$env{PARTN}"
+
 # Handle network interface setup
 SUBSYSTEM=="net", ACTION=="add" RUN+="/etc/udev/scripts/network.sh"
 SUBSYSTEM=="net", ACTION=="remove" RUN+="/etc/udev/scripts/network.sh"

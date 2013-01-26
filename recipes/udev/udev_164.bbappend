@@ -1,4 +1,4 @@
-PRINC = "4"
+PRINC = "5"
 
 FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
 
