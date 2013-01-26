@@ -2,8 +2,9 @@ inherit autotools
 
 DESCRIPTION = "MSM7K"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://librpc/clnt.c;md5=dc4b2e6d754f5ca60e4947e3aef71298"
-PR = "r0"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r1"
 
 SRC_URI = "file://${WORKSPACE}/hardware/msm7k"
 

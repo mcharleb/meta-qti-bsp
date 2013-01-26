@@ -1,9 +1,10 @@
 inherit autotools
-PR = "r1"
+PR = "r2"
 
 DESCRIPTION = "Recovery bootloader"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://NOTICE;md5=9645f39e9db895a4aa6e02cb57294595"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=platform/bootable/recovery.git"
 DEPENDS = "libmincrypt-native system-core"
 RDEPENDS = "zlib bzip2"

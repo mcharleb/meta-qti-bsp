@@ -1,8 +1,9 @@
 DESCRIPTION = "HAL libraries for camera"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://MODULE_LICENSE_BSD;md5=d41d8cd98f00b204e9800998ecf8427e"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
-PR = "r2"
+PR = "r3"
 
 SRC_URI = "file://${WORKSPACE}/camera-hal"
 

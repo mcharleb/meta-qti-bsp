@@ -1,8 +1,9 @@
-PR = "r2"
+PR = "r3"
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=5a1abdab641eec675725c843f43f03af"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=0835ade698e0bcf8506ecda2f7b4f302"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 PROVIDES = "virtual/bootloader"
 
