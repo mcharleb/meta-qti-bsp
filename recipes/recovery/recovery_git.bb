@@ -1,5 +1,5 @@
 inherit autotools
-PR = "r1"
+PR = "r2"
 
 DESCRIPTION = "Recovery bootloader"
 LICENSE = "Apache-2.0"
