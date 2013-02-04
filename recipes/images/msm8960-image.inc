@@ -41,7 +41,7 @@ IMAGE_INSTALL += "alsa-utils-speakertest"
 IMAGE_INSTALL += "alsa-utils-midi"
 IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
-#IMAGE_INSTALL += "mm-core-oss"
+IMAGE_INSTALL += "mm-video-oss"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
