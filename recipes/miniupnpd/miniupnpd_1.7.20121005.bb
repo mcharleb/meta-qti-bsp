@@ -10,13 +10,18 @@ DEPENDS = "data"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r0"
+PR = "r1"
 
 S = "${WORKDIR}/miniupnpd-${PV}"
 
+UPNPD_MIRROR = "http://miniupnp.free.fr/files"
 SRC_URI = "\
-    http://miniupnp.free.fr/files/download.php?file=miniupnpd-${PV}.tar.gz \
+    ${UPNPD_MIRROR}/miniupnpd-${PV}.tar.gz \
     file://0001-qcmap-enabled.patch \
+"
+
+MIRRORS =+ "\
+${UPNPD_MIRROR}      http://miniupnp.tuxfamily.org/files \n \
 "
 
 SRC_URI[md5sum] = "d676ef9516ca3fbdd811aee62f2ca724"
