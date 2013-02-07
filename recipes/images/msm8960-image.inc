@@ -28,6 +28,7 @@ IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 
+IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-liblog"
