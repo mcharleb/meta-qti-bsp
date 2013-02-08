@@ -1,36 +1,23 @@
-From 7871486b28ff5d4a4c0db722ff135eaf74ff66b9 Mon Sep 17 00:00:00 2001
-From: Tyler Wear <twear@quicinc.com>
-Date: Tue, 8 Jan 2013 13:20:42 -0800
+From 2f2609408337308931c356252e0c855355044825 Mon Sep 17 00:00:00 2001
+From: Tyler Wear <twear@codeaurora.org>
+Date: Thu, 7 Feb 2013 11:06:09 -0800
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
- Makefile.linux        |  108 +++++++++++++++++++++++++----------
- UPNP_QCMAP_Client.cpp |   98 +++++++++++++++++++++++++++++++
+ Makefile.linux        |  108 ++++++++++++++++++++++---------
+ UPNP_QCMAP_Client.cpp |   93 +++++++++++++++++++++++++++
  UPNP_QCMAP_Client.h   |   29 +++++++++
- config.h              |  100 ++++++++++++++++++++++++++++++++
+ config.h              |  100 +++++++++++++++++++++++++++++
  miniupnpd.c           |   11 ++--
- miniupnpd.conf        |   20 ++++---
- natpmp.c              |   69 +++++++++++-----------
+ natpmp.c              |   69 ++++++++++----------
  upnpdescgen.c         |    4 +-
- upnpredirect.c        |  152 ++++++++++--------------------------------------
+ upnpredirect.c        |  168 ++++++++-----------------------------------------
  upnpredirect.h        |   16 +++---
- upnpsoap.c            |   16 +++---
- 11 files changed, 406 insertions(+), 217 deletions(-)
- mode change 100644 => 100755 Changelog.txt
- mode change 100644 => 100755 INSTALL
- mode change 100644 => 100755 LICENSE
- mode change 100644 => 100755 Makefile
+ upnpsoap.c            |   18 +++---
+ 10 files changed, 384 insertions(+), 232 deletions(-)
  mode change 100644 => 100755 Makefile.linux
- mode change 100644 => 100755 Makefile.macosx
- mode change 100644 => 100755 README
  create mode 100755 UPNP_QCMAP_Client.cpp
  create mode 100755 UPNP_QCMAP_Client.h
- mode change 100644 => 100755 VERSION
- mode change 100644 => 100755 bsd/Makefile
- mode change 100644 => 100755 bsd/getifstats.c
- mode change 100644 => 100755 bsd/ifacewatcher.c
- mode change 100644 => 100755 bsd/testgetifstats.c
- mode change 100644 => 100755 bsd/testifacewatcher.c
  mode change 100644 => 100755 bsdqueue.h
  mode change 100644 => 100755 codelength.h
  mode change 100644 => 100755 commonrdr.h
@@ -44,30 +31,10 @@ Subject: [PATCH 1/1] qcmap-enabled
  mode change 100644 => 100755 getifstats.h
  mode change 100644 => 100755 getroute.h
  mode change 100644 => 100755 ifacewatcher.h
- mode change 100644 => 100755 ipf/Makefile
- mode change 100644 => 100755 ipf/ipfrdr.c
- mode change 100644 => 100755 ipf/ipfrdr.h
- mode change 100644 => 100755 ipf/testipfrdr.c
- mode change 100644 => 100755 ipfw/Makefile
- mode change 100644 => 100755 ipfw/ipfwaux.c
- mode change 100644 => 100755 ipfw/ipfwaux.h
- mode change 100644 => 100755 ipfw/ipfwrdr.c
- mode change 100644 => 100755 ipfw/ipfwrdr.h
- mode change 100644 => 100755 ipfw/testipfwrdr.c
- mode change 100644 => 100755 linux/getifstats.c
- mode change 100644 => 100755 linux/getroute.c
- mode change 100644 => 100755 linux/ifacewatcher.c
- mode change 100644 => 100755 linux/miniupnpd.init.d.script
- mode change 100644 => 100755 mac/Makefile
- mode change 100644 => 100755 mac/getifstats.c
- mode change 100644 => 100755 mac/org.tuxfamily.miniupnpd.plist.before
- mode change 100644 => 100755 mac/testgetifstats.c
  mode change 100644 => 100755 macros.h
  mode change 100644 => 100755 minissdp.c
  mode change 100644 => 100755 minissdp.h
- mode change 100644 => 100755 miniupnpd.8
  mode change 100644 => 100755 miniupnpd.c
- mode change 100644 => 100755 miniupnpd.conf
  mode change 100644 => 100755 miniupnpdctl.c
  mode change 100644 => 100755 miniupnpdpath.h
  mode change 100644 => 100755 miniupnpdtypes.h
@@ -75,24 +42,8 @@ Subject: [PATCH 1/1] qcmap-enabled
  mode change 100644 => 100755 minixml.h
  mode change 100644 => 100755 natpmp.c
  mode change 100644 => 100755 natpmp.h
- mode change 100644 => 100755 netfilter/Makefile
- mode change 100644 => 100755 netfilter/iptcrdr.c
- mode change 100644 => 100755 netfilter/iptcrdr.h
- mode change 100644 => 100755 netfilter/iptpinhole.c
- mode change 100644 => 100755 netfilter/iptpinhole.h
- mode change 100644 => 100755 netfilter/testiptcrdr.c
- mode change 100644 => 100755 netfilter/testiptpinhole.c
- mode change 100644 => 100755 netfilter/tiny_nf_nat.h
  mode change 100644 => 100755 options.c
  mode change 100644 => 100755 options.h
- mode change 100644 => 100755 pf/Makefile
- mode change 100644 => 100755 pf/obsdrdr.c
- mode change 100644 => 100755 pf/obsdrdr.h
- mode change 100644 => 100755 pf/pfpinhole.c
- mode change 100644 => 100755 pf/pfpinhole.h
- mode change 100644 => 100755 pf/testobsdrdr.c
- mode change 100644 => 100755 pf/testpfpinhole.c
- mode change 100644 => 100755 solaris/getifstats.c
  mode change 100644 => 100755 testgetifaddr.c
  mode change 100644 => 100755 testgetifstats.c
  mode change 100644 => 100755 testgetroute.c
@@ -121,22 +72,10 @@ Subject: [PATCH 1/1] qcmap-enabled
  mode change 100644 => 100755 upnputils.c
  mode change 100644 => 100755 upnputils.h
 
-diff --git a/Changelog.txt b/Changelog.txt
-old mode 100644
-new mode 100755
-diff --git a/INSTALL b/INSTALL
-old mode 100644
-new mode 100755
-diff --git a/LICENSE b/LICENSE
-old mode 100644
-new mode 100755
-diff --git a/Makefile b/Makefile
-old mode 100644
-new mode 100755
 diff --git a/Makefile.linux b/Makefile.linux
 old mode 100644
 new mode 100755
-index 3521a5a..c18a380
+index 3521a5a..c9d5243
 --- a/Makefile.linux
 +++ b/Makefile.linux
 @@ -29,10 +29,10 @@ CFLAGS += -Wall
@@ -361,25 +300,24 @@ index 3521a5a..c18a380
 -testgetifstats.o: getifstats.h
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
-diff --git a/Makefile.macosx b/Makefile.macosx
-old mode 100644
-new mode 100755
-diff --git a/README b/README
-old mode 100644
-new mode 100755
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
 new file mode 100755
-index 0000000..bfec31a
+index 0000000..8ca8c37
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,93 @@
 +#include "QCMAP_Client.h"
 +
 +QCMAP_Client *QcMapClient = NULL;
 +
-+int addStaticNatEntry_wrapper1(struct in_addr addr, unsigned int proto, unsigned int local_port, unsigned int g_port)
++#ifdef __cplusplus
++       extern "C"
++       {
++#endif
++
++int addStaticNatEntry_wrapper(struct in_addr addr, unsigned int proto, unsigned int local_port, unsigned int g_port)
 +{
-+  qcmap_msgr_snat_entry_config_v01 snat_entry;
++	qcmap_msgr_snat_entry_config_v01 snat_entry;
 +
 +  if(QcMapClient == NULL)
 +  {
@@ -393,16 +331,6 @@ index 0000000..bfec31a
 +  snat_entry.global_port = (uint16)g_port;
 +  
 +  return QcMapClient->AddStaticNatEntry(&snat_entry);
-+}
-+
-+#ifdef __cplusplus
-+       extern "C"
-+       {
-+#endif
-+
-+int addStaticNatEntry_wrapper(struct in_addr addr, unsigned int proto, unsigned int local_port, unsigned int g_port)
-+{
-+	return addStaticNatEntry_wrapper1( addr, proto, local_port, g_port);
 +}
 +
 +int deleteStaticNatEntry_wrapper(unsigned short port, int proto)
@@ -474,7 +402,7 @@ index 0000000..bfec31a
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.h b/UPNP_QCMAP_Client.h
 new file mode 100755
-index 0000000..0e28b64
+index 0000000..31186af
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.h
 @@ -0,0 +1,29 @@
@@ -508,24 +436,6 @@ index 0000000..0e28b64
 +}
 +#endif
 \ No newline at end of file
-diff --git a/VERSION b/VERSION
-old mode 100644
-new mode 100755
-diff --git a/bsd/Makefile b/bsd/Makefile
-old mode 100644
-new mode 100755
-diff --git a/bsd/getifstats.c b/bsd/getifstats.c
-old mode 100644
-new mode 100755
-diff --git a/bsd/ifacewatcher.c b/bsd/ifacewatcher.c
-old mode 100644
-new mode 100755
-diff --git a/bsd/testgetifstats.c b/bsd/testgetifstats.c
-old mode 100644
-new mode 100755
-diff --git a/bsd/testifacewatcher.c b/bsd/testifacewatcher.c
-old mode 100644
-new mode 100755
 diff --git a/bsdqueue.h b/bsdqueue.h
 old mode 100644
 new mode 100755
@@ -668,60 +578,6 @@ new mode 100755
 diff --git a/ifacewatcher.h b/ifacewatcher.h
 old mode 100644
 new mode 100755
-diff --git a/ipf/Makefile b/ipf/Makefile
-old mode 100644
-new mode 100755
-diff --git a/ipf/ipfrdr.c b/ipf/ipfrdr.c
-old mode 100644
-new mode 100755
-diff --git a/ipf/ipfrdr.h b/ipf/ipfrdr.h
-old mode 100644
-new mode 100755
-diff --git a/ipf/testipfrdr.c b/ipf/testipfrdr.c
-old mode 100644
-new mode 100755
-diff --git a/ipfw/Makefile b/ipfw/Makefile
-old mode 100644
-new mode 100755
-diff --git a/ipfw/ipfwaux.c b/ipfw/ipfwaux.c
-old mode 100644
-new mode 100755
-diff --git a/ipfw/ipfwaux.h b/ipfw/ipfwaux.h
-old mode 100644
-new mode 100755
-diff --git a/ipfw/ipfwrdr.c b/ipfw/ipfwrdr.c
-old mode 100644
-new mode 100755
-diff --git a/ipfw/ipfwrdr.h b/ipfw/ipfwrdr.h
-old mode 100644
-new mode 100755
-diff --git a/ipfw/testipfwrdr.c b/ipfw/testipfwrdr.c
-old mode 100644
-new mode 100755
-diff --git a/linux/getifstats.c b/linux/getifstats.c
-old mode 100644
-new mode 100755
-diff --git a/linux/getroute.c b/linux/getroute.c
-old mode 100644
-new mode 100755
-diff --git a/linux/ifacewatcher.c b/linux/ifacewatcher.c
-old mode 100644
-new mode 100755
-diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
-old mode 100644
-new mode 100755
-diff --git a/mac/Makefile b/mac/Makefile
-old mode 100644
-new mode 100755
-diff --git a/mac/getifstats.c b/mac/getifstats.c
-old mode 100644
-new mode 100755
-diff --git a/mac/org.tuxfamily.miniupnpd.plist.before b/mac/org.tuxfamily.miniupnpd.plist.before
-old mode 100644
-new mode 100755
-diff --git a/mac/testgetifstats.c b/mac/testgetifstats.c
-old mode 100644
-new mode 100755
 diff --git a/macros.h b/macros.h
 old mode 100644
 new mode 100755
@@ -729,9 +585,6 @@ diff --git a/minissdp.c b/minissdp.c
 old mode 100644
 new mode 100755
 diff --git a/minissdp.h b/minissdp.h
-old mode 100644
-new mode 100755
-diff --git a/miniupnpd.8 b/miniupnpd.8
 old mode 100644
 new mode 100755
 diff --git a/miniupnpd.c b/miniupnpd.c
@@ -758,63 +611,6 @@ index ee5cc91..867e44c
  #ifdef ENABLE_6FC_SERVICE
  #ifdef USE_NETFILTER
  	init_iptpinhole();
-diff --git a/miniupnpd.conf b/miniupnpd.conf
-old mode 100644
-new mode 100755
-index e34e088..f32dff9
---- a/miniupnpd.conf
-+++ b/miniupnpd.conf
-@@ -1,5 +1,6 @@
- # WAN network interface
--ext_ifname=eth1
-+#ext_ifname=eth1
-+ext_ifname=wlan0
- #ext_ifname=xl1
- # if the WAN interface has several IP addresses, you
- # can specify the one to use below
-@@ -15,7 +16,8 @@ ext_ifname=eth1
- # address associated with the subnet follows. for example :
- #  listening_ip=192.168.0.1/24 88.22.44.13
- #listening_ip=192.168.0.1/24
--listening_ip=192.168.10.109/24
-+#listening_ip=192.168.10.109/24
-+listening_ip=192.168.225.1/24		#default for 9x25 device
- #listening_ip=eth0
- # port for HTTP (descriptions and SOAP) traffic. set 0 for autoselect.
- port=0
-@@ -40,7 +42,7 @@ enable_upnp=yes
- #lease_file=/var/log/upnp.leases
- 
- # name of this service, default is "`uname -s` Router"
--#friendly_name=MiniUPnPd router
-+friendly_name=MiniUPnPd router
- 
- # bitrates reported by daemon in bits per second
- bitrate_up=1000000
-@@ -91,7 +93,7 @@ clean_ruleset_interval=600
- #quickrules=no
- 
- # uuid : generate your own with "make genuuid"
--uuid=3d3cec3a-8cf0-11e0-98ee-001a6bd2d07b
-+uuid=c204985d-c1ee-45ff-b7bf-7dd62c6355e3
- 
- # serial and model number the daemon will report to clients
- # in its XML description
-@@ -105,9 +107,9 @@ model_number=1
- # ip/mask format must be nn.nn.nn.nn/nn
- # it is advised to only allow redirection of port above 1024
- # and to finish the rule set with "deny 0-65535 0.0.0.0/0 0-65535"
--allow 1024-65535 192.168.0.0/24 1024-65535
--allow 1024-65535 192.168.1.0/24 1024-65535
--allow 1024-65535 192.168.0.0/23 22
--allow 12345 192.168.7.113/32 54321
--deny 0-65535 0.0.0.0/0 0-65535
-+#allow 1024-65535 192.168.0.0/24 0-65535
-+#allow 1024-65535 192.168.1.0/24 1024-65535
-+#allow 1024-65535 192.168.0.0/23 22
-+#allow 12345 192.168.7.113/32 54321
-+allow 0-65535 0.0.0.0/0 0-65535
- 
 diff --git a/miniupnpdctl.c b/miniupnpdctl.c
 old mode 100644
 new mode 100755
@@ -929,58 +725,10 @@ index c596781..b85b3e6
 diff --git a/natpmp.h b/natpmp.h
 old mode 100644
 new mode 100755
-diff --git a/netfilter/Makefile b/netfilter/Makefile
-old mode 100644
-new mode 100755
-diff --git a/netfilter/iptcrdr.c b/netfilter/iptcrdr.c
-old mode 100644
-new mode 100755
-diff --git a/netfilter/iptcrdr.h b/netfilter/iptcrdr.h
-old mode 100644
-new mode 100755
-diff --git a/netfilter/iptpinhole.c b/netfilter/iptpinhole.c
-old mode 100644
-new mode 100755
-diff --git a/netfilter/iptpinhole.h b/netfilter/iptpinhole.h
-old mode 100644
-new mode 100755
-diff --git a/netfilter/testiptcrdr.c b/netfilter/testiptcrdr.c
-old mode 100644
-new mode 100755
-diff --git a/netfilter/testiptpinhole.c b/netfilter/testiptpinhole.c
-old mode 100644
-new mode 100755
-diff --git a/netfilter/tiny_nf_nat.h b/netfilter/tiny_nf_nat.h
-old mode 100644
-new mode 100755
 diff --git a/options.c b/options.c
 old mode 100644
 new mode 100755
 diff --git a/options.h b/options.h
-old mode 100644
-new mode 100755
-diff --git a/pf/Makefile b/pf/Makefile
-old mode 100644
-new mode 100755
-diff --git a/pf/obsdrdr.c b/pf/obsdrdr.c
-old mode 100644
-new mode 100755
-diff --git a/pf/obsdrdr.h b/pf/obsdrdr.h
-old mode 100644
-new mode 100755
-diff --git a/pf/pfpinhole.c b/pf/pfpinhole.c
-old mode 100644
-new mode 100755
-diff --git a/pf/pfpinhole.h b/pf/pfpinhole.h
-old mode 100644
-new mode 100755
-diff --git a/pf/testobsdrdr.c b/pf/testobsdrdr.c
-old mode 100644
-new mode 100755
-diff --git a/pf/testpfpinhole.c b/pf/testpfpinhole.c
-old mode 100644
-new mode 100755
-diff --git a/solaris/getifstats.c b/solaris/getifstats.c
 old mode 100644
 new mode 100755
 diff --git a/testgetifaddr.c b/testgetifaddr.c
@@ -1061,19 +809,10 @@ new mode 100755
 diff --git a/upnpredirect.c b/upnpredirect.c
 old mode 100644
 new mode 100755
-index 5c9beae..bcc3c5e
+index 5c9beae..cad8583
 --- a/upnpredirect.c
 +++ b/upnpredirect.c
-@@ -18,6 +18,8 @@
- #include <ctype.h>
- #include <unistd.h>
- 
-+//#include "UPNP_QCMAP_Client.h"
-+
- #include "macros.h"
- #include "config.h"
- #include "upnpredirect.h"
-@@ -255,7 +257,7 @@ int reload_from_lease_file()
+@@ -255,7 +255,7 @@ int reload_from_lease_file()
   *          -3 permission check failed
   */
  int
@@ -1082,42 +821,49 @@ index 5c9beae..bcc3c5e
                const char * iaddr, unsigned short iport,
                const char * protocol, const char * desc,
                unsigned int leaseduration)
-@@ -278,11 +280,11 @@ upnp_redirect(const char * rhost, unsigned short eport,
+@@ -278,93 +278,48 @@ upnp_redirect(const char * rhost, unsigned short eport,
  		                 "%hu->%s:%hu %s", eport, iaddr, iport, protocol);
  		return -3;
  	}
 -	r = get_redirect_rule(ext_if_name, eport, proto,
-+	/*r = get_redirect_rule(ext_if_name, eport, proto,
- 	                      iaddr_old, sizeof(iaddr_old), &iport_old, 0, 0,
- 	                      0, 0,
+-	                      iaddr_old, sizeof(iaddr_old), &iport_old, 0, 0,
+-	                      0, 0,
 -	                      &timestamp, 0, 0);
 -	if(r == 0) {
-+	                      &timestamp, 0, 0);*/
-+	if(r == 1) { //change back to 0
- 		/* if existing redirect rule matches redirect request return success
- 		 * xbox 360 does not keep track of the port it redirects and will
- 		 * redirect another port when receiving ConflictInMappingEntry */
-@@ -298,57 +300,36 @@ upnp_redirect(const char * rhost, unsigned short eport,
- 		timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
- 		syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
- 			eport, iaddr, iport, protocol, desc);
+-		/* if existing redirect rule matches redirect request return success
+-		 * xbox 360 does not keep track of the port it redirects and will
+-		 * redirect another port when receiving ConflictInMappingEntry */
+-		if(strcmp(iaddr, iaddr_old)==0 && iport==iport_old) {
+-			syslog(LOG_INFO, "ignoring redirect request as it matches existing redirect");
+-		} else {
+ 
+-			syslog(LOG_INFO, "port %hu protocol %s already redirected to %s:%hu",
+-				eport, protocol, iaddr_old, iport_old);
+-			return -2;
+-		}
+-	} else {
+-		timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
+-		syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
+-			eport, iaddr, iport, protocol, desc);
 -		return upnp_redirect_internal(rhost, eport, iaddr, iport, proto,
 -		                              desc, timestamp);
-+		
-+		return upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
- 	}
+-	}
++	timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
++	syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
++		eport, iaddr, iport, protocol, desc);
++	
++	return upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
  
  	return 0;
  }
  
  int
 -upnp_redirect_internal(const char * rhost, unsigned short eport,
-+upnp_redirect_internal(/*const char * rhost,*/ unsigned short eport,
++upnp_redirect_internal(unsigned short eport,
                         const char * iaddr, unsigned short iport,
 -                       int proto, const char * desc,
 -                       unsigned int timestamp)
-+                       int proto/*, const char * desc,
-+                       unsigned int timestamp*/)
++                       int proto)
  {
 -	/*syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
 -		eport, iaddr, iport, protocol, desc);			*/
@@ -1152,7 +898,7 @@ index 5c9beae..bcc3c5e
 -#endif
 -	return 0;
 +
-+	//return addStaticNatEntry_wrapper(address, proto, iport, eport);
++	return addStaticNatEntry_wrapper(address, proto, iport, eport);
  }
  
  
@@ -1160,14 +906,13 @@ index 5c9beae..bcc3c5e
  /* Firewall independant code which call the FW dependant code. */
  int
 -upnp_get_redirection_infos(unsigned short eport, const char * protocol,
-+upnp_get_redirection_infos(/*unsigned short eport, const char * protocol,
-                            unsigned short * iport,
+-                           unsigned short * iport,
 -                           char * iaddr, int iaddrlen,
-+                           char * iaddr, int iaddrlen,*/
-                            char * desc, int desclen,
+-                           char * desc, int desclen,
++upnp_get_redirection_infos(char * desc, int desclen,
                             char * rhost, int rhostlen,
                             unsigned int * leaseduration)
-@@ -356,15 +337,12 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
+ {
  	int r;
  	unsigned int timestamp;
  	time_t current_time;
@@ -1185,7 +930,15 @@ index 5c9beae..bcc3c5e
  	if(r == 0 &&
  	   timestamp > 0 &&
  	   timestamp > (unsigned int)(current_time = time(NULL))) {
-@@ -393,18 +371,19 @@ upnp_get_redirection_infos_by_index(int index,
+@@ -384,7 +339,6 @@ upnp_get_redirection_infos_by_index(int index,
+                                     char * rhost, int rhostlen,
+                                     unsigned int * leaseduration)
+ {
+-	/*char ifname[IFNAMSIZ];*/
+ 	int proto = 0;
+ 	unsigned int timestamp;
+ 	time_t current_time;
+@@ -393,18 +347,18 @@ upnp_get_redirection_infos_by_index(int index,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
@@ -1194,8 +947,7 @@ index 5c9beae..bcc3c5e
 -	                              rhost, rhostlen, &timestamp,
 -	                              0, 0) < 0)
 +
-+//	if (getStaticNatConfigByEntry(index, iaddr, iaddrlen, eport, iport, &proto) < 0)
-+        if(1)
++	if (getStaticNatConfigByEntry(index, iaddr, iaddrlen, eport, iport, &proto) < 0)
 +	{
  		return -1;
 +	}
@@ -1210,16 +962,16 @@ index 5c9beae..bcc3c5e
  			memcpy(protocol, "TCP", 4);
  		else
  			memcpy(protocol, "UDP", 4);
-@@ -418,7 +397,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
+@@ -418,7 +372,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
  {
  	int r;
  #if defined(__linux__)
 -	r = delete_redirect_and_filter_rules(eport, proto);
-+	//r = deleteStaticNatEntry_wrapper( eport, proto);
++	r = deleteStaticNatEntry_wrapper( eport, proto);
  #else
  	r = delete_redirect_rule(ext_if_name, eport, proto);
  	delete_filter_rule(ext_if_name, eport, proto);
-@@ -466,10 +445,6 @@ upnp_get_portmapping_number_of_entries()
+@@ -466,45 +420,18 @@ upnp_get_portmapping_number_of_entries()
  struct rule_state *
  get_upnp_rules_state_list(int max_rules_number_target)
  {
@@ -1230,7 +982,12 @@ index 5c9beae..bcc3c5e
  	struct rule_state * tmp;
  	struct rule_state * list = 0;
  	struct rule_state * * p;
-@@ -482,29 +457,7 @@ get_upnp_rules_state_list(int max_rules_number_target)
+ 	int i = 0;
+ 	time_t current_time;
+ 
+-	/*ifname[0] = '\0';*/
+ 	tmp = malloc(sizeof(struct rule_state));
+ 	if(!tmp)
  		return 0;
  	current_time = time(NULL);
  	nextruletoclean_timestamp = 0;
@@ -1261,7 +1018,7 @@ index 5c9beae..bcc3c5e
  	free(tmp);
  	/* remove the redirections that need to be removed */
  	for(p = &list, tmp = list; tmp; tmp = *p)
-@@ -536,27 +489,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
+@@ -536,27 +463,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
  void
  remove_unused_rules(struct rule_state * list)
  {
@@ -1289,18 +1046,17 @@ index 5c9beae..bcc3c5e
  		tmp = list;
  		list = tmp->next;
  		free(tmp);
-@@ -569,8 +507,8 @@ remove_unused_rules(struct rule_state * list)
+@@ -569,16 +481,15 @@ remove_unused_rules(struct rule_state * list)
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
 -upnp_get_portmappings_in_range(unsigned short startport,
 -                               unsigned short endport,
-+upnp_get_portmappings_in_range(/*unsigned short startport,
-+                               unsigned short endport,*/
-                                const char * protocol,
+-                               const char * protocol,
++upnp_get_portmappings_in_range(const char * protocol,
                                 unsigned int * number)
  {
-@@ -578,7 +516,8 @@ upnp_get_portmappings_in_range(unsigned short startport,
+ 	int proto;
  	proto = proto_atoi(protocol);
  	if(!number)
  		return NULL;
@@ -1310,7 +1066,7 @@ index 5c9beae..bcc3c5e
  }
  
  /* stuff for miniupnpdctl */
-@@ -586,34 +525,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
+@@ -586,34 +497,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
  void
  write_ruleset_details(int s)
  {
@@ -1403,7 +1159,7 @@ new mode 100755
 diff --git a/upnpsoap.c b/upnpsoap.c
 old mode 100644
 new mode 100755
-index a12539c..fa2e32a
+index a12539c..3f131c0
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
 @@ -409,7 +409,7 @@ AddPortMapping(struct upnphttp * h, const char * action)
@@ -1435,15 +1191,17 @@ index a12539c..fa2e32a
  	                               desc, sizeof(desc),
  	                               NULL, 0,
  	                               &leaseduration);
-@@ -763,7 +763,7 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
+@@ -763,8 +763,8 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
  		return;
  	}
  
 -	port_list = upnp_get_portmappings_in_range(startport, endport,
-+	port_list = upnp_get_portmappings_in_range(/*startport, endport,*/
- 	                                           protocol, &number);
+-	                                           protocol, &number);
++	port_list = upnp_get_portmappings_in_range(protocol, &number);
++
  	for(i = 0; i < number; i++)
  	{
+ 		r = upnp_delete_redirection(port_list[i], protocol);
 @@ -957,7 +957,7 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  	memcpy(body+bodylen, list_start, sizeof(list_start));
  	bodylen += (sizeof(list_start) - 1);
@@ -1453,17 +1211,17 @@ index a12539c..fa2e32a
  	                                           protocol, &list_size);
  	/* loop through port mappings */
  	for(i = 0; number > 0 && i < list_size; i++)
-@@ -976,8 +976,8 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
+@@ -976,9 +976,7 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  			}
  		}
  		rhost[0] = '\0';
 -		r = upnp_get_redirection_infos(port_list[i], protocol, &iport,
 -		                               int_ip, sizeof(int_ip),
-+		r = upnp_get_redirection_infos(/*port_list[i], protocol, &iport, 
-+									   int_ip, sizeof(int_ip),*/
- 		                               desc, sizeof(desc),
+-		                               desc, sizeof(desc),
++		r = upnp_get_redirection_infos(desc, sizeof(desc),
  		                               rhost, sizeof(rhost),
  		                               &leaseduration);
+ 		if(r == 0)
 diff --git a/upnpsoap.h b/upnpsoap.h
 old mode 100644
 new mode 100755
