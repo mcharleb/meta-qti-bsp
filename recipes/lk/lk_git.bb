@@ -1,4 +1,4 @@
-PR = "r3"
+PR = "r4"
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -14,18 +14,25 @@ S = "${WORKDIR}/${PN}"
 
 MY_TARGET = ${@base_conditional('MACHINE', '9615-cdp', 'mdm9615', '${MACHINE}', d)}
 
+BOOTLOADER_NAME = ${@base_conditional('MACHINE', 'msm8960', 'emmc_appsboot', 'appsboot', d)}
+
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
+EXTRA_OEMAKE_append_msm8960 = " EMMC_BOOT=1 SIGNED_KERNEL=1"
 
 do_install() {
 	install	-d ${D}/boot
-	install build-${MY_TARGET}/appsboot.{mbn,raw} ${D}/boot
+	install build-${MY_TARGET}/${BOOTLOADER_NAME}.{mbn,raw} ${D}/boot
+}
+
+do_install_append_msm8960() {
+	install build-${MY_TARGET}/EMMCBOOT.MBN ${D}/boot
 }
 
 FILES_${PN} = "/boot"
 
 do_deploy () {
         install -d ${DEPLOY_DIR_IMAGE}
-        install build-${MY_TARGET}/appsboot.{mbn,raw} ${DEPLOY_DIR_IMAGE}
+        install build-${MY_TARGET}/${BOOTLOADER_NAME}.{mbn,raw} ${DEPLOY_DIR_IMAGE}
 
 	# FIXME !!  Not sure what we're doing here- and this is a PSTAGE type function...
         #package_stagefile_shell ${DEPLOY_DIR_IMAGE}/appsboot.mbn
