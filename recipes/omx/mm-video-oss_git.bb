@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r9"
+PR = "r10"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
@@ -25,6 +25,9 @@ EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8960', ' --enable-targ
 
 CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
 CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
+
+CPPFLAGS += "-I${STAGING_INCDIR}/c++"
+CPPFLAGS += "-I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 
 LDFLAGS += "-lglib-2.0"
 
