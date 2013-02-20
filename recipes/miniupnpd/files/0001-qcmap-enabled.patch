@@ -321,7 +321,7 @@ index 0000000..8ca8c37
 +
 +  if(QcMapClient == NULL)
 +  {
-+    QcMapClient = new QCMAP_Client();
++    QcMapClient = new QCMAP_Client(NULL);
 +  }
 +
 +  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
@@ -341,7 +341,7 @@ index 0000000..8ca8c37
 +
 +  if(QcMapClient == NULL)
 +  {
-+    QcMapClient = new QCMAP_Client();
++    QcMapClient = new QCMAP_Client(NULL);
 +  }
 +
 +  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
@@ -369,7 +369,7 @@ index 0000000..8ca8c37
 +{ 
 +  if(QcMapClient == NULL)
 +  {
-+    QcMapClient = new QCMAP_Client();
++    QcMapClient = new QCMAP_Client(NULL);
 +  }
 +  in_addr tmpIP;
 +  int i=0, num_entries=0;
