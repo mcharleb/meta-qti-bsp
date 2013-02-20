@@ -67,7 +67,7 @@ case "$1" in
             c=`expr $c + 1`
         done
 
-        if [ $c -ge $RETRY_LIMIT ]; then
+        if [ $c -gt $RETRY_LIMIT ]; then
             echo "WLAN bring-up failed!"
             exit
         fi

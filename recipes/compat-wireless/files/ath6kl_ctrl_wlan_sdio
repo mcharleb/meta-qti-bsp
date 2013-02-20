@@ -68,7 +68,7 @@ case "$1" in
         done
         echo 0 > /sys/devices/msm_sdcc.$SDCC_SLOT/polling
 
-        if [ $c -ge $RETRY_LIMIT ]; then
+        if [ $c -gt $RETRY_LIMIT ]; then
             echo "WLAN bring-up failed!"
             exit
         fi
