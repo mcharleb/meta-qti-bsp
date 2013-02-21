@@ -50,6 +50,7 @@ case "$1" in
 
         set -e
         c=1
+        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
         insmod $MODULE_BASE/compat/compat.ko
         insmod $MODULE_BASE/net/wireless/cfg80211.ko
         insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
@@ -88,6 +89,7 @@ case "$1" in
         rmmod ath6kl_core
         rmmod cfg80211
         rmmod compat
+        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
         ;;
 
     restart)
