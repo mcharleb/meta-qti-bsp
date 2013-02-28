@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=d7810fab7487fb0aad327b76f1be7cd7"
 DEPENDS = "virtual/kernel"
 RDEPENDS = "wireless-tools"
 
-INC_PR = "r0"
+INC_PR = "r1"
 
 SRC_URI = "file://${WORKSPACE}/external/compat-wireless"
 
@@ -23,5 +23,5 @@ EXTRA_OEMAKE = "KLIB_BUILD=${STAGING_KERNEL_DIR} KLIB=${D}"
 
 do_install() {
     oe_runmake DEPMOD=echo DESTDIR="${D}" INSTALL_MOD_PATH="${D}" \
-                      LDFLAGS="" install-modules
+                      LDFLAGS="" INSTALL_MOD_STRIP=1 install-modules
 }
