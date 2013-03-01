@@ -43,9 +43,7 @@ do_install_append() {
    mkdir -p ${D}/usr/lib/hw
 
    # Move and rename libcamera.so files to hw/machine-specific names.
-   mv ${D}/usr/lib/libcamera.so.0.0.0 ${D}/usr/lib/hw/libcamera.so
-   rm ${D}/usr/lib/libcamera.so.0
-   rm ${D}/usr/lib/libcamera.so
+   cp ${D}/usr/lib/libcamera.so.0.0.0 ${D}/usr/lib/hw/libcamera.so
 
    pushd ${D}/usr/lib/hw
    ln -s libcamera.so ./camera.msm8960.so
