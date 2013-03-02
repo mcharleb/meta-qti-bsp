@@ -12,20 +12,13 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 # Package Revision (update whenever recipe is changed)
 PR = "r1"
 
-S = "${WORKDIR}/miniupnpd-${PV}"
-
-UPNPD_MIRROR = "http://miniupnp.free.fr/files"
 SRC_URI = "\
-    ${UPNPD_MIRROR}/miniupnpd-${PV}.tar.gz \
+    https://www.codeaurora.org/mirrored_source/quic/le/miniupnpd-1.8.tar.gz \
     file://0001-qcmap-enabled.patch \
 "
 
-MIRRORS =+ "\
-${UPNPD_MIRROR}      http://miniupnp.tuxfamily.org/files \n \
-"
-
-SRC_URI[md5sum] = "d676ef9516ca3fbdd811aee62f2ca724"
-SRC_URI[sha256sum] = "5b8b8163fc578f6acb923b62002b38f071ff68fc178922dc0ff2410490ec6a0e"
+SRC_URI[md5sum] = "0d8a8e936d5a0012cb260a3b972acbf3"
+SRC_URI[sha256sum] = "e453a9225a2883e759d09e15c51bb0265b8a019d1132434131e6929fef0076bb"
 
 do_compile () {
     cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR}
