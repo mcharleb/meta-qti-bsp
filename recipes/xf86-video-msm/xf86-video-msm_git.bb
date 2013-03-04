@@ -1,15 +1,12 @@
 require recipes-graphics/xorg-driver/xorg-driver-common.inc
 
-inherit localgit
-
 DESCRIPTION = "X.Org X server -- MSM display driver"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-PV = "git-${GITSHA}"
-PR = "r4"
 
-SRC_DIR = "${WORKSPACE}/xf86-video-msm"
+PR = "r5"
 
+SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
 
 EXTRA_OECONF_append += "--with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include"
