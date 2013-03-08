@@ -1,0 +1,15 @@
+--- xmllint.c	2013-03-07 11:25:57.771674798 -0800
++++ ../xmllint.c	2010-11-03 07:49:11.000000000 -0700
+@@ -3349,11 +3349,11 @@
+ 	     i++;
+ #ifdef LIBXML_OUTPUT_ENABLED
+ 	     format = atoi(argv[i]);
+-#endif /* LIBXML_OUTPUT_ENABLED */
+ 	     if (format == 1) {
+ 	         noblanks++;
+ 	         xmlKeepBlanksDefault(0);
+ 	     }
++#endif /* LIBXML_OUTPUT_ENABLED */
+ 	}
+ #ifdef LIBXML_READER_ENABLED
+ 	else if ((!strcmp(argv[i], "-stream")) ||
