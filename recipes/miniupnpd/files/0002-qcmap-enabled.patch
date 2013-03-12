@@ -1,24 +1,26 @@
-From 808daf6c8b1fdafa231bbc312a36c00f1821ab12 Mon Sep 17 00:00:00 2001
+From 7f6614816a0986d901938314e4c1897c4dcbfed9 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Tue, 5 Mar 2013 10:11:24 -0800
+Date: Tue, 12 Mar 2013 12:47:23 -0700
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
- Makefile.linux        |  108 +++++++++++++++++++++++---------
- UPNP_QCMAP_Client.cpp |  135 ++++++++++++++++++++++++++++++++++++++++
- UPNP_QCMAP_Client.h   |   29 +++++++++
- config.h              |  100 ++++++++++++++++++++++++++++++
- miniupnpd.c           |   11 ++--
- miniupnpd.conf        |   18 +++---
- natpmp.c              |   69 +++++++++++----------
- upnpdescgen.c         |    4 +-
- upnpredirect.c        |  163 ++++++++-----------------------------------------
- upnpredirect.h        |   14 ++--
- upnpsoap.c            |   18 +++---
- 11 files changed, 436 insertions(+), 233 deletions(-)
- create mode 100755 UPNP_QCMAP_Client.cpp
+ Makefile.linux                |  108 +++++++++++++++++++--------
+ UPNP_QCMAP_Client.cpp         |  135 ++++++++++++++++++++++++++++++++++
+ UPNP_QCMAP_Client.h           |   29 +++++++
+ config.h                      |  100 +++++++++++++++++++++++++
+ linux/miniupnpd.init.d.script |   21 +----
+ miniupnpd.c                   |   11 ++-
+ miniupnpd.conf                |   20 +++--
+ natpmp.c                      |   69 +++++++++---------
+ upnpdescgen.c                 |    4 +-
+ upnpredirect.c                |  163 +++++++----------------------------------
+ upnpredirect.h                |   14 ++--
+ upnpsoap.c                    |   18 ++--
+ 12 files changed, 442 insertions(+), 250 deletions(-)
+ create mode 100644 UPNP_QCMAP_Client.cpp
  create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
+ mode change 100644 => 100755 linux/miniupnpd.init.d.script
 
 diff --git a/Makefile.linux b/Makefile.linux
 index 3521a5a..c9d5243 100644
@@ -247,8 +249,8 @@ index 3521a5a..c9d5243 100644
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
-new file mode 100755
-index 0000000..0ee1e83
+new file mode 100644
+index 0000000..abb637a
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
 @@ -0,0 +1,135 @@
@@ -530,6 +532,53 @@ index 0000000..7ec9e8d
 +/*#define DISABLE_CONFIG_FILE*/
 +
 +#endif
+diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
+old mode 100644
+new mode 100755
+index ee6e47b..f36ab66
+--- a/linux/miniupnpd.init.d.script
++++ b/linux/miniupnpd.init.d.script
+@@ -16,35 +16,24 @@
+ set -e
+ 
+ MINIUPNPD=/usr/sbin/miniupnpd
+-ARGS='-f /etc/miniupnpd/miniupnpd.conf'
+-
+-IPTABLES_CREATE=/etc/miniupnpd/iptables_init.sh
+-IPTABLES_REMOVE=/etc/miniupnpd/iptables_removeall.sh
++ARGS='-f /etc/miniupnpd/miniupnpd.conf -a wlan0'
++WLANARGS='-f /etc/miniupnpd/miniupnpd.conf -i wlan0'
+ 
+ test -f $MINIUPNPD || exit 0
+ 
+-. /lib/lsb/init-functions
+-
+ case "$1" in
+   start)
+-	log_daemon_msg "Starting miniupnpd" "miniupnpd"
+-	$IPTABLES_CREATE > /dev/null 2>&1
+ 	start-stop-daemon --start --quiet --pidfile /var/run/miniupnpd.pid --startas $MINIUPNPD -- $ARGS $LSBNAMES
+-	log_end_msg $?
++	;;
++  startWLAN)
++	start-stop-daemon --start --quiet --pidfile /var/run/miniupnpd.pid --startas $MINIUPNPD -- $WLANARGS $LSBNAMES
+ 	;;
+   stop)
+-	log_daemon_msg "Stopping miniupnpd" "miniupnpd"
+ 	start-stop-daemon --stop --quiet --pidfile /var/run/miniupnpd.pid
+-	log_end_msg $?
+-	$IPTABLES_REMOVE > /dev/null 2>&1
+ 	;;
+   restart|reload|force-reload)
+-	log_daemon_msg "Restarting miniupnpd" "miniupnpd"
+ 	start-stop-daemon --stop --retry 5 --quiet --pidfile /var/run/miniupnpd.pid
+-	$IPTABLES_REMOVE > /dev/null 2>&1
+-	$IPTABLES_CREATE > /dev/null 2>&1
+ 	start-stop-daemon --start --quiet --pidfile /var/run/miniupnpd.pid --startas $MINIUPNPD -- $ARGS $LSBNAMES
+-	log_end_msg $?
+ 	;;
+   status)
+ 	status_of_proc /usr/sbin/miniupnpd miniupnpd
 diff --git a/miniupnpd.c b/miniupnpd.c
 index 050d8db..43500c8 100644
 --- a/miniupnpd.c
@@ -553,34 +602,36 @@ index 050d8db..43500c8 100644
  #ifdef USE_NETFILTER
  	init_iptpinhole();
 diff --git a/miniupnpd.conf b/miniupnpd.conf
-index e34e088..367a19c 100644
+index e34e088..4cdb273 100644
 --- a/miniupnpd.conf
 +++ b/miniupnpd.conf
 @@ -1,5 +1,6 @@
  # WAN network interface
 -ext_ifname=eth1
 +#ext_ifname=eth1
-+ext_ifname=wlan0
++ext_ifname=rmnet0
  #ext_ifname=xl1
  # if the WAN interface has several IP addresses, you
  # can specify the one to use below
-@@ -15,7 +16,8 @@ ext_ifname=eth1
+@@ -15,8 +16,9 @@ ext_ifname=eth1
  # address associated with the subnet follows. for example :
  #  listening_ip=192.168.0.1/24 88.22.44.13
  #listening_ip=192.168.0.1/24
 -listening_ip=192.168.10.109/24
-+#listening_ip=192.168.10.109/24
-+listening_ip=192.168.225.1/24		#default for 9x25 device
- #listening_ip=eth0
+-#listening_ip=eth0
++listening_ip=wlan1
++listening_ip=rndis0
++listening_ip=ecm0
  # port for HTTP (descriptions and SOAP) traffic. set 0 for autoselect.
  port=0
+ 
 @@ -40,7 +42,7 @@ enable_upnp=yes
  #lease_file=/var/log/upnp.leases
-
+ 
  # name of this service, default is "`uname -s` Router"
 -#friendly_name=MiniUPnPd router
-+friendly_name=MiniUPnPd router
-
++friendly_name=9x25 MobileAP UPnP
+ 
  # bitrates reported by daemon in bits per second
  bitrate_up=1000000
 @@ -105,9 +107,9 @@ model_number=1
@@ -597,7 +648,7 @@ index e34e088..367a19c 100644
 +#allow 1024-65535 192.168.0.0/23 22
 +#allow 12345 192.168.7.113/32 54321
 +allow 0-65535 0.0.0.0/0 0-65535
-
+ 
 diff --git a/natpmp.c b/natpmp.c
 index c596781..b85b3e6 100644
 --- a/natpmp.c

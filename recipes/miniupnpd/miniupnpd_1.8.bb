@@ -14,7 +14,7 @@ PR = "r1"
 
 SRC_URI = "\
     https://www.codeaurora.org/mirrored_source/quic/le/miniupnpd-1.8.tar.gz \
-    file://0001-qcmap-enabled.patch \
+    file://0002-qcmap-enabled.patch \
 "
 
 SRC_URI[md5sum] = "0d8a8e936d5a0012cb260a3b972acbf3"
