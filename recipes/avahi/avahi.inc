@@ -23,6 +23,7 @@ SRC_URI = "http://avahi.org/download/avahi-${PV}.tar.gz \
           file://99avahi-autoipd \
           file://99avahi_multi.service \
           file://99avahi-daemon.conf \
+          file://99avahi-daemon \
           file://initscript.patch"
 
 USERADD_PACKAGES = "avahi-daemon"
@@ -118,6 +119,7 @@ do_install() {
 	install ${WORKDIR}/99avahi_multi.service ${D}${sysconfdir}/avahi/services/multi.service
 	rm -rf ${D}${sysconfdir}/avahi/avahi-daemon.conf 
 	install ${WORKDIR}/99avahi-daemon.conf ${D}${sysconfdir}/avahi/avahi-daemon.conf
+        install ${WORKDIR}/99avahi-daemon ${D}${sysconfdir}/init.d/avahi-daemon
 }
 
 do_install_avahi-autoipd() {
