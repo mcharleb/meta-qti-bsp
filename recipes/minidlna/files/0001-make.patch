@@ -1,0 +1,94 @@
+From 0a9e61ed9b261d3e4c106e2f53f62abe65b5056a Mon Sep 17 00:00:00 2001
+From: Tyler Wear <twear@codeaurora.org>
+Date: Tue, 29 Jan 2013 11:57:25 -0800
+Subject: [PATCH 1/1] patch
+
+---
+ Makefile                  |   17 +++++++++++------
+ metadata.c                |    6 +++---
+ minidlnatypes.h           |    1 +
+ tagutils/tagutils-plist.c |    2 +-
+ 4 files changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 86e03a3..a225e2c 100755
+--- a/Makefile
++++ b/Makefile
+@@ -12,13 +12,14 @@
+ #
+ #CFLAGS = -Wall -O -D_GNU_SOURCE -g -DDEBUG
+ #CFLAGS = -Wall -g -Os -D_GNU_SOURCE
+-CFLAGS = -Wall -g -O3 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 \
+-	 -I/usr/include/ffmpeg \
+-	 -I/usr/include/libavutil -I/usr/include/libavcodec -I/usr/include/libavformat \
+-	 -I/usr/include/ffmpeg/libavutil -I/usr/include/ffmpeg/libavcodec -I/usr/include/ffmpeg/libavformat
++#CFLAGS = -Wall -g -O3 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 \
++#	 -I/usr/include/ffmpeg \
++#	 -I/usr/include/libavutil -I/usr/include/libavcodec -I/usr/include/libavformat \
++#	 -I/usr/include/ffmpeg/libavutil -I/usr/include/ffmpeg/libavcodec -I/usr/include/ffmpeg/libavformat
++CFLAGS = -Wall -O -D_GNU_SOURCE -g -DDEBUG
+ #STATIC_LINKING: CFLAGS += -DSTATIC
+ #STATIC_LINKING: LDFLAGS = -static
+-CC = gcc
++#CC = gcc
+ RM = rm -f
+ INSTALL = install
+
+@@ -37,7 +38,11 @@ BASEOBJS = minidlna.o upnphttp.o upnpdescgen.o upnpsoap.o \
+
+ ALLOBJS = $(BASEOBJS) $(LNXOBJS)
+
+-LIBS = -lpthread -lexif -ljpeg -lsqlite3 -lavformat -lavutil -lavcodec -lid3tag -lFLAC -logg -lvorbis
++LIBS = -lpthread ${LIBDIR}/libexif.so ${LIBDIR}/libjpeg.so \
++        ${USRLIBDIR}/libsqlite3.so ${LIBDIR}/libavformat.so \
++		${LIBDIR}/libavutil.so ${LIBDIR}/libavcodec.so \
++		${USRLIBDIR}/libid3tag.so ${USRLIBDIR}/libFLAC.so \
++		${LIBDIR}/libogg.so ${LIBDIR}/libvorbis.so
+ #STATIC_LINKING: LIBS = -lvorbis -logg -lm -lsqlite3 -lpthread -lexif -ljpeg -lFLAC -lm -lid3tag -lz -lavformat -lavutil -lavcodec -lm
+
+ TESTUPNPDESCGENOBJS = testupnpdescgen.o upnpdescgen.o
+diff --git a/metadata.c b/metadata.c
+index 39a65ef..ced5a8a 100755
+--- a/metadata.c
++++ b/metadata.c
+@@ -30,9 +30,9 @@
+ #include "image_utils.h"
+ #include <jpeglib.h>
+ #include <setjmp.h>
+-#include <avutil.h>
+-#include <avcodec.h>
+-#include <avformat.h>
++#include <libavutil/avutil.h>
++#include <libavcodec/avcodec.h>
++#include <libavformat/avformat.h>
+ #include "tagutils/tagutils.h"
+
+ #include "upnpglobalvars.h"
+diff --git a/minidlnatypes.h b/minidlnatypes.h
+index 8037dfd..9889ec5 100755
+--- a/minidlnatypes.h
++++ b/minidlnatypes.h
+@@ -29,6 +29,7 @@
+ #ifndef __MINIDLNATYPES_H__
+ #define __MINIDLNATYPES_H__
+
++#include <time.h>
+ #include "config.h"
+ #include <netinet/in.h>
+
+diff --git a/tagutils/tagutils-plist.c b/tagutils/tagutils-plist.c
+index dc76917..9816423 100755
+--- a/tagutils/tagutils-plist.c
++++ b/tagutils/tagutils-plist.c
+@@ -27,7 +27,7 @@
+ #include "misc.h"
+ #include "tagutils.h"
+ #include "textutils.h"
+-#include "log.h"
++//#include "log.h"
+
+
+ #define MAX_BUF 4096
+--
+1.7.8.3
+

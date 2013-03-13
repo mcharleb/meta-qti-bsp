@@ -13,6 +13,7 @@ PR = "r0"
 
 SRC_URI = "\
     https://www.codeaurora.org/mirrored_source/quic/le/${PN}_${PV}_src.tar.gz \
+    file://0001-make.patch \
     file://0001-patch.patch \
 "
 
@@ -25,8 +26,12 @@ do_compile () {
 
 do_install () {
     cd ${S} && make DESTDIR=${D} USRLIBDIR=${STAGING_LIBDIR} LIBDIR=${STAGING_DIR_HOST}${base_libdir} install
+    sed -i s:#network_interface=eth0:network_interface=wlan1,rndis0,ecm0:g minidlna.conf
+    sed -i s:"#friendly_name=My DLNA Server":"friendly_name=9x25 MobileAP DLNA":g minidlna.conf
     install -d ${D}${sysconfdir}
-    install --mode=0644 -b ${WORKDIR}/${PN}-${PV}/${PN}.conf ${D}${sysconfdir}
+    install --mode=0644 -b ${WORKDIR}/${PN}-${PV}/${PN}.conf ${D}${sysconfdir}    
+    install -d ${D}${sysconfdir}/init.d/
+    install ${WORKDIR}/${PN}-${PV}/linux/${PN}.init.d.script ${D}${sysconfdir}/init.d/minidlna
 }
 
 do_configure_append() {
