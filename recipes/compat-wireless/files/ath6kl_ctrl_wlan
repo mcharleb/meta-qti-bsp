@@ -34,10 +34,25 @@ export MODULE_BASE=/lib/modules/$KERNEL/updates
 export RETRY_LIMIT=3
 export start_ap1=0
 
+FILE_PATH="/etc/wlan_config"
+DEVICE_PATTERN="device=AR6003"
+CHIP="ar6004"
+SDIO_POLLING_PATH="/sys/devices/msm_sdcc.3/polling"
+MODE="ap"
+INTERFACE_NAME="wlan"
+AR6003_HOSTAPD_CONF="/etc/AR6003_hostapd.conf"
+AR6004_HOSTAPD_CONF="/etc/AR6004_hostapd.conf"
+HOSTAPD_CONF="/etc/hostapd.conf"
+
 case "$1" in
     start)
         echo "Starting WLAN... $@"
         shift
+
+	if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ] || [ "$1" == "ap" ]; then
+		MODE="$1"
+	fi
+
         if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ]; then
             start_ap1=1
             shift
@@ -48,35 +63,82 @@ case "$1" in
             exit
         fi
 
-        set -e
-        c=1
-        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
-        insmod $MODULE_BASE/compat/compat.ko
-        insmod $MODULE_BASE/net/wireless/cfg80211.ko
-        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
-        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko
-        set +e
+	if [ -r "$FILE_PATH" ]; then
+		grep -iq "$DEVICE_PATTERN" "$FILE_PATH"
+		ret=$?
+		if [ $ret -eq 0 ]; then
+			CHIP="ar6003"
+		else
+			CHIP="ar6004"
+		fi
+	fi
 
-        ifconfig wlan0 up 2>  /dev/null
-        rc=$?
-        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]
-        do
-            sleep 1
-            ifconfig wlan0 up 2> /dev/null
-            rc=$?
-            c=`expr $c + 1`
-        done
+	if [ "$CHIP" == "ar6003" ]; then
+		echo "AR6003 chip detected"
 
-        if [ $c -gt $RETRY_LIMIT ]; then
-            echo "WLAN bring-up failed!"
-            exit
-        fi
+		if [ -w "$SDIO_POLLING_PATH" ]; then
+			echo 1 > "$SDIO_POLLING_PATH"
 
-        if [ $start_ap1 -eq 1 ]; then
-            echo "Adding second AP interface(wlan1)"
-            iw dev wlan0 interface add wlan1 type __ap
-            ifconfig wlan1 up > /dev/null
-        fi
+			set -e
+			modprobe ar6000 targetconf="router" devmode="$MODE" ifname="$INTERFACE_NAME" $@
+			set +e
+
+			sleep 1
+
+			rm -f "$HOSTAPD_CONF"
+			ln -s "$AR6003_HOSTAPD_CONF" "$HOSTAPD_CONF"
+
+			ifconfig wlan0 up 2> /dev/null
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				sleep 1
+				ifconfig wlan0 up 2> /dev/null
+			fi
+
+			if [ "$MODE" == "ap,ap" ] || [ "$MODE" == "sta,ap" ]; then
+				ifconfig wlan1 up 2> /dev/null
+			fi
+		else
+			echo "Cannot write to $SDIO_POLLING_PATH"
+			exit 1
+		fi
+
+	else
+		echo "AR6004 chip detected"
+
+	        set -e
+	        c=1
+	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
+	        insmod $MODULE_BASE/compat/compat.ko
+	        insmod $MODULE_BASE/net/wireless/cfg80211.ko
+	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
+	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko
+	        set +e
+
+		rm -f "$HOSTAPD_CONF"
+		ln -s "$AR6004_HOSTAPD_CONF" "$HOSTAPD_CONF"
+
+	        ifconfig wlan0 up 2>  /dev/null
+	        rc=$?
+	        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]
+	        do
+	            sleep 1
+	            ifconfig wlan0 up 2> /dev/null
+	            rc=$?
+	            c=`expr $c + 1`
+	        done
+
+	        if [ $c -gt $RETRY_LIMIT ]; then
+	            echo "WLAN bring-up failed!"
+	            exit
+	        fi
+
+	        if [ $start_ap1 -eq 1 ]; then
+	            echo "Adding second AP interface(wlan1)"
+	            iw dev wlan0 interface add wlan1 type __ap
+	            ifconfig wlan1 up > /dev/null
+	        fi
+	fi
         ;;
 
     start_ftm)
@@ -85,11 +147,33 @@ case "$1" in
 
     stop)
         echo "Stopping WLAN..."
-        rmmod ath6kl_usb
-        rmmod ath6kl_core
-        rmmod cfg80211
-        rmmod compat
-        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+
+        if [ -r "$FILE_PATH" ]; then
+                grep -iq "$DEVICE_PATTERN" "$FILE_PATH"
+                ret=$?
+                if [ $ret -eq 0 ]; then
+                        CHIP="ar6003"
+                else
+                        CHIP="ar6004"
+                fi
+        fi
+
+        if [ "$CHIP" == "ar6003" ]; then
+                if [ -w "$SDIO_POLLING_PATH" ]; then
+                        echo 0 > "$SDIO_POLLING_PATH"
+                        rmmod ar6000
+
+                else
+                        echo "Cannot write to $SDIO_POLLING_PATH"
+                        exit 1
+                fi
+	else
+	        rmmod ath6kl_usb
+	        rmmod ath6kl_core
+	        rmmod cfg80211
+	        rmmod compat
+	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+	fi
         ;;
 
     restart)
