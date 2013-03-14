@@ -17,4 +17,6 @@ SRC_URI = "\
 SRC_URI[md5sum] = "6b1a36f0d72332fae5130688e65efe1f"
 SRC_URI[sha256sum] = "6d747efe7ac4ad249bf711527882cef79fb61d9194c45b5ca5498aa60f290762"
 
-EXTRA_OECONF = "--libdir=${base_libdir}"
+EXTRA_OECONF = "--libdir=${base_libdir} \
+                --with-ogg-includes=${STAGING_INCDIR} \
+                "
