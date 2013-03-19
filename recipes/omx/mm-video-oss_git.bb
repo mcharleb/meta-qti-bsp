@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r10"
+PR = "r11"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
@@ -42,4 +42,6 @@ INSANE_SKIP_${PN} = "dev-so"
 
 do_install() {
 	oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
+	mkdir -p ${STAGING_INCDIR}/mm-core
+	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
 }
