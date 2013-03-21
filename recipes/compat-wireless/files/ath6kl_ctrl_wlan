@@ -98,6 +98,9 @@ case "$1" in
 			if [ "$MODE" == "ap,ap" ] || [ "$MODE" == "sta,ap" ]; then
 				ifconfig wlan1 up 2> /dev/null
 			fi
+			echo "Starting CXMAPP..."
+			cxmapp --init
+			cxmapp &
 		else
 			echo "Cannot write to $SDIO_POLLING_PATH"
 			exit 1
@@ -147,7 +150,7 @@ case "$1" in
 
     stop)
         echo "Stopping WLAN..."
-
+        killall -15 cxmapp
         if [ -r "$FILE_PATH" ]; then
                 grep -iq "$DEVICE_PATTERN" "$FILE_PATH"
                 ret=$?
