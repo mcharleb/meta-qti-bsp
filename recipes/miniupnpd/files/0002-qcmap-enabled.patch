@@ -1,29 +1,31 @@
-From 7f6614816a0986d901938314e4c1897c4dcbfed9 Mon Sep 17 00:00:00 2001
+From 6de147b9cea397c616b04bd2d323dab52b740134 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Tue, 12 Mar 2013 12:47:23 -0700
-Subject: [PATCH 1/1] qcmap-enabled
+Date: Fri, 5 Apr 2013 16:34:40 -0700
+Subject: [PATCH 2/2] qcmap-enabled
 
 ---
- Makefile.linux                |  108 +++++++++++++++++++--------
- UPNP_QCMAP_Client.cpp         |  135 ++++++++++++++++++++++++++++++++++
+ Makefile.linux                |   82 +++++++++++++--------
+ UPNP_QCMAP_Client.cpp         |  140 +++++++++++++++++++++++++++++++++++
  UPNP_QCMAP_Client.h           |   29 +++++++
  config.h                      |  100 +++++++++++++++++++++++++
  linux/miniupnpd.init.d.script |   21 +----
- miniupnpd.c                   |   11 ++-
+ miniupnpd.c                   |   10 ++-
  miniupnpd.conf                |   20 +++--
  natpmp.c                      |   69 +++++++++---------
  upnpdescgen.c                 |    4 +-
- upnpredirect.c                |  163 +++++++----------------------------------
+ upnpredirect.c                |  162 ++++++----------------------------------
  upnpredirect.h                |   14 ++--
  upnpsoap.c                    |   18 ++--
- 12 files changed, 442 insertions(+), 250 deletions(-)
+ 12 files changed, 421 insertions(+), 248 deletions(-)
+ mode change 100644 => 100755 Makefile.linux
  create mode 100644 UPNP_QCMAP_Client.cpp
  create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
- mode change 100644 => 100755 linux/miniupnpd.init.d.script
 
 diff --git a/Makefile.linux b/Makefile.linux
-index 3521a5a..c9d5243 100644
+old mode 100644
+new mode 100755
+index 3521a5a..d51be70
 --- a/Makefile.linux
 +++ b/Makefile.linux
 @@ -29,10 +29,10 @@ CFLAGS += -Wall
@@ -144,13 +146,10 @@ index 3521a5a..c9d5243 100644
  miniupnpdctl:	miniupnpdctl.o
  
  config.h:	genconfig.sh VERSION
-@@ -183,6 +181,59 @@ depend:	config.h
- 	makedepend -f$(MAKEFILE_LIST) -Y \
+@@ -184,13 +182,38 @@ depend:	config.h
  	$(ALLOBJS:.o=.c) $(TESTUPNPDESCGENOBJS:.o=.c) \
  	testgetifstats.c 2>/dev/null
-+	
-+top_srcdir = ../../../../../../../data
-+WORKSPACE = ../../../../../../../
+
 +qcmap_client_inc = -D__packed__= \
 +        -DIMAGE_APPS_PROC \
 +        -DFEATURE_Q_NO_SELF_QPTR \
@@ -164,47 +163,30 @@ index 3521a5a..c9d5243 100644
 +        -DFEATURE_DSUTILS_OFFTARGET \
 +        -DFEATURE_NO_REX \
 +        -DFEATURE_XMLLIB \
-+		-I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include \
-+		-I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include/rpcsvc \
-+        -I$(top_srcdir)/dss_new/src/platform/inc \
-+        -I$(top_srcdir)/dsutils/inc \
-+        -I$(top_srcdir)/netmgr/inc \
-+        -I$(top_srcdir)/dss_new/inc \
-+        -I$(top_srcdir)/dss_new/api \
-+        -I$(top_srcdir)/dss_new/src/api \
-+        -I$(top_srcdir)/dss_new/src/api/dss \
-+        -I$(top_srcdir)/dss_new/src/api/netiface \
-+        -I$(top_srcdir)/dss_new/src/api/utils \
-+        -I$(top_srcdir)/dss_new/src/dss/inc \
-+        -I$(top_srcdir)/dss_new/src/dsnet/inc \
-+        -I$(top_srcdir)/dss_new/src/dssock/inc \
-+        -I$(top_srcdir)/dss_new/src/dssock/src \
-+        -I$(top_srcdir)/dss_new/src/dssvc/inc \
-+        -I$(top_srcdir)/dss_new/src/inet/inc \
-+        -I$(top_srcdir)/dss_new/src/utils/src \
-+        -I$(top_srcdir)/dss_new/src/utils/inc \
-+        -I$(top_srcdir)/dss_new/src/tasks/inc \
-+        -I$(top_srcdir)/dss_new/src/netiface/src \
-+        -I$(top_srcdir)/dss_new/src/netiface/inc \
-+        -I$(top_srcdir)/mobileap_v2/qmi_idl \
-+        -I$(top_srcdir)/mobileap_v2/client/inc/ \
-+        -I$(WORKSPACE)/qmi-framework/inc \
-+        -I$(WORKSPACE)/qmi-framework/qcci/inc \
-+        -I$(WORKSPACE)/qmi/services \
-+        -I$(WORKSPACE)/cxm-apps \
-+        -I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include/qmi \
-+        -I$(top_srcdir)/dss_new/src/qmiifacectls/src \
-+        -I$(top_srcdir)/dss_new/src/qmiifacectls/inc \
-+        -I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include/diag \
-+        -I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include/dsutils \
-+        -I$(WORKSPACE)/oe-core/build/tmp-eglibc/sysroots/mdm9625/usr/include/xmllib \
-+        -I$(WORKSPACE)/common/inc 
++		 -I$(INCDIR) \
++		 -I$(INCDIR)/rpcsvc \
++        -I$(INCDIR)/data \
++        -I$(INCDIR)/qmi-framework\
++        -I$(INCDIR)/qmi \
++        -I$(INCDIR)/diag \
++        -I$(INCDIR)/dsutils \
++        -I$(INCDIR)/xmllib
++
 +CPPFLAGS += -Dstrlcpy=strncpy -Dstrlcat=strncat $(qcmap_client_inc)
 +#LIBS += -lpthread -lrt libqcmap_client.la
- 
++
  # DO NOT DELETE
  
-@@ -204,7 +255,10 @@ upnpreplyparse.o: upnpreplyparse.h minixml.h
+ miniupnpd.o: config.h macros.h upnpglobalvars.h upnppermissions.h
+ miniupnpd.o: miniupnpdtypes.h upnphttp.h upnpdescgen.h miniupnpdpath.h
+ miniupnpd.o: getifaddr.h upnpsoap.h options.h minissdp.h upnpredirect.h
+ miniupnpd.o: upnppinhole.h daemonize.h upnpevents.h natpmp.h commonrdr.h
+-miniupnpd.o: upnputils.h ifacewatcher.h
++miniupnpd.o: upnputils.h ifacewatcher.h UPNP_QCMAP_Client.h
+ upnphttp.o: config.h upnphttp.h upnpdescgen.h miniupnpdpath.h upnpsoap.h
+ upnphttp.o: upnpevents.h upnputils.h
+ upnpdescgen.o: config.h getifaddr.h upnpredirect.h upnpdescgen.h
+@@ -204,7 +227,10 @@ upnpreplyparse.o: upnpreplyparse.h minixml.h
  minixml.o: minixml.h
  upnpredirect.o: macros.h config.h upnpredirect.h upnpglobalvars.h
  upnpredirect.o: upnppermissions.h miniupnpdtypes.h upnpevents.h
@@ -216,7 +198,7 @@ index 3521a5a..c9d5243 100644
  getifaddr.o: config.h getifaddr.h
  daemonize.o: daemonize.h config.h
  upnpglobalvars.o: config.h upnpglobalvars.h upnppermissions.h
-@@ -214,7 +268,7 @@ options.o: miniupnpdtypes.h
+@@ -214,7 +240,7 @@ options.o: miniupnpdtypes.h
  upnppermissions.o: config.h upnppermissions.h
  minissdp.o: config.h upnpdescstrings.h miniupnpdpath.h upnphttp.h
  minissdp.o: upnpglobalvars.h upnppermissions.h miniupnpdtypes.h minissdp.h
@@ -225,7 +207,7 @@ index 3521a5a..c9d5243 100644
  natpmp.o: macros.h config.h natpmp.h upnpglobalvars.h upnppermissions.h
  natpmp.o: miniupnpdtypes.h getifaddr.h upnpredirect.h commonrdr.h upnputils.h
  upnpevents.o: config.h upnpevents.h miniupnpdpath.h upnpglobalvars.h
-@@ -223,20 +277,12 @@ upnputils.o: config.h upnputils.h
+@@ -223,20 +249,12 @@ upnputils.o: config.h upnputils.h
  getconnstatus.o: getconnstatus.h getifaddr.h
  upnppinhole.o: macros.h config.h upnpredirect.h upnpglobalvars.h
  upnppinhole.o: upnppermissions.h miniupnpdtypes.h upnpevents.h
@@ -250,10 +232,10 @@ index 3521a5a..c9d5243 100644
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
 new file mode 100644
-index 0000000..abb637a
+index 0000000..b58c467
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
-@@ -0,0 +1,135 @@
+@@ -0,0 +1,140 @@
 +#include "QCMAP_Client.h"
 +
 +QCMAP_Client *QcMapClient = NULL;
@@ -267,11 +249,6 @@ index 0000000..abb637a
 +{
 +  qcmap_msgr_snat_entry_config_v01 snat_entry;
 +  qmi_error_type_v01 qmi_err_num;
-+
-+  if(QcMapClient == NULL)
-+  {
-+    QcMapClient = new QCMAP_Client(NULL);
-+  }
 +
 +  /* Port mapping is not present, try to add it */
 +  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
@@ -295,11 +272,6 @@ index 0000000..abb637a
 +  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
 +  int i=0, num_entries=0;
 +  qmi_error_type_v01 qmi_err_num;
-+
-+  if(QcMapClient == NULL)
-+  {
-+    QcMapClient = new QCMAP_Client(NULL);
-+  }
 +
 +  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
 +  snat_entry.protocol = (uint8)proto;
@@ -325,11 +297,6 @@ index 0000000..abb637a
 +int getStaticNatConfigByEntry(int index, char *addr, int addrlen, unsigned short *eport, unsigned short *iport, int *proto)
 +{
 +  qmi_error_type_v01 qmi_err_num;
-+
-+  if(QcMapClient == NULL)
-+  {
-+    QcMapClient = new QCMAP_Client(NULL);
-+  }
 +  in_addr tmpIP;
 +  int i=0, num_entries=0;
 +  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
@@ -358,11 +325,6 @@ index 0000000..abb637a
 +int getSpecificEntry(unsigned int eport, unsigned int proto, char *addr, int addrlen, unsigned short *iport, char * rhost, int rhostlen, unsigned int * timestamp)
 +{
 +  qmi_error_type_v01 qmi_err_num;
-+
-+  if(QcMapClient == NULL)
-+  {
-+    QcMapClient = new QCMAP_Client(NULL);
-+  }
 +  in_addr tmpIP;
 +  int i=0, num_entries=0;
 +  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
@@ -382,6 +344,31 @@ index 0000000..abb637a
 +      }
 +    }
 +  }
++
++  return 1;
++}
++
++int QCMAPClient(){
++  qmi_error_type_v01 qmi_err_num;
++  if(QcMapClient != NULL)
++  {
++    return 0;
++  }
++
++  QcMapClient = new QCMAP_Client(NULL);
++  QcMapClient->EnableMobileAP(&qmi_err_num);
++  return 1;
++}
++
++int tearDownQCMAPClient(){
++  qmi_error_type_v01 qmi_err_num;
++  if(QcMapClient == NULL)
++  {
++    return 0;
++  }
++
++  QcMapClient->DisableMobileAP(&qmi_err_num);
++  delete(QcMapClient);
 +
 +  return 1;
 +}
@@ -533,9 +520,7 @@ index 0000000..7ec9e8d
 +
 +#endif
 diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
-old mode 100644
-new mode 100755
-index ee6e47b..f36ab66
+index ee6e47b..f36ab66 100644
 --- a/linux/miniupnpd.init.d.script
 +++ b/linux/miniupnpd.init.d.script
 @@ -16,35 +16,24 @@
@@ -580,29 +565,36 @@ index ee6e47b..f36ab66
    status)
  	status_of_proc /usr/sbin/miniupnpd miniupnpd
 diff --git a/miniupnpd.c b/miniupnpd.c
-index 050d8db..43500c8 100644
+index 050d8db..80c88e2 100644
 --- a/miniupnpd.c
 +++ b/miniupnpd.c
-@@ -1156,11 +1156,12 @@ init(int argc, char * * argv, struct runtime_vars * v)
+@@ -1156,9 +1156,9 @@ init(int argc, char * * argv, struct runtime_vars * v)
  		syslog(LOG_NOTICE, "Failed to set %s handler", "SIGUSR1");
  	}
  
 -	if(init_redirect() < 0)
--	{
++	if(!QCMAPClient())
+	{
 -		syslog(LOG_ERR, "Failed to init redirection engine. EXITING");
--		return 1;
--	}
-+//change to init QCMAP...
-+//	if(init_redirect() < 0)
-+//	{
-+//		syslog(LOG_ERR, "Failed to init redirection engine. EXITING");
-+//		return 1;
-+//	}
++		syslog(LOG_ERR, "Failed to init QCMAP. EXITING");
+		return 1;
+	}
  #ifdef ENABLE_6FC_SERVICE
- #ifdef USE_NETFILTER
- 	init_iptpinhole();
+@@ -1862,6 +1862,12 @@ main(int argc, char * * argv)
+	}	/* end of main loop */
+
+ shutdown:
++    /* Tear Down QCMap Client */
++	if(!tearDownQCMAPClient())
++	{
++		syslog(LOG_ERR, "Unable to tear down QCMAP Client");
++	}
++
+	/* close out open sockets */
+	while(upnphttphead.lh_first != NULL)
+	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
-index e34e088..4cdb273 100644
+index e34e088..b3de758 100644
 --- a/miniupnpd.conf
 +++ b/miniupnpd.conf
 @@ -1,5 +1,6 @@
@@ -766,7 +758,7 @@ index d13f74c..7ad5498 100644
  			str = strcat_str(str, len, &tmplen, "></e:property>");
  			/*printf("</s:%s></e:property>\n", v->name);*/
 diff --git a/upnpredirect.c b/upnpredirect.c
-index 5c9beae..b21232b 100644
+index 5c9beae..2643e97 100644
 --- a/upnpredirect.c
 +++ b/upnpredirect.c
 @@ -255,7 +255,7 @@ int reload_from_lease_file()
@@ -778,7 +770,7 @@ index 5c9beae..b21232b 100644
                const char * iaddr, unsigned short iport,
                const char * protocol, const char * desc,
                unsigned int leaseduration)
-@@ -278,68 +278,29 @@ upnp_redirect(const char * rhost, unsigned short eport,
+@@ -278,68 +278,28 @@ upnp_redirect(const char * rhost, unsigned short eport,
  		                 "%hu->%s:%hu %s", eport, iaddr, iport, protocol);
  		return -3;
  	}
@@ -808,7 +800,6 @@ index 5c9beae..b21232b 100644
 +	timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
 +	syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
 +		eport, iaddr, iport, protocol, desc);
-+	syslog(LOG_INFO, "TYLER");
 +	return upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
  
  	return 0;
@@ -859,7 +850,7 @@ index 5c9beae..b21232b 100644
  }
  
  
-@@ -361,10 +322,9 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
+@@ -361,10 +321,9 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
@@ -873,7 +864,7 @@ index 5c9beae..b21232b 100644
  	if(r == 0 &&
  	   timestamp > 0 &&
  	   timestamp > (unsigned int)(current_time = time(NULL))) {
-@@ -384,7 +344,6 @@ upnp_get_redirection_infos_by_index(int index,
+@@ -384,7 +343,6 @@ upnp_get_redirection_infos_by_index(int index,
                                      char * rhost, int rhostlen,
                                      unsigned int * leaseduration)
  {
@@ -881,7 +872,7 @@ index 5c9beae..b21232b 100644
  	int proto = 0;
  	unsigned int timestamp;
  	time_t current_time;
-@@ -393,18 +352,18 @@ upnp_get_redirection_infos_by_index(int index,
+@@ -393,18 +351,18 @@ upnp_get_redirection_infos_by_index(int index,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
@@ -905,7 +896,7 @@ index 5c9beae..b21232b 100644
  			memcpy(protocol, "TCP", 4);
  		else
  			memcpy(protocol, "UDP", 4);
-@@ -418,7 +377,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
+@@ -418,7 +376,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
  {
  	int r;
  #if defined(__linux__)
@@ -914,7 +905,7 @@ index 5c9beae..b21232b 100644
  #else
  	r = delete_redirect_rule(ext_if_name, eport, proto);
  	delete_filter_rule(ext_if_name, eport, proto);
-@@ -466,45 +425,18 @@ upnp_get_portmapping_number_of_entries()
+@@ -466,45 +424,18 @@ upnp_get_portmapping_number_of_entries()
  struct rule_state *
  get_upnp_rules_state_list(int max_rules_number_target)
  {
@@ -961,7 +952,7 @@ index 5c9beae..b21232b 100644
  	free(tmp);
  	/* remove the redirections that need to be removed */
  	for(p = &list, tmp = list; tmp; tmp = *p)
-@@ -536,27 +468,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
+@@ -536,27 +467,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
  void
  remove_unused_rules(struct rule_state * list)
  {
@@ -989,7 +980,7 @@ index 5c9beae..b21232b 100644
  		tmp = list;
  		list = tmp->next;
  		free(tmp);
-@@ -569,16 +486,15 @@ remove_unused_rules(struct rule_state * list)
+@@ -569,16 +485,15 @@ remove_unused_rules(struct rule_state * list)
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
@@ -1009,7 +1000,7 @@ index 5c9beae..b21232b 100644
  }
  
  /* stuff for miniupnpdctl */
-@@ -586,34 +502,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
+@@ -586,34 +501,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
  void
  write_ruleset_details(int s)
  {
