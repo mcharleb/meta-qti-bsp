@@ -319,7 +319,7 @@ index 0000000..b58c467
 +    }
 +  }
 +
-+  return 1;
++  return -1;
 +}
 +
 +int getSpecificEntry(unsigned int eport, unsigned int proto, char *addr, int addrlen, unsigned short *iport, char * rhost, int rhostlen, unsigned int * timestamp)
