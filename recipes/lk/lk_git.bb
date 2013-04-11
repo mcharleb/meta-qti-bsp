@@ -1,4 +1,4 @@
-PR = "r4"
+PR = "r5"
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -12,9 +12,15 @@ SRC_URI = "file://${WORKSPACE}/bootable/bootloader/lk \
 
 S = "${WORKDIR}/${PN}"
 
-MY_TARGET = ${@base_conditional('MACHINE', '9615-cdp', 'mdm9615', '${MACHINE}', d)}
 
-BOOTLOADER_NAME = ${@base_conditional('MACHINE', 'msm8960', 'emmc_appsboot', 'appsboot', d)}
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+MY_TARGET          = "${BASEMACHINE}"
+MY_TARGET_9615-cdp = "mdm9615"
+
+BOOTLOADER_NAME         = "appsboot"
+BOOTLOADER_NAME_msm8960 = "emmc_appsboot"
 
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 EXTRA_OEMAKE_append_msm8960 = " EMMC_BOOT=1 SIGNED_KERNEL=1"

@@ -1,8 +1,11 @@
 DESCRIPTION = "Miscellaneous files for the base system."
-PR = "r3"
+PR = "r4"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://host.conf;md5=a61b9f6548d337c1cc1e5a4de39f7b7f"
+
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI = " \
            file://nsswitch.conf \
@@ -11,7 +14,7 @@ SRC_URI = " \
            file://host.conf \
            file://profile \
            file://profile.d \
-           file://${MACHINE}/fstab \
+           file://${BASEMACHINE}/fstab \
            file://filesystems \
            file://issue.net \
            file://issue \
@@ -101,7 +104,7 @@ do_install () {
             install -m 0644 ${WORKDIR}/issue.net ${D}${sysconfdir}/issue.net
         fi
 
-        install -m 0644 ${WORKDIR}/${MACHINE}/fstab ${D}${sysconfdir}/fstab
+        install -m 0644 ${WORKDIR}/${BASEMACHINE}/fstab ${D}${sysconfdir}/fstab
         install -m 0644 ${WORKDIR}/filesystems ${D}${sysconfdir}/filesystems
         install -m 0644 ${WORKDIR}/usbd ${D}${sysconfdir}/default/usbd
         install -m 0644 ${WORKDIR}/profile ${D}${sysconfdir}/profile
