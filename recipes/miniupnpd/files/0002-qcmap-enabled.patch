@@ -1,12 +1,12 @@
-From 6de147b9cea397c616b04bd2d323dab52b740134 Mon Sep 17 00:00:00 2001
+From 4f827e71c355e010c2bc555c7dcefcad85a4c383 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Fri, 5 Apr 2013 16:34:40 -0700
+Date: Thu, 11 Apr 2013 14:00:32 -0700
 Subject: [PATCH 2/2] qcmap-enabled
 
 ---
  Makefile.linux                |   82 +++++++++++++--------
- UPNP_QCMAP_Client.cpp         |  140 +++++++++++++++++++++++++++++++++++
- UPNP_QCMAP_Client.h           |   29 +++++++
+ UPNP_QCMAP_Client.cpp         |  163 +++++++++++++++++++++++++++++++++++++++++
+ UPNP_QCMAP_Client.h           |   33 ++++++++
  config.h                      |  100 +++++++++++++++++++++++++
  linux/miniupnpd.init.d.script |   21 +----
  miniupnpd.c                   |   10 ++-
@@ -15,17 +15,15 @@ Subject: [PATCH 2/2] qcmap-enabled
  upnpdescgen.c                 |    4 +-
  upnpredirect.c                |  162 ++++++----------------------------------
  upnpredirect.h                |   14 ++--
- upnpsoap.c                    |   18 ++--
- 12 files changed, 421 insertions(+), 248 deletions(-)
- mode change 100644 => 100755 Makefile.linux
- create mode 100644 UPNP_QCMAP_Client.cpp
- create mode 100644 UPNP_QCMAP_Client.h
+ upnpsoap.c                    |   30 ++++---
+ 12 files changed, 456 insertions(+), 252 deletions(-)
+ create mode 100755 UPNP_QCMAP_Client.cpp
+ create mode 100755 UPNP_QCMAP_Client.h
  create mode 100644 config.h
+ mode change 100644 => 100755 upnpsoap.c
 
 diff --git a/Makefile.linux b/Makefile.linux
-old mode 100644
-new mode 100755
-index 3521a5a..d51be70
+index 3521a5a..d51be70 100644
 --- a/Makefile.linux
 +++ b/Makefile.linux
 @@ -29,10 +29,10 @@ CFLAGS += -Wall
@@ -231,12 +229,13 @@ index 3521a5a..d51be70
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
-new file mode 100644
-index 0000000..b58c467
+new file mode 100755
+index 0000000..bb52def
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
-@@ -0,0 +1,140 @@
+@@ -0,0 +1,163 @@
 +#include "QCMAP_Client.h"
++#include "getifstats.h"
 +
 +QCMAP_Client *QcMapClient = NULL;
 +
@@ -348,6 +347,28 @@ index 0000000..b58c467
 +  return 1;
 +}
 +
++int getIfaceStats(struct ifdata * data)
++{
++  qmi_error_type_v01 qmi_err_num;
++  qcmap_msgr_ip_family_enum_v01 ip_family;
++  qcmap_msgr_wwan_statistics_type_v01 wwan_stats;
++
++  //IP family, IPV4-4 IPV6-6
++  ip_family = (qcmap_msgr_ip_family_enum_v01) 4;
++
++  if (QcMapClient->GetWWANStatistics(ip_family, &wwan_stats, &qmi_err_num))
++  {
++    data->baudrate = 4200000;	/* that is the answer */
++  	data->opackets = wwan_stats.pkts_tx;
++  	data->ipackets = wwan_stats.pkts_rx;
++  	data->obytes = wwan_stats.bytes_tx;
++  	data->ibytes = wwan_stats.bytes_rx;
++    return 0;
++  }
++
++  return -1;
++}
++
 +int QCMAPClient(){
 +  qmi_error_type_v01 qmi_err_num;
 +  if(QcMapClient != NULL)
@@ -378,11 +399,11 @@ index 0000000..b58c467
 +#endif
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.h b/UPNP_QCMAP_Client.h
-new file mode 100644
-index 0000000..2b4629d
+new file mode 100755
+index 0000000..30090fc
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.h
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,33 @@
 +#include "QCMAP_Client.h"
 +#include "qualcomm_mobile_access_point_msgr_v01.h"
 +extern "C" {
@@ -410,7 +431,11 @@ index 0000000..2b4629d
 +      unsigned short *iport,
 +      int *proto
 +   );
-+}
++
++   int getIfaceStats
++   (
++      struct ifdata * data
++   );
 +#endif
 \ No newline at end of file
 diff --git a/config.h b/config.h
@@ -1081,10 +1106,52 @@ index b549824..68a29d6 100644
                                 unsigned int * number);
  
 diff --git a/upnpsoap.c b/upnpsoap.c
-index 0157f72..d5da662 100644
+old mode 100644
+new mode 100755
+index 0157f72..dabd500
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
-@@ -409,7 +409,7 @@ AddPortMapping(struct upnphttp * h, const char * action)
+@@ -88,7 +88,8 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
+	int bodylen;
+	struct ifdata data;
+
+-	r = getifstats(ext_if_name, &data);
++	//replaced getifstats(ext_if_name, &data); with call to QCMAP
++	r = getIfaceStats(&data);
+	bodylen = snprintf(body, sizeof(body), resp,
+	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+              r<0?0:data.obytes, action);
+@@ -110,7 +111,8 @@ GetTotalBytesReceived(struct upnphttp * h, const char * action)
+	int bodylen;
+	struct ifdata data;
+
+-	r = getifstats(ext_if_name, &data);
++	//replaced getifstats(ext_if_name, &data); with call to QCMAP
++	r = getIfaceStats(&data);
+	bodylen = snprintf(body, sizeof(body), resp,
+	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+	         r<0?0:data.ibytes, action);
+@@ -132,7 +134,8 @@ GetTotalPacketsSent(struct upnphttp * h, const char * action)
+	int bodylen;
+	struct ifdata data;
+
+-	r = getifstats(ext_if_name, &data);
++	//replaced  getifstats(ext_if_name, &data); with call to QCMAP
++	r = getIfaceStats(&data);
+	bodylen = snprintf(body, sizeof(body), resp,
+	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+	         r<0?0:data.opackets, action);
+@@ -154,7 +157,8 @@ GetTotalPacketsReceived(struct upnphttp * h, const char * action)
+	int bodylen;
+	struct ifdata data;
+
+-	r = getifstats(ext_if_name, &data);
++	//replaced getifstats(ext_if_name, &data); with call to QCMAP
++	r = getIfaceStats(&data);
+	bodylen = snprintf(body, sizeof(body), resp,
+	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+	         r<0?0:data.ipackets, action);
+@@ -409,7 +413,7 @@ AddPortMapping(struct upnphttp * h, const char * action)
  	       action, eport, int_ip, iport, protocol, desc, leaseduration,
  	       r_host ? r_host : "NULL");
  
@@ -1093,7 +1160,7 @@ index 0157f72..d5da662 100644
  
  	ClearNameValueList(&data);
  
-@@ -545,7 +545,7 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
+@@ -545,7 +549,7 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
  	/* TODO : accept a different external port
  	 * have some smart strategy to choose the port */
  	for(;;) {
@@ -1102,7 +1169,7 @@ index 0157f72..d5da662 100644
  		if(r==-2 && eport < 65535) {
  			eport++;
  		} else {
-@@ -631,7 +631,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
+@@ -631,7 +635,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
  	 * but different remoteHost to be set up, so that is not
  	 * a priority. */
  	r = upnp_get_redirection_infos(eport, protocol, &iport,
@@ -1111,7 +1178,7 @@ index 0157f72..d5da662 100644
  	                               desc, sizeof(desc),
  	                               NULL, 0,
  	                               &leaseduration);
-@@ -763,8 +763,8 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
+@@ -763,8 +767,8 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
  		return;
  	}
  
@@ -1122,7 +1189,7 @@ index 0157f72..d5da662 100644
  	for(i = 0; i < number; i++)
  	{
  		r = upnp_delete_redirection(port_list[i], protocol);
-@@ -958,7 +958,7 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
+@@ -958,7 +962,7 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  	memcpy(body+bodylen, list_start, sizeof(list_start));
  	bodylen += (sizeof(list_start) - 1);
  
@@ -1131,7 +1198,7 @@ index 0157f72..d5da662 100644
  	                                           protocol, &list_size);
  	/* loop through port mappings */
  	for(i = 0; number > 0 && i < list_size; i++)
-@@ -980,9 +980,9 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
+@@ -980,9 +984,9 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  		}
  		rhost[0] = '\0';
  		r = upnp_get_redirection_infos(port_list[i], protocol, &iport,
