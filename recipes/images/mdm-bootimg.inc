@@ -22,13 +22,13 @@ do_rootfs_append() {
     ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
 
     # Make Device tree blobs for various hardware configurations
-    dts_files=`find ${WORKSPACE}/kernel/arch/arm/boot/dts -iname *${MACHINE_DTS_NAME}*.dts | awk -F/ '{print $NF}' | awk -F. '{print $1}'`
+    dts_files=`find ${WORKSPACE}/kernel/arch/arm/boot/dts -iname *${MACHINE_DTS_NAME}*.dts | awk -F/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
     for d in ${dts_files}; do
         ${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${d}.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${d}.dts
     done
 
-    dtb_files=`find ${STAGING_DIR_TARGET}/boot -iname *${MACHINE_DTS_NAME}*.dtb | awk -F/ '{print $NF}' | awk -F. '{print $1}'`
+    dtb_files=`find ${STAGING_DIR_TARGET}/boot -iname *${MACHINE_DTS_NAME}*.dtb | awk -F/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
     # Create separate images with dtb appended to zImage for all targets.
     for d in ${dtb_files}; do
