@@ -1,29 +1,48 @@
 # Force a few additional dependencies in the mix so that we get the needed
 # recipes to build in the right order so we can make the bootimg file and
 # our yaffs2 image...
-DEPENDS = 	" \
-		virtual/kernel \
-		virtual/bootloader \
-		pkgconfig-native \
-		gtk-doc-native \
-		gettext-native \
-		yaffs2-utils-native \
-		mkbootimg-native \
-		"
+DEPENDS = " \
+    virtual/kernel \
+    virtual/bootloader \
+    pkgconfig-native \
+    gtk-doc-native \
+    gettext-native \
+    yaffs2-utils-native \
+    mkbootimg-native \
+    dtbtool-native \
+"
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz yaffs2"
 
 # Make the bootimg image file using the information available in the sysroot...
 do_rootfs_append() {
-	ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
-	kernelsize=`awk --non-decimal-data '/ _end/ {end="0x" $1} /_stext/ {beg="0x" $1} END {size1=end-beg+4096; size=and(size1,compl(4095)); printf("%#x",size)}' ${STAGING_DIR_TARGET}/boot/System.map-${ver}`
+    # Make bootimage
+    ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
 
-	${STAGING_DIR_NATIVE}/usr/bin/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
-	        --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
-		--ramdisk /dev/null \
-		--cmdline "noinitrd root=/dev/mtdblock13 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom" \
-		--base 0x00200000 \
-		--ramdisk_offset $kernelsize \
-		--output ${DEPLOY_DIR_IMAGE}/mdm-image-boot-recovery-${MACHINE}.img
+    # Make device tree blobs for various hardware configurations
+    dts_files=`find ${WORKSPACE}/kernel/arch/arm/boot/dts -iname *${MACHINE_DTS_NAME}*.dts | awk -F/ '{print $NF}' | awk -F[.][d] '{print $1}'`
+
+    for d in ${dts_files}; do
+        ${STAGING_KERNEL_DIR}/scripts/dtc/dtc -p 4096 -O dtb -o ${STAGING_DIR_TARGET}/boot/${d}.dtb ${WORKSPACE}/kernel/arch/arm/boot/dts/${d}.dts
+    done
+    dtb_files=`find ${STAGING_DIR_TARGET}/boot -iname *${MACHINE_DTS_NAME}*.dtb | awk -F/ '{print $NF}' | awk -F[.][d] '{print $1}'`
+
+    # Create separate images with dtb appended to zImage for all targets.
+    for d in ${dtb_files}; do
+        targets=`echo ${d#${MACHINE_DTS_NAME}-}`
+        cat ${STAGING_DIR_TARGET}/boot/zImage-${ver} ${STAGING_DIR_TARGET}/boot/${d}.dtb > ${STAGING_DIR_TARGET}/boot/dtb-zImage-${ver}-${targets}
+    done
+
+    ${STAGING_BINDIR_NATIVE}/dtbtool ${STAGING_DIR_TARGET}/boot/ -o ${STAGING_DIR_TARGET}/boot/masterDTB -p ${STAGING_KERNEL_DIR}/scripts/dtc/ -v
+
+    # Updated base address according to new memory map.
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
+        --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
+        --ramdisk /dev/null \
+        --cmdline "noinitrd root=/dev/mtdblock15 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3" \
+        --base 0x00200000 \
+        --tags-addr 0x07600000 \
+        --ramdisk_offset 0 \
+        --output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
 }
