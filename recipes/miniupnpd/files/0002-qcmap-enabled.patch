@@ -1,26 +1,27 @@
-From 4f827e71c355e010c2bc555c7dcefcad85a4c383 Mon Sep 17 00:00:00 2001
+From df22e94abf276223b5c72dc1ae9b6f41fe7d374b Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Thu, 11 Apr 2013 14:00:32 -0700
-Subject: [PATCH 2/2] qcmap-enabled
+Date: Thu, 18 Apr 2013 11:55:10 -0700
+Subject: [PATCH 1/1] qcmap-enabled
 
 ---
- Makefile.linux                |   82 +++++++++++++--------
- UPNP_QCMAP_Client.cpp         |  163 +++++++++++++++++++++++++++++++++++++++++
- UPNP_QCMAP_Client.h           |   33 ++++++++
- config.h                      |  100 +++++++++++++++++++++++++
- linux/miniupnpd.init.d.script |   21 +----
+ Makefile.linux                |   82 ++++++++++-------
+ UPNP_QCMAP_Client.cpp         |  163 +++++++++++++++++++++++++++++++++
+ UPNP_QCMAP_Client.h           |   33 +++++++
+ config.h                      |  100 ++++++++++++++++++++
+ linux/miniupnpd.init.d.script |   21 +---
+ minissdp.c                    |  203 ++++++++++++++++++++++------------------
  miniupnpd.c                   |   10 ++-
- miniupnpd.conf                |   20 +++--
- natpmp.c                      |   69 +++++++++---------
+ miniupnpd.conf                |   20 ++--
+ natpmp.c                      |   69 +++++++-------
  upnpdescgen.c                 |    4 +-
- upnpredirect.c                |  162 ++++++----------------------------------
+ upnpredirect.c                |  162 +++++---------------------------
  upnpredirect.h                |   14 ++--
  upnpsoap.c                    |   30 ++++---
- 12 files changed, 456 insertions(+), 252 deletions(-)
- create mode 100755 UPNP_QCMAP_Client.cpp
- create mode 100755 UPNP_QCMAP_Client.h
+ 13 files changed, 568 insertions(+), 343 deletions(-)
+ create mode 100644 UPNP_QCMAP_Client.cpp
+ create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
- mode change 100644 => 100755 upnpsoap.c
+ mode change 100644 => 100755 minissdp.c
 
 diff --git a/Makefile.linux b/Makefile.linux
 index 3521a5a..d51be70 100644
@@ -229,7 +230,7 @@ index 3521a5a..d51be70 100644
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
-new file mode 100755
+new file mode 100644
 index 0000000..bb52def
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
@@ -399,7 +400,7 @@ index 0000000..bb52def
 +#endif
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.h b/UPNP_QCMAP_Client.h
-new file mode 100755
+new file mode 100644
 index 0000000..30090fc
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.h
@@ -589,6 +590,256 @@ index ee6e47b..f36ab66 100644
  	;;
    status)
  	status_of_proc /usr/sbin/miniupnpd miniupnpd
+diff --git a/minissdp.c b/minissdp.c
+old mode 100644
+new mode 100755
+index f937109..bfe105b
+--- a/minissdp.c
++++ b/minissdp.c
+@@ -394,6 +394,16 @@ static struct {
+ };
+
+ static void
++_usleep(long usecs)
++{
++	struct timespec sleep_time;
++
++	sleep_time.tv_sec = 0;
++	sleep_time.tv_nsec = usecs * 1000;
++	nanosleep(&sleep_time, NULL);
++}
++
++static void
+ SendSSDPNotifies(int s, const char * host, unsigned short port,
+                  unsigned int lifetime, int ipv6)
+ {
+@@ -402,7 +412,7 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+ #else
+	struct sockaddr_in sockname;
+ #endif
+-	int l, n, i=0;
++	int l, n, dup, i=0;
+	char bufr[512];
+	char ver_str[4];
+
+@@ -424,58 +434,66 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+		p->sin_addr.s_addr = inet_addr(SSDP_MCAST_ADDR);
+	}
+
+-	while(known_service_types[i].s)
++
++	for( dup=0; dup<2; dup++ )
+	{
+-		if(i==0)
+-			ver_str[0] = '\0';
+-		else
+-			snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
+-		l = snprintf(bufr, sizeof(bufr),
+-			"NOTIFY * HTTP/1.1\r\n"
+-			"HOST: %s:%d\r\n"
+-			"CACHE-CONTROL: max-age=%u\r\n"
+-			"lOCATION: http://%s:%d" ROOTDESC_PATH"\r\n"
+-			"SERVER: " MINIUPNPD_SERVER_STRING "\r\n"
+-			"NT: %s%s\r\n"
+-			"USN: %s::%s%s\r\n"
+-			"NTS: ssdp:alive\r\n"
+-			"OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
+-			"01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
+-			"BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
+-			"CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
+-			"\r\n",
+-			ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
+-			SSDP_PORT,
+-			lifetime,
+-			host, port,
+-			known_service_types[i].s, ver_str,
+-			uuidvalue, known_service_types[i].s, ver_str,
+-			upnp_bootid, upnp_bootid, upnp_configid );
+-		if(l<0)
+-		{
+-			syslog(LOG_ERR, "SendSSDPNotifies() snprintf error");
+-			continue;
+-		}
+-		if((unsigned int)l >= sizeof(bufr))
+-		{
+-			syslog(LOG_WARNING, "SendSSDPNotifies(): truncated output");
+-			l = sizeof(bufr);
+-		}
+-		n = sendto(s, bufr, l, 0,
+-			(struct sockaddr *)&sockname,
+-#ifdef ENABLE_IPV6
+-			ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
+-#else
+-			sizeof(struct sockaddr_in)
+-#endif
+-			);
+-		if(n < 0)
++
++		if( dup )
++			_usleep(200000);
++		i=0;
++		while(known_service_types[i].s)
+		{
+-			/* XXX handle EINTR, EAGAIN, EWOULDBLOCK */
+-			syslog(LOG_ERR, "sendto(udp_notify=%d, %s): %m", s,
+-			       host ? host : "NULL");
++			if(i==0)
++				ver_str[0] = '\0';
++			else
++				snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
++			l = snprintf(bufr, sizeof(bufr),
++				"NOTIFY * HTTP/1.1\r\n"
++				"HOST: %s:%d\r\n"
++				"CACHE-CONTROL: max-age=%u\r\n"
++				"lOCATION: http://%s:%d" ROOTDESC_PATH"\r\n"
++				"SERVER: " MINIUPNPD_SERVER_STRING "\r\n"
++				"NT: %s%s\r\n"
++				"USN: %s::%s%s\r\n"
++				"NTS: ssdp:alive\r\n"
++				"OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
++				"01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
++				"BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
++				"CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
++				"\r\n",
++				ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
++				SSDP_PORT,
++				lifetime,
++				host, port,
++				known_service_types[i].s, ver_str,
++				uuidvalue, known_service_types[i].s, ver_str,
++				upnp_bootid, upnp_bootid, upnp_configid );
++			if(l<0)
++			{
++				syslog(LOG_ERR, "SendSSDPNotifies() snprintf error");
++				continue;
++			}
++			if((unsigned int)l >= sizeof(bufr))
++			{
++				syslog(LOG_WARNING, "SendSSDPNotifies(): truncated output");
++				l = sizeof(bufr);
++			}
++			n = sendto(s, bufr, l, 0,
++				(struct sockaddr *)&sockname,
++	#ifdef ENABLE_IPV6
++				ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
++	#else
++				sizeof(struct sockaddr_in)
++	#endif
++				);
++			if(n < 0)
++			{
++				/* XXX handle EINTR, EAGAIN, EWOULDBLOCK */
++				syslog(LOG_ERR, "sendto(udp_notify=%d, %s): %m", s,
++					   host ? host : "NULL");
++			}
++			i++;
+		}
+-		i++;
+	}
+ }
+
+@@ -720,7 +738,7 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+	int i, j;
+	char bufr[512];
+	char ver_str[4];
+-	int ret = 0;
++	int dup, ret = 0;
+	int ipv6 = 0;
+
+     memset(&sockname, 0, sizeof(struct sockaddr_in));
+@@ -734,49 +752,52 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+	inet_pton(AF_INET6, LL_SSDP_MCAST_ADDR, &(sockname6.sin6_addr));
+ #endif
+
+-	for(j=0; j<n_sockets; j++)
++	for (dup = 0; dup < 2; dup++)
+	{
+-#ifdef ENABLE_IPV6
+-		ipv6 = j & 1;
+-#endif
+-	    for(i=0; known_service_types[i].s; i++)
+-	    {
+-			if(i==0)
+-				ver_str[0] = '\0';
+-			else
+-				snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
+-	        l = snprintf(bufr, sizeof(bufr),
+-                 "NOTIFY * HTTP/1.1\r\n"
+-                 "HOST: %s:%d\r\n"
+-                 "NT: %s%s\r\n"
+-                 "USN: %s::%s%s\r\n"
+-                 "NTS: ssdp:byebye\r\n"
+-				 "OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
+-				 "01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
+-				 "BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
+-				 "CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
+-                 "\r\n",
+-                 ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
+-			     SSDP_PORT,
+-				 known_service_types[i].s, ver_str,
+-                 uuidvalue, known_service_types[i].s, ver_str,
+-                 upnp_bootid, upnp_bootid, upnp_configid);
+-	        n = sendto(sockets[j], bufr, l, 0,
+-#ifdef ENABLE_IPV6
+-	                   ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
+-	                   ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
+-#else
+-	                   (struct sockaddr *)&sockname,
+-	                   sizeof(struct sockaddr_in)
+-#endif
+-	                 );
+-			if(n < 0)
++		for(j=0; j<n_sockets; j++)
++		{
++	#ifdef ENABLE_IPV6
++			ipv6 = j & 1;
++	#endif
++			for(i=0; known_service_types[i].s; i++)
+			{
+-				syslog(LOG_ERR, "SendSSDPGoodbye: sendto(udp_shutdown=%d): %m",
+-				       sockets[j]);
+-				ret = -1;
++				if(i==0)
++					ver_str[0] = '\0';
++				else
++					snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
++				l = snprintf(bufr, sizeof(bufr),
++					 "NOTIFY * HTTP/1.1\r\n"
++					 "HOST: %s:%d\r\n"
++					 "NT: %s%s\r\n"
++					 "USN: %s::%s%s\r\n"
++					 "NTS: ssdp:byebye\r\n"
++					 "OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
++					 "01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
++					 "BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
++					 "CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
++					 "\r\n",
++					 ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
++					 SSDP_PORT,
++					 known_service_types[i].s, ver_str,
++					 uuidvalue, known_service_types[i].s, ver_str,
++					 upnp_bootid, upnp_bootid, upnp_configid);
++				n = sendto(sockets[j], bufr, l, 0,
++	#ifdef ENABLE_IPV6
++						   ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
++						   ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
++	#else
++						   (struct sockaddr *)&sockname,
++						   sizeof(struct sockaddr_in)
++	#endif
++						 );
++				if(n < 0)
++				{
++					syslog(LOG_ERR, "SendSSDPGoodbye: sendto(udp_shutdown=%d): %m",
++						   sockets[j]);
++					ret = -1;
++				}
+			}
+-    	}
++		}
+	}
+	return ret;
+ }
 diff --git a/miniupnpd.c b/miniupnpd.c
 index 050d8db..80c88e2 100644
 --- a/miniupnpd.c
@@ -599,14 +850,14 @@ index 050d8db..80c88e2 100644
  
 -	if(init_redirect() < 0)
 +	if(!QCMAPClient())
-	{
+ 	{
 -		syslog(LOG_ERR, "Failed to init redirection engine. EXITING");
 +		syslog(LOG_ERR, "Failed to init QCMAP. EXITING");
-		return 1;
-	}
+ 		return 1;
+ 	}
  #ifdef ENABLE_6FC_SERVICE
 @@ -1862,6 +1862,12 @@ main(int argc, char * * argv)
-	}	/* end of main loop */
+ 	}	/* end of main loop */
 
  shutdown:
 +    /* Tear Down QCMap Client */
@@ -615,9 +866,9 @@ index 050d8db..80c88e2 100644
 +		syslog(LOG_ERR, "Unable to tear down QCMAP Client");
 +	}
 +
-	/* close out open sockets */
-	while(upnphttphead.lh_first != NULL)
-	{
+ 	/* close out open sockets */
+ 	while(upnphttphead.lh_first != NULL)
+ 	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
 index e34e088..b3de758 100644
 --- a/miniupnpd.conf
@@ -1106,51 +1357,49 @@ index b549824..68a29d6 100644
                                 unsigned int * number);
  
 diff --git a/upnpsoap.c b/upnpsoap.c
-old mode 100644
-new mode 100755
-index 0157f72..dabd500
+index 0157f72..e79c570 100644
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
 @@ -88,7 +88,8 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
-	int bodylen;
-	struct ifdata data;
+ 	int bodylen;
+ 	struct ifdata data;
 
 -	r = getifstats(ext_if_name, &data);
 +	//replaced getifstats(ext_if_name, &data); with call to QCMAP
 +	r = getIfaceStats(&data);
-	bodylen = snprintf(body, sizeof(body), resp,
-	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+ 	bodylen = snprintf(body, sizeof(body), resp,
+ 	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
               r<0?0:data.obytes, action);
 @@ -110,7 +111,8 @@ GetTotalBytesReceived(struct upnphttp * h, const char * action)
-	int bodylen;
-	struct ifdata data;
+ 	int bodylen;
+ 	struct ifdata data;
 
 -	r = getifstats(ext_if_name, &data);
 +	//replaced getifstats(ext_if_name, &data); with call to QCMAP
 +	r = getIfaceStats(&data);
-	bodylen = snprintf(body, sizeof(body), resp,
-	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
-	         r<0?0:data.ibytes, action);
+ 	bodylen = snprintf(body, sizeof(body), resp,
+ 	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+ 	         r<0?0:data.ibytes, action);
 @@ -132,7 +134,8 @@ GetTotalPacketsSent(struct upnphttp * h, const char * action)
-	int bodylen;
-	struct ifdata data;
+ 	int bodylen;
+ 	struct ifdata data;
 
 -	r = getifstats(ext_if_name, &data);
 +	//replaced  getifstats(ext_if_name, &data); with call to QCMAP
 +	r = getIfaceStats(&data);
-	bodylen = snprintf(body, sizeof(body), resp,
-	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
-	         r<0?0:data.opackets, action);
+ 	bodylen = snprintf(body, sizeof(body), resp,
+ 	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+ 	         r<0?0:data.opackets, action);
 @@ -154,7 +157,8 @@ GetTotalPacketsReceived(struct upnphttp * h, const char * action)
-	int bodylen;
-	struct ifdata data;
+ 	int bodylen;
+ 	struct ifdata data;
 
 -	r = getifstats(ext_if_name, &data);
 +	//replaced getifstats(ext_if_name, &data); with call to QCMAP
 +	r = getIfaceStats(&data);
-	bodylen = snprintf(body, sizeof(body), resp,
-	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
-	         r<0?0:data.ipackets, action);
+ 	bodylen = snprintf(body, sizeof(body), resp,
+ 	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
+ 	         r<0?0:data.ipackets, action);
 @@ -409,7 +413,7 @@ AddPortMapping(struct upnphttp * h, const char * action)
  	       action, eport, int_ip, iport, protocol, desc, leaseduration,
  	       r_host ? r_host : "NULL");
