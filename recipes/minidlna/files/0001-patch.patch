@@ -19,8 +19,8 @@ index 491eb61..4824195
  PIDFILE=/var/run/minidlna.pid
  CONF=/etc/minidlna.conf
 -ARGS="-f $CONF"
-+ARGS="-f $CONF -i wlan0"
-+WLANARGS="-f $CONF"
++ARGS="-f $CONF -i wlan0 -R"
++WLANARGS="-f $CONF -R"
 
  test -f $MINIDLNA || exit 0
 
