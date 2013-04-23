@@ -7,7 +7,7 @@ SRC_URI = "file://${WORKSPACE}/mm-video-oss/mm-core"
 
 inherit autotools
 
-PR = "r8"
+PR = "r9"
 
 S = "${WORKDIR}/mm-core"
 
@@ -15,9 +15,12 @@ LV = "1.0.0"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8655', ' --enable-target=msm7630', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm7627a', ' --enable-target=msm7627A', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8960', ' --enable-target=msm8960', '', d)}"
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target=msm7630', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm7627a', ' --enable-target=msm7627A', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target=msm8960', '', d)}"
 
 FILES_${PN} = "\
     /usr/lib/* \
