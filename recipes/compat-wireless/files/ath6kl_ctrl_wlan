@@ -111,6 +111,7 @@ case "$1" in
 
 	        set -e
 	        c=1
+            echo hsic 2000 > /sys/bus/platform/devices/usb_bam/inactivity_timer
 	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
 	        insmod $MODULE_BASE/compat/compat.ko
 	        insmod $MODULE_BASE/net/wireless/cfg80211.ko
@@ -188,6 +189,7 @@ case "$1" in
 	        rmmod cfg80211
 	        rmmod compat
 	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+            echo hsic 0 > /sys/bus/platform/devices/usb_bam/inactivity_timer
 	fi
         ;;
 
