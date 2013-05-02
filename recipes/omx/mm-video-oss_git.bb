@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r11"
+PR = "r12"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
@@ -19,9 +19,12 @@ LV = "1.0.0"
 
 inherit autotools
 
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
 EXTRA_OECONF_append = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('MACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
 CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"

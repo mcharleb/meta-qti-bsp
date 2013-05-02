@@ -3,16 +3,19 @@ HOMEPAGE = "http://codeaurora.org"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 LICENSE = "BSD"
 
-SRC_URI +="file://${MACHINE}/firmware-links.sh"
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
-PR = "r1"
+SRC_URI +="file://${BASEMACHINE}/firmware-links.sh"
+
+PR = "r2"
 
 inherit update-rc.d
 
 INITSCRIPT_NAME = "firmware-links.sh"
 
 do_install() {
-    install -m 0755 ${WORKDIR}/${MACHINE}/firmware-links.sh -D ${D}${sysconfdir}/init.d/firmware-links.sh
+    install -m 0755 ${WORKDIR}/${BASEMACHINE}/firmware-links.sh -D ${D}${sysconfdir}/init.d/firmware-links.sh
 }
 
 pkg_postinst-${PN} () {
