@@ -1,27 +1,27 @@
-From 6f96c7f6d80dea530101fc914f2e5dca6324bc44 Mon Sep 17 00:00:00 2001
+From 8ed7ce961b3956acb1b455c1a57876acaa495cb1 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Thu, 2 May 2013 17:42:31 -0700
+Date: Tue, 7 May 2013 13:47:02 -0700
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
- Makefile.linux                |   92 ++++++++------
- UPNP_QCMAP_Client.cpp         |  282 +++++++++++++++++++++++++++++++++++++++++
- UPNP_QCMAP_Client.h           |   33 +++++
- config.h                      |  100 +++++++++++++++
+ Makefile.linux                |   92 ++++++-----
+ UPNP_QCMAP_Client.cpp         |  366 +++++++++++++++++++++++++++++++++++++++++
+ UPNP_QCMAP_Client.h           |   33 ++++
+ config.h                      |  100 +++++++++++
  linux/miniupnpd.init.d.script |   15 --
- minissdp.c                    |  203 ++++++++++++++++-------------
+ minissdp.c                    |  203 +++++++++++++----------
  miniupnpd.c                   |   17 ++-
- miniupnpd.conf                |   21 ++--
- natpmp.c                      |   69 +++++-----
+ miniupnpd.conf                |   21 ++-
+ natpmp.c                      |   69 ++++----
  upnpdescgen.c                 |    8 +-
- upnpredirect.c                |  162 ++++--------------------
+ upnpredirect.c                |  157 +++++-------------
  upnpredirect.h                |   14 +-
- upnpsoap.c                    |   41 +++---
- 13 files changed, 695 insertions(+), 362 deletions(-)
- create mode 100644 UPNP_QCMAP_Client.cpp
+ upnpsoap.c                    |   41 +++--
+ 13 files changed, 795 insertions(+), 341 deletions(-)
+ create mode 100755 UPNP_QCMAP_Client.cpp
  create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
- mode change 100644 => 100755 linux/miniupnpd.init.d.script
+ mode change 100644 => 100755 upnpredirect.c
 
 diff --git a/Makefile.linux b/Makefile.linux
 index 3521a5a..0c6137a 100644
@@ -241,11 +241,11 @@ index 3521a5a..0c6137a 100644
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
-new file mode 100644
-index 0000000..7251546
+new file mode 100755
+index 0000000..96984d0
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
-@@ -0,0 +1,282 @@
+@@ -0,0 +1,366 @@
 +#include "QCMAP_Client.h"
 +#include "getifstats.h"
 +
@@ -525,6 +525,90 @@ index 0000000..7251546
 +	return str;
 +}
 +
++/* IPTables cannot store redirection descriptions, so we use our
++ * own structure to store them */
++struct rdr_desc {
++	struct rdr_desc * next;
++	unsigned int timestamp;
++	unsigned short eport;
++	short proto;
++	char str[];
++};
++
++/* pointer to the chained list where descriptions are stored */
++static struct rdr_desc * rdr_desc_list = 0;
++
++/* add a description to the list of redirection descriptions */
++void
++add_redirect_desc(unsigned short eport, int proto,
++                  const char * desc, unsigned int timestamp)
++{
++	struct rdr_desc * p;
++	size_t l;
++	/* set a default description if none given */
++	if(!desc)
++		desc = "miniupnpd";
++	l = strlen(desc) + 1;
++	p = (rdr_desc*) malloc(sizeof(struct rdr_desc) + l);
++	if(p)
++	{
++		p->next = rdr_desc_list;
++		p->timestamp = timestamp;
++		p->eport = eport;
++		p->proto = (short)proto;
++		memcpy(p->str, desc, l);
++		rdr_desc_list = p;
++	}
++}
++
++/* delete a description from the list */
++void
++del_redirect_desc(unsigned short eport, int proto)
++{
++	struct rdr_desc * p, * last;
++	p = rdr_desc_list;
++	last = 0;
++	while(p)
++	{
++		if(p->eport == eport && p->proto == proto)
++		{
++			if(!last)
++				rdr_desc_list = p->next;
++			else
++				last->next = p->next;
++			free(p);
++			return;
++		}
++		last = p;
++		p = p->next;
++	}
++}
++
++/* go through the list to find the description */
++void
++get_redirect_desc(unsigned short eport, int proto,
++                  char * desc, int desclen,
++                  unsigned int * timestamp)
++{
++	struct rdr_desc * p;
++	for(p = rdr_desc_list; p; p = p->next)
++	{
++		if(p->eport == eport && p->proto == (short)proto)
++		{
++			if(desc)
++				strncpy(desc, p->str, desclen);
++			if(timestamp)
++				*timestamp = p->timestamp;
++			return;
++		}
++	}
++	/* if no description was found, return miniupnpd as default */
++	if(desc)
++		strncpy(desc, "miniupnpd", desclen);
++	if(timestamp)
++		*timestamp = 0;
++}
++
 +#ifdef __cplusplus
 +       }
 +#endif
@@ -676,9 +760,7 @@ index 0000000..7ec9e8d
 +
 +#endif
 diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
-old mode 100644
-new mode 100755
-index ee6e47b..b29c249
+index ee6e47b..b29c249 100644
 --- a/linux/miniupnpd.init.d.script
 +++ b/linux/miniupnpd.init.d.script
 @@ -18,33 +18,18 @@ set -e
@@ -968,14 +1050,14 @@ index 050d8db..0ee9b68 100644
 --- a/miniupnpd.c
 +++ b/miniupnpd.c
 @@ -1074,7 +1074,7 @@ init(int argc, char * * argv, struct runtime_vars * v)
-			fprintf(stderr, "Unknown option: %s\n", argv[i]);
-		}
-	}
+ 			fprintf(stderr, "Unknown option: %s\n", argv[i]);
+ 		}
+ 	}
 -	if(!ext_if_name || !lan_addrs.lh_first)
 +	if(!lan_addrs.lh_first)
-	{
-		/* bad configuration */
-		goto print_usage;
+ 	{
+ 		/* bad configuration */
+ 		goto print_usage;
 @@ -1156,9 +1156,9 @@ init(int argc, char * * argv, struct runtime_vars * v)
  		syslog(LOG_NOTICE, "Failed to set %s handler", "SIGUSR1");
  	}
@@ -1019,7 +1101,7 @@ index 050d8db..0ee9b68 100644
  	while(upnphttphead.lh_first != NULL)
  	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
-index e34e088..cf1324d 100644
+index e34e088..448df81 100644
 --- a/miniupnpd.conf
 +++ b/miniupnpd.conf
 @@ -1,6 +1,6 @@
@@ -1175,23 +1257,23 @@ index d13f74c..1da3a55 100644
  			str = strcat_str(str, len, &tmplen, ">");
  			/*printf("<e:property><s:%s>", v->name);*/
 @@ -1161,7 +1161,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
-			case CONNECTIONSTATUS_MAGICALVALUE:
-				/* or get_wan_connection_status_str(ext_if_name) */
-				str = strcat_str(str, len, &tmplen,
+ 			case CONNECTIONSTATUS_MAGICALVALUE:
+ 				/* or get_wan_connection_status_str(ext_if_name) */
+ 				str = strcat_str(str, len, &tmplen,
 -				   upnpallowedvalues[18 + get_wan_connection_status(ext_if_name)]);
 +				   upnpallowedvalues[18 + getWanStatus()]);
-				break;
+ 				break;
  #ifdef ENABLE_6FC_SERVICE
-			case FIREWALLENABLED_MAGICALVALUE:
+ 			case FIREWALLENABLED_MAGICALVALUE:
 @@ -1198,7 +1198,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
-					str = strcat_str(str, len, &tmplen, use_ext_ip_addr);
-				else {
-					char ext_ip_addr[INET_ADDRSTRLEN];
+ 					str = strcat_str(str, len, &tmplen, use_ext_ip_addr);
+ 				else {
+ 					char ext_ip_addr[INET_ADDRSTRLEN];
 -					if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN) < 0) {
 +					if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0) {
-						str = strcat_str(str, len, &tmplen, "0.0.0.0");
-					} else {
-						str = strcat_str(str, len, &tmplen, ext_ip_addr);
+ 						str = strcat_str(str, len, &tmplen, "0.0.0.0");
+ 					} else {
+ 						str = strcat_str(str, len, &tmplen, ext_ip_addr);
 @@ -1217,7 +1217,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
  			default:
  				str = strcat_str(str, len, &tmplen, upnpallowedvalues[v->ieventvalue]);
@@ -1202,7 +1284,9 @@ index d13f74c..1da3a55 100644
  			str = strcat_str(str, len, &tmplen, "></e:property>");
  			/*printf("</s:%s></e:property>\n", v->name);*/
 diff --git a/upnpredirect.c b/upnpredirect.c
-index 5c9beae..2643e97 100644
+old mode 100644
+new mode 100755
+index 5c9beae..d2d0721
 --- a/upnpredirect.c
 +++ b/upnpredirect.c
 @@ -255,7 +255,7 @@ int reload_from_lease_file()
@@ -1214,7 +1298,7 @@ index 5c9beae..2643e97 100644
                const char * iaddr, unsigned short iport,
                const char * protocol, const char * desc,
                unsigned int leaseduration)
-@@ -278,68 +278,28 @@ upnp_redirect(const char * rhost, unsigned short eport,
+@@ -278,68 +278,33 @@ upnp_redirect(const char * rhost, unsigned short eport,
  		                 "%hu->%s:%hu %s", eport, iaddr, iport, protocol);
  		return -3;
  	}
@@ -1240,13 +1324,19 @@ index 5c9beae..2643e97 100644
 -			eport, iaddr, iport, protocol, desc);
 -		return upnp_redirect_internal(rhost, eport, iaddr, iport, proto,
 -		                              desc, timestamp);
--	}
 +	timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
 +	syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
 +		eport, iaddr, iport, protocol, desc);
-+	return upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
- 
- 	return 0;
++	r = upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
++	if(r >= 0)
++		add_redirect_desc(eport, proto, desc, timestamp);
++	if(timestamp > 0) {
++		if(!nextruletoclean_timestamp || (timestamp < nextruletoclean_timestamp))
++			nextruletoclean_timestamp = timestamp;
+ 	}
+-
+-	return 0;
++	return r;
  }
  
  int
@@ -1294,7 +1384,7 @@ index 5c9beae..2643e97 100644
  }
  
  
-@@ -361,10 +321,9 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
+@@ -361,17 +326,20 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
@@ -1302,13 +1392,26 @@ index 5c9beae..2643e97 100644
 -	                      iaddr, iaddrlen, iport, desc, desclen,
 -	                      rhost, rhostlen, &timestamp,
 -	                      0, 0);
+-	if(r == 0 &&
+-	   timestamp > 0 &&
 +	r = getSpecificEntry( eport, proto_atoi(protocol),
 +	                      iaddr, iaddrlen, iport,
 +	                      rhost, rhostlen, &timestamp);
- 	if(r == 0 &&
- 	   timestamp > 0 &&
++	if (r == 0) {
++		get_redirect_desc(eport, proto_atoi(protocol), desc, desclen, &timestamp);
++
++		if(timestamp > 0 &&
  	   timestamp > (unsigned int)(current_time = time(NULL))) {
-@@ -384,7 +343,6 @@ upnp_get_redirection_infos_by_index(int index,
+ 		*leaseduration = timestamp - current_time;
+ 	} else {
+ 		*leaseduration = 0;
+ 	}
++	}
++
+ 	return r;
+ }
+
+@@ -384,7 +352,6 @@ upnp_get_redirection_infos_by_index(int index,
                                      char * rhost, int rhostlen,
                                      unsigned int * leaseduration)
  {
@@ -1316,7 +1419,7 @@ index 5c9beae..2643e97 100644
  	int proto = 0;
  	unsigned int timestamp;
  	time_t current_time;
-@@ -393,18 +351,18 @@ upnp_get_redirection_infos_by_index(int index,
+@@ -393,18 +360,19 @@ upnp_get_redirection_infos_by_index(int index,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
@@ -1331,6 +1434,7 @@ index 5c9beae..2643e97 100644
 +	}
  	else
  	{
++		get_redirect_desc(*eport, proto, desc, desclen, &timestamp);
  		current_time = time(NULL);
  		*leaseduration = (timestamp > (unsigned int)current_time)
  		                 ? (timestamp - current_time)
@@ -1340,7 +1444,7 @@ index 5c9beae..2643e97 100644
  			memcpy(protocol, "TCP", 4);
  		else
  			memcpy(protocol, "UDP", 4);
-@@ -418,7 +376,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
+@@ -418,7 +386,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
  {
  	int r;
  #if defined(__linux__)
@@ -1349,17 +1453,16 @@ index 5c9beae..2643e97 100644
  #else
  	r = delete_redirect_rule(ext_if_name, eport, proto);
  	delete_filter_rule(ext_if_name, eport, proto);
-@@ -466,45 +424,18 @@ upnp_get_portmapping_number_of_entries()
- struct rule_state *
- get_upnp_rules_state_list(int max_rules_number_target)
- {
--	/*char ifname[IFNAMSIZ];*/
--	int proto;
--	unsigned short iport;
--	unsigned int timestamp;
- 	struct rule_state * tmp;
- 	struct rule_state * list = 0;
- 	struct rule_state * * p;
+@@ -430,6 +398,8 @@ _upnp_delete_redir(unsigned short eport, int proto)
+ #ifdef ENABLE_EVENTS
+ 	upnp_event_var_change_notify(EWanIPC);
+ #endif
++	if ( r >= 0 )
++		del_redirect_desc(eport, proto);
+ 	return r;
+ }
+
+@@ -476,17 +446,15 @@ get_upnp_rules_state_list(int max_rules_number_target)
  	int i = 0;
  	time_t current_time;
  
@@ -1372,31 +1475,14 @@ index 5c9beae..2643e97 100644
 -	while(get_redirect_rule_by_index(i, /*ifname*/0, &tmp->eport, 0, 0,
 -	                              &iport, &proto, 0, 0, 0,0, &timestamp,
 -								  &tmp->packets, &tmp->bytes) >= 0)
--	{
--		tmp->to_remove = 0;
--		if(timestamp > 0) {
--			/* need to remove this port mapping ? */
--			if(timestamp <= (unsigned int)current_time)
--				tmp->to_remove = 1;
--			else if((nextruletoclean_timestamp <= (unsigned int)current_time)
--			       || (timestamp < nextruletoclean_timestamp))
--				nextruletoclean_timestamp = timestamp;
--		}
--		tmp->proto = (short)proto;
--		/* add tmp to list */
--		tmp->next = list;
--		list = tmp;
--		/* prepare next iteration */
--		i++;
--		tmp = malloc(sizeof(struct rule_state));
--		if(!tmp)
--			break;
--	}
-+
- 	free(tmp);
- 	/* remove the redirections that need to be removed */
- 	for(p = &list, tmp = list; tmp; tmp = *p)
-@@ -536,27 +467,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
++	while(getStaticNatConfigByEntry(i, 0, 0, &tmp->eport, &iport, &proto) >= 0)
+ 	{
+ 		tmp->to_remove = 0;
++		get_redirect_desc(tmp->eport, proto, 0, 0, &timestamp);
+ 		if(timestamp > 0) {
+ 			/* need to remove this port mapping ? */
+ 			if(timestamp <= (unsigned int)current_time)
+@@ -536,27 +504,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
  void
  remove_unused_rules(struct rule_state * list)
  {
@@ -1424,7 +1510,7 @@ index 5c9beae..2643e97 100644
  		tmp = list;
  		list = tmp->next;
  		free(tmp);
-@@ -569,16 +485,15 @@ remove_unused_rules(struct rule_state * list)
+@@ -569,16 +522,15 @@ remove_unused_rules(struct rule_state * list)
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
@@ -1444,7 +1530,7 @@ index 5c9beae..2643e97 100644
  }
  
  /* stuff for miniupnpdctl */
-@@ -586,34 +501,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
+@@ -586,34 +538,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
  void
  write_ruleset_details(int s)
  {
@@ -1660,14 +1746,14 @@ index 0157f72..4950467 100644
  		if(r == 0)
  		{
 @@ -1134,7 +1137,7 @@ QueryStateVariable(struct upnphttp * h, const char * action)
-	{
-		const char * status;
+ 	{
+ 		const char * status;
 
 -		status = get_wan_connection_status_str(ext_if_name);
 +		status = getWanStatusStr();
-		bodylen = snprintf(body, sizeof(body), resp,
+ 		bodylen = snprintf(body, sizeof(body), resp,
                             action, "urn:schemas-upnp-org:control-1-0",
-		                   status, action);
+ 		                   status, action);
 -- 
 1.7.8.3
 
