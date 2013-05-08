@@ -5,4 +5,4 @@ usbfs                /proc/bus/usb        usbfs      defaults              0  0
 tmpfs                /dev/shm             tmpfs      mode=0777             0  0
 /dev/mtdblock17      /usr                 yaffs2     defaults              0  0
 /dev/mmcblk0p1       /media/card          auto       defaults              0  0
-/dev/mtdblock9       /cache               yaffs2     defaults              0  0
+/dev/mtdblock11       /cache               yaffs2     defaults              0  0
