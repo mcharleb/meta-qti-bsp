@@ -1,6 +1,6 @@
-From 740ccf069dd3df37bcf3f981e3023295f109c060 Mon Sep 17 00:00:00 2001
+From 3f4ae12756fde595a78cf8eeb80f8a6d0c1d94b0 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Wed, 8 May 2013 15:00:05 -0700
+Date: Tue, 14 May 2013 11:24:20 -0700
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
@@ -16,11 +16,12 @@ Subject: [PATCH 1/1] qcmap-enabled
  upnpdescgen.c                 |    8 +-
  upnpredirect.c                |  157 +++++------------
  upnpredirect.h                |   14 +-
- upnpsoap.c                    |   41 +++--
- 13 files changed, 852 insertions(+), 341 deletions(-)
- create mode 100755 UPNP_QCMAP_Client.cpp
- create mode 100755 UPNP_QCMAP_Client.h
+ upnpsoap.c                    |   45 +++---
+ 13 files changed, 854 insertions(+), 343 deletions(-)
+ create mode 100644 UPNP_QCMAP_Client.cpp
+ create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
+ mode change 100644 => 100755 upnpsoap.c
 
 diff --git a/Makefile.linux b/Makefile.linux
 index 3521a5a..0c6137a 100644
@@ -240,7 +241,7 @@ index 3521a5a..0c6137a 100644
 +testgetifstats.o: getifstats.h
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
-new file mode 100755
+new file mode 100644
 index 0000000..17b3a0c
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
@@ -641,7 +642,7 @@ index 0000000..17b3a0c
 +#endif
 \ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.h b/UPNP_QCMAP_Client.h
-new file mode 100755
+new file mode 100644
 index 0000000..d08dc45
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.h
@@ -711,7 +712,7 @@ index 0000000..d08dc45
 \ No newline at end of file
 diff --git a/config.h b/config.h
 new file mode 100644
-index 0000000..7ec9e8d
+index 0000000..266942f
 --- /dev/null
 +++ b/config.h
 @@ -0,0 +1,100 @@
@@ -806,7 +807,7 @@ index 0000000..7ec9e8d
 +
 +/* Enable to make MiniUPnPd more strict about UPnP conformance
 + * and the messages it receives from control points */
-+/*#define UPNP_STRICT*/
++#define UPNP_STRICT
 +
 +/* Add the optional Date: header in all HTTP responses */
 +/*#define ENABLE_HTTP_DATE*/
@@ -1665,7 +1666,9 @@ index b549824..68a29d6 100644
                                 unsigned int * number);
  
 diff --git a/upnpsoap.c b/upnpsoap.c
-index 0157f72..4950467 100644
+old mode 100644
+new mode 100755
+index 0157f72..bd594b6
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
 @@ -88,7 +88,8 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
@@ -1757,6 +1760,15 @@ index 0157f72..4950467 100644
  		if(r==-2 && eport < 65535) {
  			eport++;
  		} else {
+@@ -604,7 +607,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
+	protocol = GetValueFromNameValueList(&data, "NewProtocol");
+
+ #ifdef UPNP_STRICT
+-	if(!ext_port || !protocol || !r_host)
++	if(!ext_port || !protocol)
+ #else
+	if(!ext_port || !protocol)
+ #endif
 @@ -631,7 +634,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
  	 * but different remoteHost to be set up, so that is not
  	 * a priority. */
@@ -1766,6 +1778,15 @@ index 0157f72..4950467 100644
  	                               desc, sizeof(desc),
  	                               NULL, 0,
  	                               &leaseduration);
+@@ -676,7 +679,7 @@ DeletePortMapping(struct upnphttp * h, const char * action)
+	protocol = GetValueFromNameValueList(&data, "NewProtocol");
+
+ #ifdef UPNP_STRICT
+-	if(!ext_port || !protocol || !r_host)
++	if(!ext_port || !protocol)
+ #else
+	if(!ext_port || !protocol)
+ #endif
 @@ -763,8 +766,8 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
  		return;
  	}
