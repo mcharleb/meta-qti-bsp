@@ -1,28 +1,44 @@
-From 21e21cc5308c5cbdbb8b8aa8a80cd85073484264 Mon Sep 17 00:00:00 2001
+From 81e0105c750529d64f82b3df5c11a842b656f5d2 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Tue, 30 Apr 2013 17:47:10 -0700
+Date: Thu, 9 May 2013 13:44:27 -0700
 Subject: [PATCH 1/1] patch
 
 ---
- linux/minidlna.init.d.script |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ linux/minidlna.init.d.script |   12 ++----------
+ 1 files changed, 2 insertions(+), 10 deletions(-)
  mode change 100644 => 100755 linux/minidlna.init.d.script
 
 diff --git a/linux/minidlna.init.d.script b/linux/minidlna.init.d.script
 old mode 100644
 new mode 100755
-index 491eb61..b279905
+index 491eb61..6dbaa9f
 --- a/linux/minidlna.init.d.script
 +++ b/linux/minidlna.init.d.script
-@@ -21,7 +21,7 @@
- MINIDLNA=/usr/sbin/minidlna
- PIDFILE=/var/run/minidlna.pid
- CONF=/etc/minidlna.conf
--ARGS="-f $CONF"
-+ARGS="-f $CONF -R"
+@@ -25,22 +25,14 @@ ARGS="-f $CONF"
 
  test -f $MINIDLNA || exit 0
 
+-. /lib/lsb/init-functions
+-
+ case "$1" in
+-start)  log_daemon_msg "Starting minidlna" "minidlna"
+-        start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $MINIDLNA -- $ARGS $LSBNAMES
+-        log_end_msg $?
++start)  start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $MINIDLNA -- $ARGS $LSBNAMES
+         ;;
+-stop)   log_daemon_msg "Stopping minidlna" "minidlna"
+-        start-stop-daemon --stop --quiet --pidfile $PIDFILE
+-        log_end_msg $?
++stop)   start-stop-daemon --stop --quiet --pidfile $PIDFILE
+         ;;
+ restart|reload|force-reload)
+-        log_daemon_msg "Restarting minidlna" "minidlna"
+         start-stop-daemon --stop --retry 5 --quiet --pidfile $PIDFILE
+         start-stop-daemon --start --quiet --pidfile $PIDFILE --startas $MINIDLNA -- $ARGS $LSBNAMES
+-        log_end_msg $?
+         ;;
+ status)
+         status_of_proc -p $PIDFILE $MINIDLNA minidlna && exit 0 || exit $?
 -- 
 1.7.8.3
 
