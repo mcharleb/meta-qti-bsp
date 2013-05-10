@@ -38,6 +38,12 @@ echo /data     yaffs2  userdata >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.
 echo /recovery mtd     recovery >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
 echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
 
+#Copy contents of userdata rootfs
+cp -r ${TMPDIR}/rootfs/mdm9625-usr-image/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
+#Remove fota dir and ipth_dme binary from userdata. We dont want to update them
+rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/fota
+rm ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
+
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
 cp   ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
