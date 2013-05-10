@@ -33,9 +33,9 @@ do_install_append() {
         install -d ${D}/data/
         install -d ${D}/system/
         install -m 0755 ${WORKSPACE}/oe-core/meta-msm/recipes/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
-        echo /dev/mtdblock14       /system     yaffs2     defaults    0   0 >> ${D}/res/recovery_volume_config
-        echo /dev/mtdblock15       /data       yaffs2     defaults    0   0 >> ${D}/res/recovery_volume_config
-        echo /dev/mtdblock10       /misc       mtd        defaults    0   0 >> ${D}/res/recovery_volume_config
+        echo /dev/mtdblock16       /system     yaffs2     defaults    0   0 >> ${D}/res/recovery_volume_config
+        echo /dev/mtdblock17       /data       yaffs2     defaults    0   0 >> ${D}/res/recovery_volume_config
+        echo /dev/mtdblock12       /misc       mtd        defaults    0   0 >> ${D}/res/recovery_volume_config
         install -m 0755 ${WORKDIR}/${PN}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 }
 
