@@ -22,7 +22,7 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/mdm-image-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
 
-cp ${DEPLOY_DIR_IMAGE}/mdm-image-boot-recovery-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
+cp ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
 
 # copy the contents of system rootfs
 cp -r ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/mdm-image-1.0-r0/rootfs/. ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM/.
