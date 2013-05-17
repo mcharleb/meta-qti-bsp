@@ -153,7 +153,7 @@ case "$1" in
         ;;
 
     start_ftm)
-        $0 start testmode=2
+        $0 start debug_quirks=0x10
         ;;
 
     stop)
