@@ -17,13 +17,13 @@ SRC_URI = "\
     file://0002-qcmap-enabled.patch \
 "
 
-SRC_URI[md5sum] = "0d8a8e936d5a0012cb260a3b972acbf3"
-SRC_URI[sha256sum] = "e453a9225a2883e759d09e15c51bb0265b8a019d1132434131e6929fef0076bb"
+SRC_URI[md5sum] = "2b913c53fbeb562731e84b66b3ce704f"
+SRC_URI[sha256sum] = "2fc003b0d53a9209389843d32d574f7f0b2886c9609840640ca5e2aa1fd73d4e"
 
 do_compile () {
     cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR} INCDIR=${STAGING_INCDIR}
 }
 
 do_install () {
-    make -f Makefile.linux PREFIX=${D} LIBDIR=${STAGING_LIBDIR} install
+    make -f Makefile.linux DESTDIR=${D} LIBDIR=${STAGING_LIBDIR} install
 }
