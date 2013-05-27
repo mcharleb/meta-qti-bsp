@@ -33,7 +33,7 @@ export KERNEL=`uname -r`
 export MODULE_BASE=/lib/modules/$KERNEL/updates
 export RETRY_LIMIT=3
 export start_ap1=0
-
+export num_dev=2
 FILE_PATH="/etc/wlan_config"
 DEVICE_PATTERN="device=AR6003"
 CHIP="ar6004"
@@ -55,8 +55,10 @@ case "$1" in
 
         if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ]; then
             start_ap1=1
+	    num_dev=2
             shift
         elif [ "$1" == "ap" ]; then
+	    num_dev=1
             shift
         elif [ "$1" == "ap,sta" ]; then
             $0 help
@@ -115,7 +117,7 @@ case "$1" in
 	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
 	        insmod $MODULE_BASE/compat/compat.ko
 	        insmod $MODULE_BASE/net/wireless/cfg80211.ko
-	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko $@
+	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko devmode=$num_dev $@
 	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko
 	        set +e
 
