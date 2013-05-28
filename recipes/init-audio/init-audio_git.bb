@@ -16,5 +16,5 @@ do_install() {
 pkg_postinst() {
     [ -n "$$D" ] && OPT="-r $D" || OPT="-s"
     update-rc.d $OPT -f init_qcom_audio
-    update-rc.d $OPT init_qcom_audio start 60 2 3 4 5 . stop 40 0 1 6 .
+    update-rc.d $OPT init_qcom_audio start 20 2 3 4 5 . stop 80 0 1 6 .
 }
