@@ -1,4 +1,4 @@
-PRINC = "6"
+PRINC = "7"
 
 FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
 
@@ -7,3 +7,4 @@ BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI += "file://do-not-install-unnecessary-udev-rules.patch"
 SRC_URI_append_msm8960 += " file://${BASEMACHINE}/local.rules"
+SRC_URI_append_msm8974 += " file://${BASEMACHINE}/local.rules"
