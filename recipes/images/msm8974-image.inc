@@ -24,6 +24,7 @@ IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
+IMAGE_INSTALL += "kernel-modules"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
 IMAGE_INSTALL += "powerapp"
@@ -49,6 +50,7 @@ IMAGE_INSTALL += "open-source-kernel-tests"
 IMAGE_INSTALL += "libtbm-msm"
 IMAGE_INSTALL += "libgenlock"
 IMAGE_INSTALL += "mm-image-codec"
+IMAGE_INSTALL += "init-audio"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
