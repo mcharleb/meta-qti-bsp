@@ -1,4 +1,4 @@
-PR = "r5"
+PR = "r6"
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -21,9 +21,11 @@ MY_TARGET_9615-cdp = "mdm9615"
 
 BOOTLOADER_NAME         = "appsboot"
 BOOTLOADER_NAME_msm8960 = "emmc_appsboot"
+BOOTLOADER_NAME_msm8974 = "emmc_appsboot"
 
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 EXTRA_OEMAKE_append_msm8960 = " EMMC_BOOT=1 SIGNED_KERNEL=1"
+EXTRA_OEMAKE_append_msm8974 = " EMMC_BOOT=1 SIGNED_KERNEL=1"
 
 do_install() {
 	install	-d ${D}/boot
@@ -31,6 +33,10 @@ do_install() {
 }
 
 do_install_append_msm8960() {
+	install build-${MY_TARGET}/EMMCBOOT.MBN ${D}/boot
+}
+
+do_install_append_msm8974() {
 	install build-${MY_TARGET}/EMMCBOOT.MBN ${D}/boot
 }
 

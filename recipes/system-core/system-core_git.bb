@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
-PR = "r7"
+PR = "r8"
 
 inherit autotools
 
@@ -18,6 +18,7 @@ INITSCRIPT_PARAMS = "start 42 S 2 3 4 5 S . stop 80 0 1 6 ."
 inherit update-rc.d
 
 EXTRA_OECONF_append_msm8960 = " --with-host-os=${HOST_OS}"
+EXTRA_OECONF_append_msm8974 = " --with-host-os=${HOST_OS}"
 
 do_install_append() {
    install -m 0755 -d ${D}${includedir}/cutils
@@ -42,6 +43,12 @@ do_install_append() {
 }
 
 do_install_append_msm8960 () {
+	install -d ${DEPLOY_DIR}/host/linux/bin
+	install ${D}/usr/bin/adb ${DEPLOY_DIR}/host/linux/bin
+	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
+}
+
+do_install_append_msm8974 () {
 	install -d ${DEPLOY_DIR}/host/linux/bin
 	install ${D}/usr/bin/adb ${DEPLOY_DIR}/host/linux/bin
 	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
