@@ -1,33 +1,34 @@
-From 3f4ae12756fde595a78cf8eeb80f8a6d0c1d94b0 Mon Sep 17 00:00:00 2001
+From 5cbb59e01deeb73db388184f226e63925a122f2d Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Tue, 14 May 2013 11:24:20 -0700
+Date: Mon, 3 Jun 2013 14:18:19 -0700
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
- Makefile.linux                |   92 ++++++----
- UPNP_QCMAP_Client.cpp         |  394 +++++++++++++++++++++++++++++++++++++++++
- UPNP_QCMAP_Client.h           |   62 +++++++
- config.h                      |  100 +++++++++++
+ Makefile.linux                |  118 ++++++-------
+ UPNP_QCMAP_Client.cpp         |  417 +++++++++++++++++++++++++++++++++++++++++
+ UPNP_QCMAP_Client.h           |   62 ++++++
+ config.h                      |  103 ++++++++++
+ getifstats.h                  |    6 +
  linux/miniupnpd.init.d.script |   15 --
- minissdp.c                    |  203 ++++++++++++----------
- miniupnpd.c                   |   17 ++-
- miniupnpd.conf                |   21 ++-
- natpmp.c                      |   69 ++++----
- upnpdescgen.c                 |    8 +-
- upnpredirect.c                |  157 +++++------------
- upnpredirect.h                |   14 +-
- upnpsoap.c                    |   45 +++---
- 13 files changed, 854 insertions(+), 343 deletions(-)
+ minissdp.c                    |  103 ++++++----
+ miniupnpd.c                   |   32 +++-
+ miniupnpd.conf                |   21 +-
+ natpmp.c                      |   17 ++-
+ upnpdescgen.c                 |   16 ++
+ upnpredirect.c                |   77 ++++++++-
+ upnpredirect.h                |   23 ++-
+ upnpsoap.c                    |   62 +++++-
+ 14 files changed, 917 insertions(+), 155 deletions(-)
  create mode 100644 UPNP_QCMAP_Client.cpp
  create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
- mode change 100644 => 100755 upnpsoap.c
+ mode change 100644 => 100755 getifstats.h
 
 diff --git a/Makefile.linux b/Makefile.linux
-index 3521a5a..0c6137a 100644
+index 900f702..4f2254f 100644
 --- a/Makefile.linux
 +++ b/Makefile.linux
-@@ -29,10 +29,10 @@ CFLAGS += -Wall
+@@ -30,10 +30,10 @@ CFLAGS += -Wall
  CFLAGS += -Wextra -Wstrict-prototypes -Wdeclaration-after-statement
  #CFLAGS += -Wno-missing-field-initializers
  #CFLAGS += -ansi	# iptables headers does use typeof which is a gcc extension
@@ -40,17 +41,38 @@ index 3521a5a..0c6137a 100644
  CP = cp
  
  
-@@ -48,13 +48,14 @@ BASEOBJS = miniupnpd.o upnphttp.o upnpdescgen.o upnpsoap.o \
+@@ -49,34 +49,14 @@ BASEOBJS = miniupnpd.o upnphttp.o upnpdescgen.o upnpsoap.o \
             upnpevents.o upnputils.o getconnstatus.o \
             upnppinhole.o
  
 -LNXOBJS = linux/getifstats.o linux/ifacewatcher.o linux/getroute.o
 -NETFILTEROBJS = netfilter/iptcrdr.o netfilter/iptpinhole.o
 +CPPOBJS = UPNP_QCMAP_Client.o
-+		   
+
+-ALLOBJS = $(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS)
+-
+-PCFILE_FOUND := $(shell pkg-config --exists libiptc; echo $$?)
+-
+-ifeq (${PCFILE_FOUND},0)
 +LNXOBJS = linux/getifstats.o linux/ifacewatcher.o
  
- ALLOBJS = $(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS)
+-IPTABLESVERSION := $(shell pkg-config --modversion libiptc)
+-IPTABLESVERSION1 := $(shell echo $(IPTABLESVERSION) | cut -d. -f1 )
+-IPTABLESVERSION2 := $(shell echo $(IPTABLESVERSION) | cut -d. -f2 )
+-IPTABLESVERSION3 := $(shell echo $(IPTABLESVERSION) | cut -d. -f3 )
+-# test if iptables version >= 1.4.3
+-TEST := $(shell [ \( \( $(IPTABLESVERSION1) -ge 1 \) -a \( $(IPTABLESVERSION2) -ge 4 \) \) -a \( $(IPTABLESVERSION3) -ge 3 \) ] && echo 1 )
+-ifeq ($(TEST), 1)
+-CFLAGS += -DIPTABLES_143
+-endif
+-
+-CFLAGS  += $(shell pkg-config --cflags libiptc)
+-LIBS    += $(shell pkg-config --libs-only-l libiptc)
+-LDFLAGS += $(shell pkg-config --libs-only-L libiptc)
+-LDFLAGS += $(shell pkg-config --libs-only-other libiptc)
+-
+-else
++ALLOBJS = $(BASEOBJS) $(LNXOBJS) $(NETFILTEROBJS)
  
  ifeq "$(wildcard /etc/gentoo-release )" ""
 -LIBS ?= -liptc
@@ -58,7 +80,7 @@ index 3521a5a..0c6137a 100644
  else # gentoo
  # the following is better, at least on gentoo with iptables 1.4.6
  # see http://miniupnp.tuxfamily.org/forum/viewtopic.php?p=1618
-@@ -65,8 +66,8 @@ endif
+@@ -87,8 +67,8 @@ endif
  
  ARCH ?= $(shell uname -m | grep -q "x86_64" && echo 64)
  ifdef IPTABLESPATH
@@ -69,7 +91,7 @@ index 3521a5a..0c6137a 100644
  # get iptables version and set IPTABLES_143 macro if needed
  ifeq ($(TARGET_OPENWRT),)
  IPTABLESVERSION := $(shell grep "\#define VERSION" $(IPTABLESPATH)/config.h | tr -d \" |cut -d" " -f3 )
-@@ -103,7 +104,7 @@ else # ifdef IPTABLESPATH
+@@ -125,7 +105,7 @@ else # ifdef IPTABLESPATH
  TEST := $(shell test -f /usr/include/xtables.h && grep -q "XTABLES_VERSION_CODE" /usr/include/xtables.h && echo 1)
  ifeq ($(TEST), 1)
  CFLAGS := $(CFLAGS) -DIPTABLES_143
@@ -78,9 +100,11 @@ index 3521a5a..0c6137a 100644
  TESTIP4TC := $(shell test -f /lib/libip4tc.so && echo 1)
  ifeq ($(TESTIP4TC), 1)
  LIBS := $(LIBS) -lip4tc
-@@ -115,13 +116,14 @@ endif # ($(TESTIP6TC), 1)
+@@ -136,15 +116,15 @@ LIBS := $(LIBS) -lip6tc
+ endif # ($(TESTIP6TC), 1)
  endif # ($(TEST), 1)
  endif # ifdef IPTABLESPATH
+-endif # ifdef PCFILE_FOUND
  
 -LIBS += -lnfnetlink
 +#LIBS += -lnfnetlink
@@ -97,7 +121,7 @@ index 3521a5a..0c6137a 100644
  
  .PHONY:	all clean install depend genuuid
  
-@@ -130,26 +132,21 @@ all:	$(EXECUTABLES)
+@@ -153,23 +133,17 @@ all:	$(EXECUTABLES)
  clean:
  	$(RM) $(ALLOBJS)
  	$(RM) $(EXECUTABLES)
@@ -113,21 +137,17 @@ index 3521a5a..0c6137a 100644
 -	netfilter/ip6tables_init.sh netfilter/ip6tables_removeall.sh \
  	linux/miniupnpd.init.d.script
  	$(STRIP) miniupnpd
- 	$(INSTALL) -d $(SBININSTALLDIR)
- 	$(INSTALL) miniupnpd $(SBININSTALLDIR)
- 	$(INSTALL) -d $(ETCINSTALLDIR)
--	$(INSTALL) netfilter/iptables_init.sh $(ETCINSTALLDIR)
--	$(INSTALL) netfilter/iptables_removeall.sh $(ETCINSTALLDIR)
--	$(INSTALL) netfilter/ip6tables_init.sh $(ETCINSTALLDIR)
--	$(INSTALL) netfilter/ip6tables_removeall.sh $(ETCINSTALLDIR)
- 	$(INSTALL) --mode=0644 -b miniupnpd.conf $(ETCINSTALLDIR)
- 	$(INSTALL) -d $(PREFIX)/etc/init.d
- 	$(INSTALL) linux/miniupnpd.init.d.script $(PREFIX)/etc/init.d/miniupnpd
-+	$(INSTALL) -d $(MANINSTALLDIR)
- 	$(INSTALL) miniupnpd.8 $(MANINSTALLDIR)
- 	gzip $(MANINSTALLDIR)/miniupnpd.8
- 
-@@ -162,9 +159,8 @@ else
+	$(INSTALL) -d $(DESTDIR)$(SBININSTALLDIR)
+	$(INSTALL) miniupnpd $(DESTDIR)$(SBININSTALLDIR)
+	$(INSTALL) -d $(DESTDIR)$(ETCINSTALLDIR)
+-	$(INSTALL) netfilter/iptables_init.sh $(DESTDIR)$(ETCINSTALLDIR)
+-	$(INSTALL) netfilter/iptables_removeall.sh $(DESTDIR)$(ETCINSTALLDIR)
+-	$(INSTALL) netfilter/ip6tables_init.sh $(DESTDIR)$(ETCINSTALLDIR)
+-	$(INSTALL) netfilter/ip6tables_removeall.sh $(DESTDIR)$(ETCINSTALLDIR)
+	$(INSTALL) --mode=0644 -b miniupnpd.conf $(DESTDIR)$(ETCINSTALLDIR)
+	$(INSTALL) -d $(DESTDIR)$(PREFIX)/etc/init.d
+	$(INSTALL) linux/miniupnpd.init.d.script $(DESTDIR)$(PREFIX)/etc/init.d/miniupnpd
+@@ -187,9 +161,8 @@ else
  	sed -i -e "s/^uuid=[-0-9a-f]*/uuid=`($(STAGING_DIR_HOST)/bin/genuuid||$(STAGING_DIR_HOST)/bin/uuidgen||$(STAGING_DIR_HOST)/bin/uuid) 2>/dev/null`/" miniupnpd.conf
  endif
  
@@ -139,7 +159,7 @@ index 3521a5a..0c6137a 100644
  
  testgetifstats:	testgetifstats.o linux/getifstats.o
 
-@@ -172,8 +168,6 @@ testupnppermissions:	testupnppermissions.o upnppermissions.o
+@@ -197,8 +170,6 @@ testupnppermissions:	testupnppermissions.o upnppermissions.o
  
  testgetifaddr:	testgetifaddr.o getifaddr.o
  
@@ -148,10 +168,14 @@ index 3521a5a..0c6137a 100644
  miniupnpdctl:	miniupnpdctl.o
  
  config.h:	genconfig.sh VERSION
-@@ -184,27 +178,56 @@ depend:	config.h
+@@ -207,8 +178,32 @@ config.h:	genconfig.sh VERSION
+ depend:	config.h
+	makedepend -f$(MAKEFILE_LIST) -Y \
  	$(ALLOBJS:.o=.c) $(TESTUPNPDESCGENOBJS:.o=.c) \
- 	testgetifstats.c 2>/dev/null
-
+-	testgetifstats.c testupnppermissions.c testgetifaddr.c \
+-	testgetroute.c miniupnpdctl.c 2>/dev/null
++	testgetifstats.c 2>/dev/null
++
 +qcmap_client_inc = -D__packed__= \
 +        -DIMAGE_APPS_PROC \
 +        -DFEATURE_Q_NO_SELF_QPTR \
@@ -176,10 +200,10 @@ index 3521a5a..0c6137a 100644
 +
 +CPPFLAGS += -Dstrlcpy=strncpy -Dstrlcat=strncat $(qcmap_client_inc)
 +#LIBS += -lpthread -lrt libqcmap_client.la
-+
+
  # DO NOT DELETE
  
- miniupnpd.o: config.h macros.h upnpglobalvars.h upnppermissions.h
+@@ -216,52 +211,47 @@ miniupnpd.o: config.h macros.h upnpglobalvars.h upnppermissions.h
  miniupnpd.o: miniupnpdtypes.h upnphttp.h upnpdescgen.h miniupnpdpath.h
  miniupnpd.o: getifaddr.h upnpsoap.h options.h minissdp.h upnpredirect.h
  miniupnpd.o: upnppinhole.h daemonize.h upnpevents.h natpmp.h commonrdr.h
@@ -208,7 +232,10 @@ index 3521a5a..0c6137a 100644
  getifaddr.o: config.h getifaddr.h
  daemonize.o: daemonize.h config.h
  upnpglobalvars.o: config.h upnpglobalvars.h upnppermissions.h
-@@ -214,7 +237,7 @@ options.o: miniupnpdtypes.h
+ upnpglobalvars.o: miniupnpdtypes.h
+-options.o: config.h options.h upnppermissions.h upnpglobalvars.h
++options.o: options.h config.h upnppermissions.h upnpglobalvars.h
+ options.o: miniupnpdtypes.h
  upnppermissions.o: config.h upnppermissions.h
  minissdp.o: config.h upnpdescstrings.h miniupnpdpath.h upnphttp.h
  minissdp.o: upnpglobalvars.h upnppermissions.h miniupnpdtypes.h minissdp.h
@@ -217,7 +244,10 @@ index 3521a5a..0c6137a 100644
  natpmp.o: macros.h config.h natpmp.h upnpglobalvars.h upnppermissions.h
  natpmp.o: miniupnpdtypes.h getifaddr.h upnpredirect.h commonrdr.h upnputils.h
  upnpevents.o: config.h upnpevents.h miniupnpdpath.h upnpglobalvars.h
-@@ -223,20 +246,11 @@ upnputils.o: config.h upnputils.h
+ upnpevents.o: upnppermissions.h miniupnpdtypes.h upnpdescgen.h upnputils.h
+-upnputils.o: config.h upnputils.h upnpglobalvars.h upnppermissions.h
+-upnputils.o: miniupnpdtypes.h getroute.h
++upnputils.o: config.h upnputils.h
  getconnstatus.o: getconnstatus.h getifaddr.h
  upnppinhole.o: macros.h config.h upnpredirect.h upnpglobalvars.h
  upnppinhole.o: upnppermissions.h miniupnpdtypes.h upnpevents.h
@@ -232,22 +262,22 @@ index 3521a5a..0c6137a 100644
 -netfilter/iptcrdr.o: miniupnpdtypes.h
 -netfilter/iptpinhole.o: config.h netfilter/iptpinhole.h upnpglobalvars.h
 -netfilter/iptpinhole.o: upnppermissions.h config.h miniupnpdtypes.h
--netfilter/iptpinhole.o: netfilter/tiny_nf_nat.h
 -testupnpdescgen.o: macros.h config.h upnpdescgen.h
  upnpdescgen.o: config.h getifaddr.h upnpredirect.h upnpdescgen.h
  upnpdescgen.o: miniupnpdpath.h upnpglobalvars.h upnppermissions.h
  upnpdescgen.o: miniupnpdtypes.h upnpdescstrings.h upnpurns.h getconnstatus.h
--testgetifstats.o: getifstats.h
-+testgetifstats.o: getifstats.h
-\ No newline at end of file
 diff --git a/UPNP_QCMAP_Client.cpp b/UPNP_QCMAP_Client.cpp
 new file mode 100644
-index 0000000..17b3a0c
+index 0000000..74018c7
 --- /dev/null
 +++ b/UPNP_QCMAP_Client.cpp
-@@ -0,0 +1,394 @@
+@@ -0,0 +1,417 @@
 +/*
 +Copyright (c) 2013, The Linux Foundation. All rights reserved.
++
++MiniUPnPd
++Copyright (c) 2006-2011, Thomas BERNARD
++All rights reserved.
 +
 +Redistribution and use in source and binary forms, with or without
 +modification, are permitted provided that the following conditions are
@@ -286,179 +316,198 @@ index 0000000..17b3a0c
 +
 +int addStaticNatEntry_wrapper(struct in_addr addr, unsigned int proto, unsigned int local_port, unsigned int g_port)
 +{
-+  qcmap_msgr_snat_entry_config_v01 snat_entry;
-+  qmi_error_type_v01 qmi_err_num;
++    qcmap_msgr_snat_entry_config_v01 snat_entry;
++    qmi_error_type_v01 qmi_err_num;
 +
-+  /* Port mapping is not present, try to add it */
-+  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
-+  snat_entry.private_ip_addr = ntohl(addr.s_addr);
-+  snat_entry.protocol = (uint8)proto;
-+  snat_entry.private_port = (uint16)local_port;
-+  snat_entry.global_port = (uint16)g_port;
-+  
-+  if (!QcMapClient->AddStaticNatEntry(&snat_entry, &qmi_err_num))
-+  {
-+    if(qmi_err_num == QMI_ERR_NO_EFFECT_V01)
-+	  return -2;
-+	return -1;
-+  }
-+  return 0;
++    /* Port mapping is not present, try to add it */
++    memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
++    snat_entry.private_ip_addr = ntohl(addr.s_addr);
++    snat_entry.protocol = (uint8)proto;
++    snat_entry.private_port = (uint16)local_port;
++    snat_entry.global_port = (uint16)g_port;
++
++    if (!QcMapClient->AddStaticNatEntry(&snat_entry, &qmi_err_num))
++    {
++        if(qmi_err_num == QMI_ERR_INTERFACE_NOT_FOUND_V01)
++            return 0;
++        if(qmi_err_num == QMI_ERR_NO_EFFECT_V01)
++            return -2;
++        return -1;
++    }
++    return 0;
 +}
 +
 +int deleteStaticNatEntry_wrapper(unsigned short port, int proto)
 +{
-+  qcmap_msgr_snat_entry_config_v01 snat_entry;
-+  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
-+  int i=0, num_entries=0;
-+  qmi_error_type_v01 qmi_err_num;
++    qcmap_msgr_snat_entry_config_v01 snat_entry;
++    qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
++    int i=0, num_entries=0, r=-1;
++    qmi_error_type_v01 qmi_err_num;
 +
-+  memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
-+  snat_entry.protocol = (uint8)proto;
-+  snat_entry.global_port = (uint16)port;
++    memset(&snat_entry, 0, sizeof(qcmap_msgr_snat_entry_config_v01));
++    snat_entry.protocol = (uint8)proto;
++    snat_entry.global_port = (uint16)port;
 +
-+  memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
-+  if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
-+  {
-+    for (i=0; i<num_entries; i++)
++    memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
++    if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
 +    {
-+      if(port == snat_config[i].global_port && proto == snat_config[i].protocol)
-+      {
-+        snat_entry.private_ip_addr = snat_config[i].private_ip_addr;
-+        snat_entry.private_port = snat_config[i].private_port;
++        for (i=0; i<num_entries; i++)
++        {
++            if(port == snat_config[i].global_port && proto == snat_config[i].protocol)
++            {
++                snat_entry.private_ip_addr = snat_config[i].private_ip_addr;
++                snat_entry.private_port = snat_config[i].private_port;
 +
-+        return QcMapClient->DeleteStaticNatEntry(&snat_entry, &qmi_err_num);  //something is going wrong here
-+      }
++                r = QcMapClient->DeleteStaticNatEntry(&snat_entry, &qmi_err_num);
++                if (r == 0)
++                {
++                    if (qmi_err_num == QMI_ERR_INTERFACE_NOT_FOUND_V01)
++                        return 0;
++                    return -1;
++                }
++                return r;
++            }
++        }
 +    }
-+  }
-+  return -1;
++    return r;
 +}
 +
 +int getStaticNatConfigByEntry(int index, char *addr, int addrlen, unsigned short *eport, unsigned short *iport, int *proto)
 +{
-+  qmi_error_type_v01 qmi_err_num;
-+  in_addr tmpIP;
-+  int i=0, num_entries=0;
-+  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
++    qmi_error_type_v01 qmi_err_num;
++    in_addr tmpIP;
++    int i=0, num_entries=0;
++    qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
 +
-+  memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
-+  if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
-+  {
-+    for (i=0; i<num_entries; i++)
++    memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
++    if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
 +    {
-+      if(i == index)
-+      {
-+        tmpIP.s_addr = ntohl(snat_config[i].private_ip_addr);
-+        snprintf(addr, addrlen,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
-+        *iport = snat_config[i].private_port;
-+        *eport = snat_config[i].global_port;
-+        *proto = snat_config[i].protocol;
++        for (i=0; i<num_entries; i++)
++        {
++            if(i == index)
++            {
++                tmpIP.s_addr = ntohl(snat_config[i].private_ip_addr);
++                snprintf(addr, addrlen,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
++                *iport = snat_config[i].private_port;
++                *eport = snat_config[i].global_port;
++                *proto = snat_config[i].protocol;
 +
-+        return 0;
-+      }
++                return 0;
++            }
++        }
 +    }
-+  }
 +
-+  return -1;
++    return -1;
 +}
 +
 +int getSpecificEntry(unsigned int eport, unsigned int proto, char *addr, int addrlen, unsigned short *iport, char * rhost, int rhostlen, unsigned int * timestamp)
 +{
-+  qmi_error_type_v01 qmi_err_num;
-+  in_addr tmpIP;
-+  int i=0, num_entries=0;
-+  qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
++    qmi_error_type_v01 qmi_err_num;
++    in_addr tmpIP;
++    int i=0, num_entries=0;
++    qcmap_msgr_snat_entry_config_v01 snat_config[QCMAP_MSGR_MAX_SNAT_ENTRIES_V01];
 +
-+  memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
-+  if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
-+  {
-+    for (i=0; i<num_entries; i++)
++    memset(snat_config, 0, QCMAP_MSGR_MAX_SNAT_ENTRIES_V01*sizeof(qcmap_msgr_snat_entry_config_v01));
++    if (QcMapClient->GetStaticNatConfig(snat_config, &num_entries, &qmi_err_num))
 +    {
-+      if((snat_config[i].global_port == (uint16)eport) && (snat_config[i].protocol == (uint8)proto))
-+      {
-+        tmpIP.s_addr = ntohl(snat_config[i].private_ip_addr);
-+        snprintf(addr, addrlen,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
-+        *iport = snat_config[i].private_port;
++        for (i=0; i<num_entries; i++)
++        {
++            if((snat_config[i].global_port == (uint16)eport) && (snat_config[i].protocol == (uint8)proto))
++            {
++                tmpIP.s_addr = ntohl(snat_config[i].private_ip_addr);
++                snprintf(addr, addrlen,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
++                *iport = snat_config[i].private_port;
 +
-+        return 0;
-+      }
++                return 0;
++            }
++        }
 +    }
-+  }
 +
-+  return -1;
++    return -1;
 +}
 +
 +int getIfaceStats(struct ifdata * data)
 +{
-+  qmi_error_type_v01 qmi_err_num;
-+  qcmap_msgr_ip_family_enum_v01 ip_family;
-+  qcmap_msgr_wwan_statistics_type_v01 wwan_stats;
++    qmi_error_type_v01 qmi_err_num;
++    qcmap_msgr_ip_family_enum_v01 ip_family;
++    qcmap_msgr_wwan_statistics_type_v01 wwan_stats;
++    qcmap_msgr_data_bitrate_v01 data_rate;
 +
-+  //IP family, IPV4-4 IPV6-6
-+  ip_family = (qcmap_msgr_ip_family_enum_v01) 4;
++    memset(&wwan_stats, 0, sizeof(qcmap_msgr_wwan_statistics_type_v01));
++    memset(&data_rate, 0, sizeof(qcmap_msgr_data_bitrate_v01));
 +
-+  if (QcMapClient->GetWWANStatistics(ip_family, &wwan_stats, &qmi_err_num))
-+  {
-+    data->baudrate = 4200000;	/* that is the answer */
-+  	data->opackets = wwan_stats.pkts_tx;
-+  	data->ipackets = wwan_stats.pkts_rx;
-+  	data->obytes = wwan_stats.bytes_tx;
-+  	data->ibytes = wwan_stats.bytes_rx;
-+    return 0;
-+  }
++    //IP family, IPV4-4 IPV6-6
++    ip_family = (qcmap_msgr_ip_family_enum_v01) 4;
 +
-+  return -1;
++    if (QcMapClient->GetWWANStatistics(ip_family, &wwan_stats, &qmi_err_num))
++    {
++        data->baudrate = 4200000;	/* that is the answer */
++        data->opackets = wwan_stats.pkts_tx;
++        data->ipackets = wwan_stats.pkts_rx;
++        data->obytes = wwan_stats.bytes_tx;
++        data->ibytes = wwan_stats.bytes_rx;
++
++        if(QcMapClient->GetDataRate(&data_rate, &qmi_err_num))
++        {
++            data->downstream_bitrate = (unsigned long)(data_rate.max_rx_rate & 0xFFFFFFFF);
++            data->upstream_bitrate = (unsigned long)(data_rate.max_tx_rate & 0xFFFFFFFF);
++        }
++        return 0;
++    }
++
++    return -1;
 +}
 +
 +int QCMAPClient(){
-+  qmi_error_type_v01 qmi_err_num;
-+  if(QcMapClient != NULL)
-+  {
-+    return 0;
-+  }
++    qmi_error_type_v01 qmi_err_num;
++    if(QcMapClient != NULL)
++    {
++        return 0;
++    }
 +
-+  QcMapClient = new QCMAP_Client(NULL);
-+  QcMapClient->EnableMobileAP(&qmi_err_num);
-+  return 1;
++    QcMapClient = new QCMAP_Client(NULL);
++    QcMapClient->EnableMobileAP(&qmi_err_num);
++    return 1;
 +}
 +
 +int tearDownQCMAPClient(){
-+  qmi_error_type_v01 qmi_err_num;
-+  if(QcMapClient == NULL)
-+  {
-+    return 0;
-+  }
++    qmi_error_type_v01 qmi_err_num;
++    if(QcMapClient == NULL)
++    {
++        return 0;
++    }
 +
-+  QcMapClient->DisableMobileAP(&qmi_err_num);
-+  delete(QcMapClient);
++    QcMapClient->DisableMobileAP(&qmi_err_num);
++    delete(QcMapClient);
 +
-+  return 1;
++    return 1;
 +}
 +
 +int getIPAddr(char *ext_ip_addr, int size){
-+  qmi_error_type_v01 qmi_err_num;
-+  in_addr public_ip;
-+  in_addr primary_dns;
-+  in_addr secondary_dns;
-+  in_addr tmpIP;
++    qmi_error_type_v01 qmi_err_num;
++    in_addr public_ip;
++    in_addr primary_dns;
++    in_addr secondary_dns;
++    in_addr tmpIP;
 +
-+  memset(&public_ip,0,sizeof(in_addr));
-+  memset(&primary_dns,0,sizeof(in_addr));
-+  memset(&secondary_dns,0,sizeof(in_addr));
++    memset(&public_ip,0,sizeof(in_addr));
++    memset(&primary_dns,0,sizeof(in_addr));
++    memset(&secondary_dns,0,sizeof(in_addr));
 +
-+  if (QcMapClient->GetIPv4NetworkConfiguration((in_addr_t *)&public_ip.s_addr,
-+                                     (uint32 *)&primary_dns.s_addr,
-+                                     (in_addr_t *)&secondary_dns.s_addr,
-+                                     &qmi_err_num))
-+  {
-+    if ( public_ip.s_addr != 0 )
++    if (QcMapClient->GetIPv4NetworkConfiguration((in_addr_t *)&public_ip.s_addr,
++                                 (uint32 *)&primary_dns.s_addr,
++                                 (in_addr_t *)&secondary_dns.s_addr,
++                                 &qmi_err_num))
 +    {
-+      tmpIP.s_addr = ntohl(public_ip.s_addr);
-+      snprintf(ext_ip_addr, size,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
-+      return 0;
++        if ( public_ip.s_addr != 0 )
++        {
++            tmpIP.s_addr = ntohl(public_ip.s_addr);
++            snprintf(ext_ip_addr, size,"%u.%u.%u.%u", tmpIP.s_addr & 0xff, (tmpIP.s_addr >> 8) & 0xff, (tmpIP.s_addr >> 16) & 0xff, tmpIP.s_addr >> 24);
++            return 0;
++        }
 +    }
-+  }
 +
-+  return -1;
++    return -1;
 +}
 +
 +/**
@@ -472,52 +521,52 @@ index 0000000..17b3a0c
 + *  5 - Disconnected */
 +int getWanStatus()
 +{
-+  int r = 0;
-+  qcmap_msgr_wwan_call_type_v01 call_type = QCMAP_MSGR_WWAN_CALL_TYPE_V4_V01;
-+  qmi_error_type_v01 qmi_err_num;
-+  qcmap_msgr_wwan_status_enum_v01 v4_status, v6_status;
++    int r = 0;
++    qcmap_msgr_wwan_call_type_v01 call_type = QCMAP_MSGR_WWAN_CALL_TYPE_V4_V01;
++    qmi_error_type_v01 qmi_err_num;
++    qcmap_msgr_wwan_status_enum_v01 v4_status, v6_status;
 +
-+  if (QcMapClient->GetWWANStatus(&v4_status, &v6_status, &qmi_err_num))
-+  {
-+    if ( v4_status != NULL)
++    if (QcMapClient->GetWWANStatus(&v4_status, &v6_status, &qmi_err_num))
 +    {
-+      if(v4_status == QCMAP_MSGR_WWAN_STATUS_CONNECTING_V01)
-+      {
-+        r = 1;
-+      }
-+      else if(v4_status == QCMAP_MSGR_WWAN_STATUS_CONNECTED_V01)
-+      {
-+        r = 2;
-+      }
-+      else if(v4_status == QCMAP_MSGR_WWAN_STATUS_DISCONNECTING_V01)
-+      {
-+        r = 4;
-+      }
-+      else if(v4_status == QCMAP_MSGR_WWAN_STATUS_DISCONNECTED_V01)
-+      {
-+        r = 5;
-+      }
++        if ( v4_status != NULL)
++        {
++            if(v4_status == QCMAP_MSGR_WWAN_STATUS_CONNECTING_V01)
++            {
++                r = 1;
++            }
++            else if(v4_status == QCMAP_MSGR_WWAN_STATUS_CONNECTED_V01)
++            {
++                r = 2;
++            }
++            else if(v4_status == QCMAP_MSGR_WWAN_STATUS_DISCONNECTING_V01)
++            {
++                r = 4;
++            }
++            else if(v4_status == QCMAP_MSGR_WWAN_STATUS_DISCONNECTED_V01)
++            {
++                r = 5;
++            }
++        }
++        //else if ( v6_status != NULL)
++        //{
++            //if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_CONNECTING_V01)
++            //{
++                //r = 1;
++            //}
++            //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_CONNECTED_V01)
++            //{
++                //r = 2;
++            //}
++            //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_DISCONNECTING_V01)
++            //{
++                //r = 4;
++            //}
++            //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_DISCONNECTED_V01)
++            //{
++                //r = 5;
++            //}
++        //}
 +    }
-+    //else if ( v6_status != NULL)
-+    //{
-+      //if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_CONNECTING_V01)
-+      //{
-+        //r = 1;
-+      //}
-+      //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_CONNECTED_V01)
-+      //{
-+        //r = 2;
-+      //}
-+      //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_DISCONNECTING_V01)
-+      //{
-+        //r = 4;
-+      //}
-+      //else if(v6_status == QCMAP_MSGR_WWAN_STATUS_IPV6_DISCONNECTED_V01)
-+      //{
-+        //r = 5;
-+      //}
-+    //}
-+  }
 +
 +	return r;
 +}
@@ -712,10 +761,10 @@ index 0000000..d08dc45
 \ No newline at end of file
 diff --git a/config.h b/config.h
 new file mode 100644
-index 0000000..266942f
+index 0000000..e31d95e
 --- /dev/null
 +++ b/config.h
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,103 @@
 +/* MiniUPnP Project
 + * http://miniupnp.free.fr/ or http://miniupnp.tuxfamily.org/
 + * (c) 2006-2012 Thomas Bernard
@@ -815,7 +864,35 @@ index 0000000..266942f
 +/* disable reading and parsing of config file (miniupnpd.conf) */
 +/*#define DISABLE_CONFIG_FILE*/
 +
++/* Enable QCMAP */
++#define QCMAP
++
 +#endif
+diff --git a/getifstats.h b/getifstats.h
+old mode 100644
+new mode 100755
+index e14b853..61e5bf8
+--- a/getifstats.h
++++ b/getifstats.h
+@@ -7,12 +7,18 @@
+ #ifndef GETIFSTATS_H_INCLUDED
+ #define GETIFSTATS_H_INCLUDED
+
++#include "config.h"
++
+ struct ifdata {
+	unsigned long opackets;
+	unsigned long ipackets;
+	unsigned long obytes;
+	unsigned long ibytes;
+	unsigned long baudrate;
++#ifdef QCMAP
++	unsigned long upstream_bitrate;
++	unsigned long downstream_bitrate;
++#endif
+ };
+
+ /* getifstats()
 diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
 index ee6e47b..b29c249 100644
 --- a/linux/miniupnpd.init.d.script
@@ -855,11 +932,11 @@ index ee6e47b..b29c249 100644
    status)
  	status_of_proc /usr/sbin/miniupnpd miniupnpd
 diff --git a/minissdp.c b/minissdp.c
-index f937109..bfe105b 100644
+index 934d9ca..8645524 100644
 --- a/minissdp.c
 +++ b/minissdp.c
-@@ -394,6 +394,16 @@ static struct {
- };
+@@ -484,6 +484,16 @@ SendSSDPNotify(int s, const struct sockaddr * dest,
+ }
  
  static void
 +_usleep(long usecs)
@@ -875,226 +952,130 @@ index f937109..bfe105b 100644
  SendSSDPNotifies(int s, const char * host, unsigned short port,
                   unsigned int lifetime, int ipv6)
  {
-@@ -402,7 +412,7 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+@@ -492,7 +502,7 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
  #else
  	struct sockaddr_in sockname;
  #endif
--	int l, n, i=0;
-+	int l, n, dup, i=0;
- 	char bufr[512];
+-	int i=0;
++	int dup, i=0;
  	char ver_str[4];
 
-@@ -424,58 +434,66 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+	memset(&sockname, 0, sizeof(sockname));
+@@ -513,22 +523,30 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
  		p->sin_addr.s_addr = inet_addr(SSDP_MCAST_ADDR);
  	}
 
 -	while(known_service_types[i].s)
-+
-+	for( dup=0; dup<2; dup++ )
- 	{
+-	{
 -		if(i==0)
 -			ver_str[0] = '\0';
 -		else
 -			snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
--		l = snprintf(bufr, sizeof(bufr),
--			"NOTIFY * HTTP/1.1\r\n"
--			"HOST: %s:%d\r\n"
--			"CACHE-CONTROL: max-age=%u\r\n"
--			"lOCATION: http://%s:%d" ROOTDESC_PATH"\r\n"
--			"SERVER: " MINIUPNPD_SERVER_STRING "\r\n"
--			"NT: %s%s\r\n"
--			"USN: %s::%s%s\r\n"
--			"NTS: ssdp:alive\r\n"
--			"OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
--			"01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
--			"BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
--			"CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
--			"\r\n",
--			ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
--			SSDP_PORT,
--			lifetime,
--			host, port,
--			known_service_types[i].s, ver_str,
--			uuidvalue, known_service_types[i].s, ver_str,
--			upnp_bootid, upnp_bootid, upnp_configid );
--		if(l<0)
--		{
--			syslog(LOG_ERR, "SendSSDPNotifies() snprintf error");
--			continue;
--		}
--		if((unsigned int)l >= sizeof(bufr))
--		{
--			syslog(LOG_WARNING, "SendSSDPNotifies(): truncated output");
--			l = sizeof(bufr);
--		}
--		n = sendto(s, bufr, l, 0,
--			(struct sockaddr *)&sockname,
--#ifdef ENABLE_IPV6
--			ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
--#else
--			sizeof(struct sockaddr_in)
--#endif
--			);
--		if(n < 0)
+-		SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
+-		               known_service_types[i].s, ver_str,	/* NT: */
+-		               uuidvalue, "::", known_service_types[i].s, /* ver_str,	USN: */
+-		               lifetime, ipv6);
+-		if(i==0) /* rootdevice */
+-			SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
+-			               uuidvalue, "",	/* NT: */
+-			               uuidvalue, "", "", /* ver_str,	USN: */
+-			               lifetime, ipv6);
+-		i++;
++
++	for( dup=0; dup<2; dup++ )
++	{
 +
 +		if( dup )
 +			_usleep(200000);
 +		i=0;
-+		while(known_service_types[i].s)
- 		{
--			/* XXX handle EINTR, EAGAIN, EWOULDBLOCK */
--			syslog(LOG_ERR, "sendto(udp_notify=%d, %s): %m", s,
--			       host ? host : "NULL");
-+			if(i==0)
-+				ver_str[0] = '\0';
-+			else
-+				snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
-+			l = snprintf(bufr, sizeof(bufr),
-+				"NOTIFY * HTTP/1.1\r\n"
-+				"HOST: %s:%d\r\n"
-+				"CACHE-CONTROL: max-age=%u\r\n"
-+				"lOCATION: http://%s:%d" ROOTDESC_PATH"\r\n"
-+				"SERVER: " MINIUPNPD_SERVER_STRING "\r\n"
-+				"NT: %s%s\r\n"
-+				"USN: %s::%s%s\r\n"
-+				"NTS: ssdp:alive\r\n"
-+				"OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
-+				"01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
-+				"BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
-+				"CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
-+				"\r\n",
-+				ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
-+				SSDP_PORT,
-+				lifetime,
-+				host, port,
-+				known_service_types[i].s, ver_str,
-+				uuidvalue, known_service_types[i].s, ver_str,
-+				upnp_bootid, upnp_bootid, upnp_configid );
-+			if(l<0)
-+			{
-+				syslog(LOG_ERR, "SendSSDPNotifies() snprintf error");
-+				continue;
-+			}
-+			if((unsigned int)l >= sizeof(bufr))
-+			{
-+				syslog(LOG_WARNING, "SendSSDPNotifies(): truncated output");
-+				l = sizeof(bufr);
-+			}
-+			n = sendto(s, bufr, l, 0,
-+				(struct sockaddr *)&sockname,
-+	#ifdef ENABLE_IPV6
-+				ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
-+	#else
-+				sizeof(struct sockaddr_in)
-+	#endif
-+				);
-+			if(n < 0)
-+			{
-+				/* XXX handle EINTR, EAGAIN, EWOULDBLOCK */
-+				syslog(LOG_ERR, "sendto(udp_notify=%d, %s): %m", s,
-+					   host ? host : "NULL");
-+			}
-+			i++;
- 		}
--		i++;
++    	while(known_service_types[i].s)
++    	{
++    		if(i==0)
++    			ver_str[0] = '\0';
++    		else
++    			snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
++    		SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
++    		               known_service_types[i].s, ver_str,	/* NT: */
++    		               uuidvalue, "::", known_service_types[i].s, /* ver_str,	USN: */
++    		               lifetime, ipv6);
++    		if(i==0) /* rootdevice */
++    			SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
++    			               uuidvalue, "",	/* NT: */
++    			               uuidvalue, "", "", /* ver_str,	USN: */
++    			               lifetime, ipv6);
++    		i++;
++		}
  	}
  }
  
-@@ -720,7 +738,7 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+@@ -849,7 +867,7 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+ #endif
  	int i, j;
- 	char bufr[512];
  	char ver_str[4];
 -	int ret = 0;
 +	int dup, ret = 0;
  	int ipv6 = 0;
 
      memset(&sockname, 0, sizeof(struct sockaddr_in));
-@@ -734,49 +752,52 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+@@ -863,39 +881,42 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
  	inet_pton(AF_INET6, LL_SSDP_MCAST_ADDR, &(sockname6.sin6_addr));
  #endif
  
 -	for(j=0; j<n_sockets; j++)
 +	for (dup = 0; dup < 2; dup++)
  	{
--#ifdef ENABLE_IPV6
++		for(j=0; j<n_sockets; j++)
++		{
+ #ifdef ENABLE_IPV6
 -		ipv6 = j & 1;
--#endif
++			ipv6 = j & 1;
+ #endif
 -	    for(i=0; known_service_types[i].s; i++)
 -	    {
 -			if(i==0)
 -				ver_str[0] = '\0';
 -			else
 -				snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
--	        l = snprintf(bufr, sizeof(bufr),
--                 "NOTIFY * HTTP/1.1\r\n"
--                 "HOST: %s:%d\r\n"
--                 "NT: %s%s\r\n"
--                 "USN: %s::%s%s\r\n"
--                 "NTS: ssdp:byebye\r\n"
--				 "OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
--				 "01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
--				 "BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
--				 "CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
--                 "\r\n",
--                 ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
--			     SSDP_PORT,
--				 known_service_types[i].s, ver_str,
--                 uuidvalue, known_service_types[i].s, ver_str,
--                 upnp_bootid, upnp_bootid, upnp_configid);
--	        n = sendto(sockets[j], bufr, l, 0,
--#ifdef ENABLE_IPV6
--	                   ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
--	                   ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
--#else
--	                   (struct sockaddr *)&sockname,
--	                   sizeof(struct sockaddr_in)
--#endif
--	                 );
--			if(n < 0)
-+		for(j=0; j<n_sockets; j++)
-+		{
-+	#ifdef ENABLE_IPV6
-+			ipv6 = j & 1;
-+	#endif
+-			ret += SendSSDPbyebye(sockets[j],
 +			for(i=0; known_service_types[i].s; i++)
- 			{
--				syslog(LOG_ERR, "SendSSDPGoodbye: sendto(udp_shutdown=%d): %m",
--				       sockets[j]);
--				ret = -1;
++			{
 +				if(i==0)
 +					ver_str[0] = '\0';
 +				else
 +					snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
-+				l = snprintf(bufr, sizeof(bufr),
-+					 "NOTIFY * HTTP/1.1\r\n"
-+					 "HOST: %s:%d\r\n"
-+					 "NT: %s%s\r\n"
-+					 "USN: %s::%s%s\r\n"
-+					 "NTS: ssdp:byebye\r\n"
-+					 "OPT: \"http://schemas.upnp.org/upnp/1/0/\"; ns=01\r\n" /* UDA v1.1 */
-+					 "01-NLS: %u\r\n" /* same as BOOTID field. UDA v1.1 */
-+					 "BOOTID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
-+					 "CONFIGID.UPNP.ORG: %u\r\n" /* UDA v1.1 */
-+					 "\r\n",
-+					 ipv6 ? "[" LL_SSDP_MCAST_ADDR "]" : SSDP_MCAST_ADDR,
-+					 SSDP_PORT,
-+					 known_service_types[i].s, ver_str,
-+					 uuidvalue, known_service_types[i].s, ver_str,
-+					 upnp_bootid, upnp_bootid, upnp_configid);
-+				n = sendto(sockets[j], bufr, l, 0,
-+	#ifdef ENABLE_IPV6
-+						   ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
-+						   ipv6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in)
-+	#else
-+						   (struct sockaddr *)&sockname,
-+						   sizeof(struct sockaddr_in)
-+	#endif
-+						 );
-+				if(n < 0)
++				ret += SendSSDPbyebye(sockets[j],
+ #ifdef ENABLE_IPV6
+-			                      ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
++									  ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
+ #else
+-			                      (struct sockaddr *)&sockname,
++									  (struct sockaddr *)&sockname,
+ #endif
+-			                      known_service_types[i].s, ver_str,	/* NT: */
+-			                      uuidvalue, "::", known_service_types[i].s, /* ver_str, USN: */
+-			                      ipv6);
+-			if(i==0)	/* root device */
+-			{
+-				ret += SendSSDPbyebye(sockets[j],
++									  known_service_types[i].s, ver_str,	/* NT: */
++									  uuidvalue, "::", known_service_types[i].s, /* ver_str, USN: */
++									  ipv6);
++				if(i==0)	/* root device */
 +				{
-+					syslog(LOG_ERR, "SendSSDPGoodbye: sendto(udp_shutdown=%d): %m",
-+						   sockets[j]);
-+					ret = -1;
++					ret += SendSSDPbyebye(sockets[j],
+ #ifdef ENABLE_IPV6
+-				                      ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
++										  ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
+ #else
+-				                      (struct sockaddr *)&sockname,
++										  (struct sockaddr *)&sockname,
+ #endif
+-				                      uuidvalue, "",	/* NT: */
+-				                      uuidvalue, "", "", /* ver_str, USN: */
+-				                      ipv6);
++										  uuidvalue, "",	/* NT: */
++										  uuidvalue, "", "", /* ver_str, USN: */
++										  ipv6);
 +				}
  			}
 -    	}
@@ -1103,36 +1084,47 @@ index f937109..bfe105b 100644
  	return ret;
  }
 diff --git a/miniupnpd.c b/miniupnpd.c
-index 050d8db..0ee9b68 100644
+index 1dd3ff3..1243568 100644
 --- a/miniupnpd.c
 +++ b/miniupnpd.c
-@@ -1074,7 +1074,7 @@ init(int argc, char * * argv, struct runtime_vars * v)
+@@ -1079,7 +1079,11 @@ init(int argc, char * * argv, struct runtime_vars * v)
  			fprintf(stderr, "Unknown option: %s\n", argv[i]);
  		}
  	}
 -	if(!ext_if_name || !lan_addrs.lh_first)
-+	if(!lan_addrs.lh_first)
++	if(
++#ifndef QCMAP
++           !ext_if_name ||
++#endif
++           !lan_addrs.lh_first)
  	{
  		/* bad configuration */
  		goto print_usage;
-@@ -1156,9 +1156,9 @@ init(int argc, char * * argv, struct runtime_vars * v)
+@@ -1161,9 +1165,15 @@ init(int argc, char * * argv, struct runtime_vars * v)
  		syslog(LOG_NOTICE, "Failed to set %s handler", "SIGUSR1");
  	}
  
--	if(init_redirect() < 0)
-+	if(!QCMAPClient())
++#ifndef QCMAP
+	if(init_redirect() < 0)
  	{
--		syslog(LOG_ERR, "Failed to init redirection engine. EXITING");
+		syslog(LOG_ERR, "Failed to init redirection engine. EXITING");
++#else
++	if(!QCMAPClient())
++	{
 +		syslog(LOG_ERR, "Failed to init QCMAP. EXITING");
++#endif
  		return 1;
  	}
  #ifdef ENABLE_6FC_SERVICE
-@@ -1324,14 +1324,13 @@ main(int argc, char * * argv)
+@@ -1329,14 +1339,22 @@ main(int argc, char * * argv)
  		return 0;
  	}
 
--	syslog(LOG_INFO, "Starting%s%swith external interface %s",
++#ifndef QCMAP
+	syslog(LOG_INFO, "Starting%s%swith external interface %s",
++#else
 +	syslog(LOG_INFO, "Starting%s%swith external interface",
++#endif
  #ifdef ENABLE_NATPMP
  	       GETFLAG(ENABLENATPMPMASK) ? " NAT-PMP " : " ",
  #else
@@ -1140,25 +1132,32 @@ index 050d8db..0ee9b68 100644
  #endif
 -	       GETFLAG(ENABLEUPNPMASK) ? "UPnP-IGD " : "",
 -	       ext_if_name);
-+	       GETFLAG(ENABLEUPNPMASK) ? "UPnP-IGD " : "");
++	       GETFLAG(ENABLEUPNPMASK) ? "UPnP-IGD " : ""
++#ifndef QCMAP
++               ,ext_if_name);
++#else
++               );
++#endif
 
  	if(GETFLAG(ENABLEUPNPMASK))
  	{
-@@ -1862,6 +1861,12 @@ main(int argc, char * * argv)
+@@ -1867,6 +1885,14 @@ main(int argc, char * * argv)
  	}	/* end of main loop */
 
  shutdown:
-+    /* Tear Down QCMap Client */
++#ifdef QCMAP
++        /* Tear Down QCMap Client */
 +	if(!tearDownQCMAPClient())
 +	{
 +		syslog(LOG_ERR, "Unable to tear down QCMAP Client");
 +	}
++#endif
 +
  	/* close out open sockets */
  	while(upnphttphead.lh_first != NULL)
  	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
-index e34e088..448df81 100644
+index e34e088..1562f9b 100644
 --- a/miniupnpd.conf
 +++ b/miniupnpd.conf
 @@ -1,6 +1,6 @@
@@ -1170,19 +1169,17 @@ index e34e088..448df81 100644
  # if the WAN interface has several IP addresses, you
  # can specify the one to use below
  #ext_ip=
-@@ -15,8 +15,9 @@ ext_ifname=eth1
+@@ -15,8 +15,7 @@ ext_ifname=eth1
  # address associated with the subnet follows. for example :
  #  listening_ip=192.168.0.1/24 88.22.44.13
  #listening_ip=192.168.0.1/24
 -listening_ip=192.168.10.109/24
 -#listening_ip=eth0
-+#listening_ip=wlan1
-+#listening_ip=rndis0
 +listening_ip=bridge0
  # port for HTTP (descriptions and SOAP) traffic. set 0 for autoselect.
  port=0
  
-@@ -40,7 +41,7 @@ enable_upnp=yes
+@@ -40,7 +39,7 @@ enable_upnp=yes
  #lease_file=/var/log/upnp.leases
  
  # name of this service, default is "`uname -s` Router"
@@ -1191,7 +1188,16 @@ index e34e088..448df81 100644
  
  # bitrates reported by daemon in bits per second
  bitrate_up=1000000
-@@ -105,9 +106,9 @@ model_number=1
+@@ -91,7 +90,7 @@ clean_ruleset_interval=600
+ #quickrules=no
+
+ # uuid : generate your own with "make genuuid"
+-uuid=3d3cec3a-8cf0-11e0-98ee-001a6bd2d07b
++uuid=dcb9c05f-e425-426c-9d3e-96481a238bc9
+
+ # serial and model number the daemon will report to clients
+ # in its XML description
+@@ -105,9 +104,9 @@ model_number=1
  # ip/mask format must be nn.nn.nn.nn/nn
  # it is advised to only allow redirection of port above 1024
  # and to finish the rule set with "deny 0-65535 0.0.0.0/0 0-65535"
@@ -1207,248 +1213,212 @@ index e34e088..448df81 100644
 +allow 0-65535 0.0.0.0/0 0-65535
  
 diff --git a/natpmp.c b/natpmp.c
-index c596781..b85b3e6 100644
+index 2add04a..55d7fb4 100644
 --- a/natpmp.c
 +++ b/natpmp.c
-@@ -203,33 +203,33 @@ void ProcessIncomingNATPMPPacket(int s)
+@@ -203,6 +203,7 @@ void ProcessIncomingNATPMPPacket(int s)
  				/* remove the mapping */
  				if(iport == 0) {
  					/* remove all the mappings for this client */
--					int index = 0;
--					unsigned short eport2, iport2;
--					char iaddr2[16];
--					int proto2;
--					char desc[64];
--					while(get_redirect_rule_by_index(index, 0,
--					          &eport2, iaddr2, sizeof(iaddr2),
--							  &iport2, &proto2,
--							  desc, sizeof(desc),
--					          0, 0, &timestamp, 0, 0) >= 0) {
--						syslog(LOG_DEBUG, "%d %d %hu->'%s':%hu '%s'",
--						       index, proto2, eport2, iaddr2, iport2, desc);
--						if(0 == strcmp(iaddr2, senderaddrstr)
--						  && 0 == memcmp(desc, "NAT-PMP", 7)) {
--							r = _upnp_delete_redir(eport2, proto2);
--							/* TODO : check return value */
--							if(r<0) {
--								syslog(LOG_ERR, "failed to remove port mapping");
--								index++;
--							} else {
--								syslog(LOG_INFO, "NAT-PMP %s port %hu mapping removed",
--								       proto2==IPPROTO_TCP?"TCP":"UDP", eport2);
--							}
--						} else {
--							index++;
--						}
--					}
-+//					int index = 0;
-+//					unsigned short eport2, iport2;
-+//					char iaddr2[16];
-+//					int proto2;
-+//					char desc[64];
-+//					while(get_redirect_rule_by_index(index, 0,
-+//					          &eport2, iaddr2, sizeof(iaddr2),
-+//							  &iport2, &proto2,
-+//							  desc, sizeof(desc),
-+//					          0, 0, &timestamp, 0, 0) >= 0) {
-+//						syslog(LOG_DEBUG, "%d %d %hu->'%s':%hu '%s'",
-+//						       index, proto2, eport2, iaddr2, iport2, desc);
-+//						if(0 == strcmp(iaddr2, senderaddrstr)
-+//						  && 0 == memcmp(desc, "NAT-PMP", 7)) {
-+//							r = _upnp_delete_redir(eport2, proto2);
-+//							/* TODO : check return value */
-+//							if(r<0) {
-+//								syslog(LOG_ERR, "failed to remove port mapping");
-+//								index++;
-+//							} else {
-+//								syslog(LOG_INFO, "NAT-PMP %s port %hu mapping removed",
-+//								       proto2==IPPROTO_TCP?"TCP":"UDP", eport2);
-+//							}
-+//						} else {
-+//							index++;
-+//						}
-+//					}
++#ifndef QCMAP
+					int index = 0;
+					unsigned short eport2, iport2;
+					char iaddr2[16];
+@@ -230,6 +231,7 @@ void ProcessIncomingNATPMPPacket(int s)
+							index++;
+						}
+					}
++#endif
  				} else {
  					/* To improve the interworking between nat-pmp and
  					 * UPnP, we should check that we remove only NAT-PMP
-@@ -247,10 +247,11 @@ void ProcessIncomingNATPMPPacket(int s)
+@@ -247,10 +249,14 @@ void ProcessIncomingNATPMPPacket(int s)
  			   || !check_upnp_rule_against_permissions(upnppermlist, num_upnpperm, eport, senderaddr.sin_addr, iport)) {
  				resp[3] = 2;	/* Not Authorized/Refused */
  			} else do {
--				r = get_redirect_rule(ext_if_name, eport, proto,
--				                      iaddr_old, sizeof(iaddr_old),
--				                      &iport_old, 0, 0, 0, 0,
--				                      &timestamp, 0, 0);
-+				//r = get_redirect_rule(ext_if_name, eport, proto,
-+				//                      iaddr_old, sizeof(iaddr_old),
-+				//                      &iport_old, 0, 0, 0, 0,
-+				//                      &timestamp, 0, 0);
-+				r=0; //remove this
++#ifndef QCMAP
+				r = get_redirect_rule(ext_if_name, eport, proto,
+				                      iaddr_old, sizeof(iaddr_old),
+				                      &iport_old, 0, 0, 0, 0,
+				                      &timestamp, 0, 0);
++#else
++                                r=0;
++#endif
  				if(r==0) {
  					if(strcmp(senderaddrstr, iaddr_old)==0
  				       && iport==iport_old) {
-@@ -279,9 +280,9 @@ void ProcessIncomingNATPMPPacket(int s)
+@@ -279,9 +285,14 @@ void ProcessIncomingNATPMPPacket(int s)
  					         eport, (proto==IPPROTO_TCP)?"tcp":"udp");
  #endif
  					/* TODO : check return code */
 -					if(upnp_redirect_internal(NULL, eport, senderaddrstr,
 -					                          iport, proto, desc,
 -					                          timestamp) < 0) {
-+					if(upnp_redirect_internal(/*NULL,*/eport, senderaddrstr, 
-+											  iport, proto/*, desc,
-+											 timestamp*/) < 0) {
++					if(upnp_redirect_internal(
++#ifndef QCMAP
++                                                                  NULL,
++#endif
++                                                                  eport, senderaddrstr,
++					                          iport, proto
++                                                                  , desc, timestamp
++                                                                  ) < 0) {
  						syslog(LOG_ERR, "Failed to add NAT-PMP %hu %s->%s:%hu '%s'",
  						       eport, (proto==IPPROTO_TCP)?"tcp":"udp", senderaddrstr, iport, desc);
  						resp[3] = 3;  /* Failure */
 diff --git a/upnpdescgen.c b/upnpdescgen.c
-index d13f74c..1da3a55 100644
+index 754e06d..2f37a59 100644
 --- a/upnpdescgen.c
 +++ b/upnpdescgen.c
-@@ -1151,7 +1151,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
+@@ -1151,7 +1151,11 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
  	str = strcat_str(str, len, &tmplen, "\">");
  	while(v->name) {
  		if(v->itype & 0x80) {
--			str = strcat_str(str, len, &tmplen, "<e:property><s:");
++#ifndef QCMAP
+			str = strcat_str(str, len, &tmplen, "<e:property><s:");
++#else
 +			str = strcat_str(str, len, &tmplen, "<e:property><");
++#endif
  			str = strcat_str(str, len, &tmplen, v->name);
  			str = strcat_str(str, len, &tmplen, ">");
  			/*printf("<e:property><s:%s>", v->name);*/
-@@ -1161,7 +1161,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
+@@ -1161,7 +1165,11 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
  			case CONNECTIONSTATUS_MAGICALVALUE:
  				/* or get_wan_connection_status_str(ext_if_name) */
  				str = strcat_str(str, len, &tmplen,
--				   upnpallowedvalues[18 + get_wan_connection_status(ext_if_name)]);
-+				   upnpallowedvalues[18 + getWanStatus()]);
++#ifndef QCMAP
+				   upnpallowedvalues[18 + get_wan_connection_status(ext_if_name)]);
++#else
++                                   upnpallowedvalues[18 + getWanStatus()]);
++#endif
  				break;
  #ifdef ENABLE_6FC_SERVICE
  			case FIREWALLENABLED_MAGICALVALUE:
-@@ -1198,7 +1198,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
+@@ -1198,7 +1206,11 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
  					str = strcat_str(str, len, &tmplen, use_ext_ip_addr);
  				else {
  					char ext_ip_addr[INET_ADDRSTRLEN];
--					if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN) < 0) {
-+					if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0) {
++#ifndef QCMAP
+					if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN, NULL, NULL) < 0) {
++#else
++                                        if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0) {
++#endif
  						str = strcat_str(str, len, &tmplen, "0.0.0.0");
  					} else {
  						str = strcat_str(str, len, &tmplen, ext_ip_addr);
-@@ -1217,7 +1217,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
+@@ -1217,7 +1229,11 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
  			default:
  				str = strcat_str(str, len, &tmplen, upnpallowedvalues[v->ieventvalue]);
  			}
--			str = strcat_str(str, len, &tmplen, "</s:");
++#ifndef QCMAP
+			str = strcat_str(str, len, &tmplen, "</s:");
++#else
 +			str = strcat_str(str, len, &tmplen, "</");
++#endif
  			str = strcat_str(str, len, &tmplen, v->name);
  			str = strcat_str(str, len, &tmplen, "></e:property>");
  			/*printf("</s:%s></e:property>\n", v->name);*/
 diff --git a/upnpredirect.c b/upnpredirect.c
-index 5c9beae..c1dbae1 100644
+index 5c9beae..8905d7e 100644
 --- a/upnpredirect.c
 +++ b/upnpredirect.c
-@@ -255,7 +255,7 @@ int reload_from_lease_file()
+@@ -255,7 +255,11 @@ int reload_from_lease_file()
   *          -3 permission check failed
   */
  int
--upnp_redirect(const char * rhost, unsigned short eport,
-+upnp_redirect(/*const char * rhost,*/unsigned short eport, 
++#ifndef QCMAP
+ upnp_redirect(const char * rhost, unsigned short eport,
++#else
++upnp_redirect(/*const char * rhost,*/unsigned short eport,
++#endif
                const char * iaddr, unsigned short iport,
                const char * protocol, const char * desc,
                unsigned int leaseduration)
-@@ -278,68 +278,33 @@ upnp_redirect(const char * rhost, unsigned short eport,
+@@ -278,6 +282,7 @@ upnp_redirect(const char * rhost, unsigned short eport,
  		                 "%hu->%s:%hu %s", eport, iaddr, iport, protocol);
  		return -3;
  	}
--	r = get_redirect_rule(ext_if_name, eport, proto,
--	                      iaddr_old, sizeof(iaddr_old), &iport_old, 0, 0,
--	                      0, 0,
--	                      &timestamp, 0, 0);
--	if(r == 0) {
--		/* if existing redirect rule matches redirect request return success
--		 * xbox 360 does not keep track of the port it redirects and will
--		 * redirect another port when receiving ConflictInMappingEntry */
--		if(strcmp(iaddr, iaddr_old)==0 && iport==iport_old) {
--			syslog(LOG_INFO, "ignoring redirect request as it matches existing redirect");
--		} else {
- 
--			syslog(LOG_INFO, "port %hu protocol %s already redirected to %s:%hu",
--				eport, protocol, iaddr_old, iport_old);
--			return -2;
--		}
--	} else {
--		timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
--		syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
--			eport, iaddr, iport, protocol, desc);
--		return upnp_redirect_internal(rhost, eport, iaddr, iport, proto,
--		                              desc, timestamp);
-+	timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
-+	syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
-+		eport, iaddr, iport, protocol, desc);
-+	r = upnp_redirect_internal(/*rhost,*/ eport, iaddr, iport, proto/*, desc, timestamp*/);
-+	if(r >= 0)
-+		add_redirect_desc(eport, proto, desc, timestamp);
-+	if(timestamp > 0) {
-+		if(!nextruletoclean_timestamp || (timestamp < nextruletoclean_timestamp))
-+			nextruletoclean_timestamp = timestamp;
++#ifndef QCMAP
+	r = get_redirect_rule(ext_if_name, eport, proto,
+	                      iaddr_old, sizeof(iaddr_old), &iport_old, 0, 0,
+	                      0, 0,
+@@ -295,32 +300,45 @@ upnp_redirect(const char * rhost, unsigned short eport,
+			return -2;
+		}
+	} else {
++#endif
+		timestamp = (leaseduration > 0) ? time(NULL) + leaseduration : 0;
+		syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
+			eport, iaddr, iport, protocol, desc);
++#ifdef QCMAP
++	return upnp_redirect_internal(eport, iaddr, iport, proto, desc, timestamp);
++#else
+		return upnp_redirect_internal(rhost, eport, iaddr, iport, proto,
+		                              desc, timestamp);
  	}
--
--	return 0;
-+	return r;
++#endif
+
+	return 0;
  }
  
  int
 -upnp_redirect_internal(const char * rhost, unsigned short eport,
-+upnp_redirect_internal(unsigned short eport,
++upnp_redirect_internal(
++#ifndef QCMAP
++                       const char * rhost,
++#endif
++                       unsigned short eport,
                         const char * iaddr, unsigned short iport,
 -                       int proto, const char * desc,
--                       unsigned int timestamp)
-+                       int proto)
++                       int proto,
++                       const char * desc,
+                        unsigned int timestamp)
  {
--	/*syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
--		eport, iaddr, iport, protocol, desc);			*/
--	if(add_redirect_rule2(ext_if_name, rhost, eport, iaddr, iport, proto,
--	                      desc, timestamp) < 0) {
--		return -1;
--	}
-+	struct in_addr address;
++#ifndef QCMAP
+	/*syslog(LOG_INFO, "redirecting port %hu to %s:%hu protocol %s for: %s",
+		eport, iaddr, iport, protocol, desc);			*/
+	if(add_redirect_rule2(ext_if_name, rhost, eport, iaddr, iport, proto,
+	                      desc, timestamp) < 0) {
+		return -1;
+	}
++#endif
  
--#ifdef ENABLE_LEASEFILE
--	lease_file_add( eport, iaddr, iport, proto, desc, timestamp);
--#endif
--/*	syslog(LOG_INFO, "creating pass rule to %s:%hu protocol %s for: %s",
--		iaddr, iport, protocol, desc);*/
--	if(add_filter_rule2(ext_if_name, rhost, iaddr, eport, iport, proto, desc) < 0) {
--		/* clean up the redirect rule */
--#if !defined(__linux__)
--		delete_redirect_rule(ext_if_name, eport, proto);
--#endif
+ #ifdef ENABLE_LEASEFILE
+	lease_file_add( eport, iaddr, iport, proto, desc, timestamp);
+ #endif
++#ifndef QCMAP
+ /*	syslog(LOG_INFO, "creating pass rule to %s:%hu protocol %s for: %s",
+		iaddr, iport, protocol, desc);*/
+	if(add_filter_rule2(ext_if_name, rhost, iaddr, eport, iport, proto, desc) < 0) {
+@@ -328,8 +346,17 @@ upnp_redirect_internal(const char * rhost, unsigned short eport,
+ #if !defined(__linux__)
+		delete_redirect_rule(ext_if_name, eport, proto);
+ #endif
++#else
++	struct in_addr address;
++
 +	if(inet_aton(iaddr, &address) < 0) {
 +		syslog(LOG_ERR, "inet_aton(%s) : %m", iaddr);
  		return -1;
  	}
--	if(timestamp > 0) {
--		if(!nextruletoclean_timestamp || (timestamp < nextruletoclean_timestamp))
--			nextruletoclean_timestamp = timestamp;
--	}
--#ifdef ENABLE_EVENTS
--	/* the number of port mappings changed, we must
--	 * inform the subscribers */
--	upnp_event_var_change_notify(EWanIPC);
--#endif
--	return 0;
-+
-+	return addStaticNatEntry_wrapper(address, proto, iport, eport);
- }
- 
- 
-@@ -361,17 +326,20 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
++        if(addStaticNatEntry_wrapper(address, proto, iport, eport) < 0)
++                return -1;
++	add_redirect_desc(eport, proto, desc, timestamp);
++#endif
+	if(timestamp > 0) {
+		if(!nextruletoclean_timestamp || (timestamp < nextruletoclean_timestamp))
+			nextruletoclean_timestamp = timestamp;
+@@ -361,17 +388,30 @@ upnp_get_redirection_infos(unsigned short eport, const char * protocol,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
--	r = get_redirect_rule(ext_if_name, eport, proto_atoi(protocol),
--	                      iaddr, iaddrlen, iport, desc, desclen,
--	                      rhost, rhostlen, &timestamp,
--	                      0, 0);
--	if(r == 0 &&
--	   timestamp > 0 &&
++#ifndef QCMAP
+	r = get_redirect_rule(ext_if_name, eport, proto_atoi(protocol),
+	                      iaddr, iaddrlen, iport, desc, desclen,
+	                      rhost, rhostlen, &timestamp,
+	                      0, 0);
+	if(r == 0 &&
+	   timestamp > 0 &&
++#else
 +	r = getSpecificEntry( eport, proto_atoi(protocol),
 +	                      iaddr, iaddrlen, iport,
 +	                      rhost, rhostlen, &timestamp);
@@ -1456,376 +1426,331 @@ index 5c9beae..c1dbae1 100644
 +		get_redirect_desc(eport, proto_atoi(protocol), desc, desclen, &timestamp);
 +
 +		if(timestamp > 0 &&
++#endif
  	   timestamp > (unsigned int)(current_time = time(NULL))) {
  		*leaseduration = timestamp - current_time;
  	} else {
  		*leaseduration = 0;
  	}
-+	}
-+
++#ifdef QCMAP
++        }
++#endif
  	return r;
  }
 
-@@ -384,7 +352,6 @@ upnp_get_redirection_infos_by_index(int index,
-                                     char * rhost, int rhostlen,
-                                     unsigned int * leaseduration)
- {
--	/*char ifname[IFNAMSIZ];*/
- 	int proto = 0;
- 	unsigned int timestamp;
- 	time_t current_time;
-@@ -393,18 +360,19 @@ upnp_get_redirection_infos_by_index(int index,
+@@ -393,13 +433,20 @@ upnp_get_redirection_infos_by_index(int index,
  		desc[0] = '\0';
  	if(rhost && (rhostlen > 0))
  		rhost[0] = '\0';
--	if(get_redirect_rule_by_index(index, 0/*ifname*/, eport, iaddr, iaddrlen,
--	                              iport, &proto, desc, desclen,
--	                              rhost, rhostlen, &timestamp,
--	                              0, 0) < 0)
-+
++#ifndef QCMAP
+	if(get_redirect_rule_by_index(index, 0/*ifname*/, eport, iaddr, iaddrlen,
+	                              iport, &proto, desc, desclen,
+	                              rhost, rhostlen, &timestamp,
+	                              0, 0) < 0)
++#else
 +	if (getStaticNatConfigByEntry(index, iaddr, iaddrlen, eport, iport, &proto) < 0)
-+	{
++#endif
  		return -1;
-+	}
  	else
  	{
++#ifdef QCMAP
 +		get_redirect_desc(*eport, proto, desc, desclen, &timestamp);
++#endif
  		current_time = time(NULL);
  		*leaseduration = (timestamp > (unsigned int)current_time)
  		                 ? (timestamp - current_time)
- 		                 : 0;
--		if(proto == IPPROTO_TCP)
-+		if(proto == IPPROTO_TCP) //17 = UDP, 
- 			memcpy(protocol, "TCP", 4);
- 		else
- 			memcpy(protocol, "UDP", 4);
-@@ -418,7 +386,7 @@ _upnp_delete_redir(unsigned short eport, int proto)
+@@ -418,8 +465,12 @@ _upnp_delete_redir(unsigned short eport, int proto)
  {
  	int r;
  #if defined(__linux__)
--	r = delete_redirect_and_filter_rules(eport, proto);
-+	r = deleteStaticNatEntry_wrapper( eport, proto);
++#ifndef QCMAP
+	r = delete_redirect_and_filter_rules(eport, proto);
  #else
++	r = deleteStaticNatEntry_wrapper( eport, proto);
++#endif
++#else
  	r = delete_redirect_rule(ext_if_name, eport, proto);
  	delete_filter_rule(ext_if_name, eport, proto);
-@@ -430,6 +398,8 @@ _upnp_delete_redir(unsigned short eport, int proto)
+ #endif
+@@ -430,6 +481,10 @@ _upnp_delete_redir(unsigned short eport, int proto)
  #ifdef ENABLE_EVENTS
  	upnp_event_var_change_notify(EWanIPC);
  #endif
++#ifdef QCMAP
 +	if ( r >= 0 )
 +		del_redirect_desc(eport, proto);
++#endif
  	return r;
  }
-
-@@ -476,17 +446,15 @@ get_upnp_rules_state_list(int max_rules_number_target)
- 	int i = 0;
- 	time_t current_time;
  
--	/*ifname[0] = '\0';*/
- 	tmp = malloc(sizeof(struct rule_state));
- 	if(!tmp)
+@@ -482,11 +537,18 @@ get_upnp_rules_state_list(int max_rules_number_target)
  		return 0;
  	current_time = time(NULL);
  	nextruletoclean_timestamp = 0;
--	while(get_redirect_rule_by_index(i, /*ifname*/0, &tmp->eport, 0, 0,
--	                              &iport, &proto, 0, 0, 0,0, &timestamp,
--								  &tmp->packets, &tmp->bytes) >= 0)
++#ifndef QCMAP
+	while(get_redirect_rule_by_index(i, /*ifname*/0, &tmp->eport, 0, 0,
+	                              &iport, &proto, 0, 0, 0,0, &timestamp,
+								  &tmp->packets, &tmp->bytes) >= 0)
++#else
 +	while(getStaticNatConfigByEntry(i, 0, 0, &tmp->eport, &iport, &proto) >= 0)
++#endif
  	{
  		tmp->to_remove = 0;
++#ifdef QCMAP
 +		get_redirect_desc(tmp->eport, proto, 0, 0, &timestamp);
++#endif
  		if(timestamp > 0) {
  			/* need to remove this port mapping ? */
  			if(timestamp <= (unsigned int)current_time)
-@@ -536,27 +504,12 @@ get_upnp_rules_state_list(int max_rules_number_target)
- void
- remove_unused_rules(struct rule_state * list)
- {
--	char ifname[IFNAMSIZ];
--	unsigned short iport;
- 	struct rule_state * tmp;
--	u_int64_t packets;
--	u_int64_t bytes;
--	unsigned int timestamp;
- 	int n = 0;
- 
+@@ -547,6 +609,7 @@ remove_unused_rules(struct rule_state * list)
  	while(list)
  	{
  		/* remove the rule if no traffic has used it */
--		if(get_redirect_rule(ifname, list->eport, list->proto,
--	                         0, 0, &iport, 0, 0, 0, 0, &timestamp,
--		                     &packets, &bytes) >= 0)
--		{
--			if(packets == list->packets && bytes == list->bytes)
--			{
--				_upnp_delete_redir(list->eport, list->proto);
--				n++;
--			}
--		}
++#ifndef QCMAP
+		if(get_redirect_rule(ifname, list->eport, list->proto,
+	                         0, 0, &iport, 0, 0, 0, 0, &timestamp,
+		                     &packets, &bytes) >= 0)
+@@ -557,6 +620,7 @@ remove_unused_rules(struct rule_state * list)
+				n++;
+			}
+		}
++#endif
  		tmp = list;
  		list = tmp->next;
  		free(tmp);
-@@ -569,16 +522,15 @@ remove_unused_rules(struct rule_state * list)
+@@ -569,8 +633,11 @@ remove_unused_rules(struct rule_state * list)
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
 -upnp_get_portmappings_in_range(unsigned short startport,
--                               unsigned short endport,
--                               const char * protocol,
-+upnp_get_portmappings_in_range(const char * protocol,
++upnp_get_portmappings_in_range(
++#ifndef QCMAP
++                               unsigned short startport,
+                                unsigned short endport,
++#endif
+                                const char * protocol,
                                 unsigned int * number)
  {
- 	int proto;
+@@ -578,7 +645,11 @@ upnp_get_portmappings_in_range(unsigned short startport,
  	proto = proto_atoi(protocol);
  	if(!number)
  		return NULL;
--	return get_portmappings_in_range(startport, endport, proto, number);
-+	//return get_portmappings_in_range(startport, endport, proto, number);
-+	return NULL;
++#ifndef QCMAP
+	return get_portmappings_in_range(startport, endport, proto, number);
++#else
++        return NULL;
++#endif
  }
  
  /* stuff for miniupnpdctl */
-@@ -586,34 +538,7 @@ upnp_get_portmappings_in_range(unsigned short startport,
- void
- write_ruleset_details(int s)
- {
--	int proto = 0;
--	unsigned short eport, iport;
--	char desc[64];
--	char iaddr[32];
--	char rhost[32];
--	unsigned int timestamp;
--	u_int64_t packets;
--	u_int64_t bytes;
--	int i = 0;
--	char buffer[256];
--	int n;
--
- 	write(s, "Ruleset :\n", 10);
--	while(get_redirect_rule_by_index(i, 0/*ifname*/, &eport, iaddr, sizeof(iaddr),
--	                                 &iport, &proto, desc, sizeof(desc),
--	                                 rhost, sizeof(rhost),
--	                                 &timestamp,
--	                                 &packets, &bytes) >= 0)
--	{
--		n = snprintf(buffer, sizeof(buffer),
--		             "%2d %s %s:%hu->%s:%hu "
--		             "'%s' %u %" PRIu64 " %" PRIu64 "\n",
--		             /*"'%s' %llu %llu\n",*/
--		             i, proto==IPPROTO_TCP?"TCP":"UDP", rhost,
--		             eport, iaddr, iport, desc, timestamp, packets, bytes);
--		write(s, buffer, n);
--		i++;
--	}
- }
- #endif
- 
 diff --git a/upnpredirect.h b/upnpredirect.h
-index b549824..68a29d6 100644
+index b549824..db8f6ac 100644
 --- a/upnpredirect.h
 +++ b/upnpredirect.h
-@@ -26,7 +26,7 @@ int reload_from_lease_file(void);
+@@ -26,7 +26,11 @@ int reload_from_lease_file(void);
   *          -3 permission check failed
   */
  int
 -upnp_redirect(const char * rhost, unsigned short eport,
-+upnp_redirect(/*const char * rhost,*/unsigned short eport, 
++upnp_redirect(
++#ifndef QCMAP
++              const char * rhost,
++#endif
++              unsigned short eport,
                const char * iaddr, unsigned short iport,
                const char * protocol, const char * desc,
                unsigned int leaseduration);
-@@ -34,16 +34,16 @@ upnp_redirect(const char * rhost, unsigned short eport,
+@@ -34,10 +38,16 @@ upnp_redirect(const char * rhost, unsigned short eport,
  /* upnp_redirect_internal()
   * same as upnp_redirect() without any check */
  int
 -upnp_redirect_internal(const char * rhost, unsigned short eport,
-+upnp_redirect_internal(/*const char * rhost,*/unsigned short eport, 
++upnp_redirect_internal(
++#ifndef QCMAP
++                       const char * rhost,
++#endif
++                       unsigned short eport,
                         const char * iaddr, unsigned short iport,
 -                       int proto, const char * desc,
 -                       unsigned int timestamp);
-+                       int proto/*, const char * desc,
-+                      unsigned int timestamp*/); 
++                       int proto,
++                       const char * desc,
++                       unsigned int timestamp
++                       );
  
  /* upnp_get_redirection_infos()
   * returns : 0 on success
-  *           -1 failed to get the port mapping entry or no entry exists */
- int
--upnp_get_redirection_infos(unsigned short eport, const char * protocol,
-+upnp_get_redirection_infos(unsigned short eport, const char *protocol,
-                            unsigned short * iport, char * iaddr, int iaddrlen,
-                            char * desc, int desclen,
-                            char * rhost, int rhostlen,
-@@ -103,8 +103,8 @@ remove_unused_rules(struct rule_state * list);
+@@ -103,8 +113,11 @@ remove_unused_rules(struct rule_state * list);
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
 -upnp_get_portmappings_in_range(unsigned short startport,
--                               unsigned short endport,
-+upnp_get_portmappings_in_range(/*unsigned short startport,
-+                               unsigned short endport,*/
++upnp_get_portmappings_in_range(
++#ifndef QCMAP
++                               unsigned short startport,
+                                unsigned short endport,
++#endif
                                 const char * protocol,
                                 unsigned int * number);
  
 diff --git a/upnpsoap.c b/upnpsoap.c
-old mode 100644
-new mode 100755
-index 0157f72..bd594b6
+index c61ea05..0f3cc0d 100644
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
-@@ -88,7 +88,8 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
+@@ -88,8 +88,11 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
+	char body[512];
  	int bodylen;
  	struct ifdata data;
-
--	r = getifstats(ext_if_name, &data);
-+	//replaced getifstats(ext_if_name, &data); with call to QCMAP
+-
++#ifndef QCMAP
+	r = getifstats(ext_if_name, &data);
++#else
 +	r = getIfaceStats(&data);
++#endif
  	bodylen = snprintf(body, sizeof(body), resp,
  	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
               r<0?0:data.obytes, action);
-@@ -110,7 +111,8 @@ GetTotalBytesReceived(struct upnphttp * h, const char * action)
+@@ -110,8 +113,11 @@ GetTotalBytesReceived(struct upnphttp * h, const char * action)
+	char body[512];
  	int bodylen;
  	struct ifdata data;
-
--	r = getifstats(ext_if_name, &data);
-+	//replaced getifstats(ext_if_name, &data); with call to QCMAP
+-
++#ifndef QCMAP
+	r = getifstats(ext_if_name, &data);
++#else
 +	r = getIfaceStats(&data);
++#endif
  	bodylen = snprintf(body, sizeof(body), resp,
  	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
  	         r<0?0:data.ibytes, action);
-@@ -132,7 +134,8 @@ GetTotalPacketsSent(struct upnphttp * h, const char * action)
+@@ -132,8 +138,11 @@ GetTotalPacketsSent(struct upnphttp * h, const char * action)
+	char body[512];
  	int bodylen;
  	struct ifdata data;
-
--	r = getifstats(ext_if_name, &data);
-+	//replaced  getifstats(ext_if_name, &data); with call to QCMAP
+-
++#ifndef QCMAP
+	r = getifstats(ext_if_name, &data);
++#else
 +	r = getIfaceStats(&data);
++#endif
  	bodylen = snprintf(body, sizeof(body), resp,
  	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
  	         r<0?0:data.opackets, action);
-@@ -154,7 +157,8 @@ GetTotalPacketsReceived(struct upnphttp * h, const char * action)
+@@ -154,8 +163,11 @@ GetTotalPacketsReceived(struct upnphttp * h, const char * action)
+	char body[512];
  	int bodylen;
  	struct ifdata data;
-
--	r = getifstats(ext_if_name, &data);
-+	//replaced getifstats(ext_if_name, &data); with call to QCMAP
+-
++#ifndef QCMAP
+	r = getifstats(ext_if_name, &data);
++#else
 +	r = getIfaceStats(&data);
++#endif
  	bodylen = snprintf(body, sizeof(body), resp,
  	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
  	         r<0?0:data.ipackets, action);
-@@ -191,7 +195,7 @@ GetCommonLinkProperties(struct upnphttp * h, const char * action)
+@@ -192,7 +204,11 @@ GetCommonLinkProperties(struct upnphttp * h, const char * action)
  			if(upstream_bitrate == 0) upstream_bitrate = data.baudrate;
  		}
  	}
--	if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN) < 0) {
++#ifndef QCMAP
+	if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN, NULL, NULL) < 0) {
++#else
 +	if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0) {
++#endif
  		status = "Down";
  	}
  	bodylen = snprintf(body, sizeof(body), resp,
-@@ -220,7 +224,7 @@ GetStatusInfo(struct upnphttp * h, const char * action)
+@@ -220,8 +236,11 @@ GetStatusInfo(struct upnphttp * h, const char * action)
+	/* ConnectionStatus possible values :
  	 * Unconfigured, Connecting, Connected, PendingDisconnect,
  	 * Disconnecting, Disconnected */
-
--	status = get_wan_connection_status_str(ext_if_name);
+-
++#ifndef QCMAP
+	status = get_wan_connection_status_str(ext_if_name);
++#else
 +	status = getWanStatusStr();
++#endif
  	uptime = (time(NULL) - startup_time);
  	bodylen = snprintf(body, sizeof(body), resp,
  		action, SERVICE_TYPE_WANIPC,
-@@ -269,10 +273,9 @@ GetExternalIPAddress(struct upnphttp * h, const char * action)
+@@ -270,10 +289,16 @@ GetExternalIPAddress(struct upnphttp * h, const char * action)
  	{
  		strncpy(ext_ip_addr, use_ext_ip_addr, INET_ADDRSTRLEN);
  	}
--	else if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN) < 0)
-+	else if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0)
++#ifndef QCMAP
+	else if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN, NULL, NULL) < 0)
  	{
--		syslog(LOG_ERR, "Failed to get ip address for interface %s",
--			ext_if_name);
+		syslog(LOG_ERR, "Failed to get ip address for interface %s",
+			ext_if_name);
++#else
++	else if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0)
++	{
 +		syslog(LOG_ERR, "Failed to get ip address for interface");
++#endif
  		strncpy(ext_ip_addr, "0.0.0.0", INET_ADDRSTRLEN);
  	}
  #else
-@@ -409,7 +412,7 @@ AddPortMapping(struct upnphttp * h, const char * action)
+@@ -410,7 +435,11 @@ AddPortMapping(struct upnphttp * h, const char * action)
  	       action, eport, int_ip, iport, protocol, desc, leaseduration,
  	       r_host ? r_host : "NULL");
  
 -	r = upnp_redirect(r_host, eport, int_ip, iport, protocol, desc, leaseduration);
-+	r = upnp_redirect(/*r_host,*/eport, int_ip, iport, protocol, desc, leaseduration); 
++	r = upnp_redirect(
++#ifndef QCMAP
++                          r_host,
++#endif
++                          eport, int_ip, iport, protocol, desc, leaseduration);
  
  	ClearNameValueList(&data);
  
-@@ -545,7 +548,7 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
+@@ -546,7 +575,11 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
  	/* TODO : accept a different external port
  	 * have some smart strategy to choose the port */
  	for(;;) {
 -		r = upnp_redirect(r_host, eport, int_ip, iport, protocol, desc, leaseduration);
-+		r = upnp_redirect(/*r_host,*/eport, int_ip, iport, protocol, desc, leaseduration); 
++	                  r = upnp_redirect(
++#ifndef QCMAP
++                          r_host,
++#endif
++                          eport, int_ip, iport, protocol, desc, leaseduration);
  		if(r==-2 && eport < 65535) {
  			eport++;
  		} else {
-@@ -604,7 +607,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
-	protocol = GetValueFromNameValueList(&data, "NewProtocol");
-
- #ifdef UPNP_STRICT
--	if(!ext_port || !protocol || !r_host)
-+	if(!ext_port || !protocol)
- #else
-	if(!ext_port || !protocol)
- #endif
-@@ -631,7 +634,7 @@ GetSpecificPortMappingEntry(struct upnphttp * h, const char * action)
- 	 * but different remoteHost to be set up, so that is not
- 	 * a priority. */
- 	r = upnp_get_redirection_infos(eport, protocol, &iport,
--	                               int_ip, sizeof(int_ip),
-+								   int_ip, sizeof(int_ip),
- 	                               desc, sizeof(desc),
- 	                               NULL, 0,
- 	                               &leaseduration);
-@@ -676,7 +679,7 @@ DeletePortMapping(struct upnphttp * h, const char * action)
-	protocol = GetValueFromNameValueList(&data, "NewProtocol");
-
- #ifdef UPNP_STRICT
--	if(!ext_port || !protocol || !r_host)
-+	if(!ext_port || !protocol)
- #else
-	if(!ext_port || !protocol)
- #endif
-@@ -763,8 +766,8 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
+@@ -764,7 +797,10 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
  		return;
  	}
  
 -	port_list = upnp_get_portmappings_in_range(startport, endport,
--	                                           protocol, &number);
-+	port_list = upnp_get_portmappings_in_range(protocol, &number);
-+
++	port_list = upnp_get_portmappings_in_range(
++#ifndef QCMAP
++                                                   startport, endport,
++#endif
+	                                           protocol, &number);
  	for(i = 0; i < number; i++)
  	{
- 		r = upnp_delete_redirection(port_list[i], protocol);
-@@ -958,7 +961,7 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
+@@ -974,7 +1010,10 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  	memcpy(body+bodylen, list_start, sizeof(list_start));
  	bodylen += (sizeof(list_start) - 1);
  
 -	port_list = upnp_get_portmappings_in_range(startport, endport,
-+	port_list = upnp_get_portmappings_in_range(/*startport, endport,*/
++	port_list = upnp_get_portmappings_in_range(
++#ifndef QCMAP
++                                                   startport, endport,
++#endif
  	                                           protocol, &list_size);
  	/* loop through port mappings */
  	for(i = 0; number > 0 && i < list_size; i++)
-@@ -980,9 +983,9 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
- 		}
- 		rhost[0] = '\0';
- 		r = upnp_get_redirection_infos(port_list[i], protocol, &iport,
--		                               int_ip, sizeof(int_ip),
--		                               desc, sizeof(desc),
--		                               rhost, sizeof(rhost),
-+								   int_ip, sizeof(int_ip),
-+	                               desc, sizeof(desc),
-+	                               NULL, 0,
- 		                               &leaseduration);
- 		if(r == 0)
- 		{
-@@ -1134,7 +1137,7 @@ QueryStateVariable(struct upnphttp * h, const char * action)
+@@ -1149,8 +1188,11 @@ QueryStateVariable(struct upnphttp * h, const char * action)
+	else if(strcmp(var_name, "ConnectionStatus") == 0)
  	{
  		const char * status;
-
--		status = get_wan_connection_status_str(ext_if_name);
+-
++#ifndef QCMAP
+		status = get_wan_connection_status_str(ext_if_name);
++#else
 +		status = getWanStatusStr();
++#endif
  		bodylen = snprintf(body, sizeof(body), resp,
                             action, "urn:schemas-upnp-org:control-1-0",
  		                   status, action);
