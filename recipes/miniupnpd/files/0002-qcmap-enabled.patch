@@ -1,6 +1,6 @@
-From 5cbb59e01deeb73db388184f226e63925a122f2d Mon Sep 17 00:00:00 2001
+From 1609acc517bcc9703f99dbb7f1189fc6293a422f Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Mon, 3 Jun 2013 14:18:19 -0700
+Date: Tue, 4 Jun 2013 13:11:34 -0700
 Subject: [PATCH 1/1] qcmap-enabled
 
 ---
@@ -12,17 +12,18 @@ Subject: [PATCH 1/1] qcmap-enabled
  linux/miniupnpd.init.d.script |   15 --
  minissdp.c                    |  103 ++++++----
  miniupnpd.c                   |   32 +++-
- miniupnpd.conf                |   21 +-
+ miniupnpd.conf                |   25 ++--
  natpmp.c                      |   17 ++-
  upnpdescgen.c                 |   16 ++
  upnpredirect.c                |   77 ++++++++-
  upnpredirect.h                |   23 ++-
- upnpsoap.c                    |   62 +++++-
- 14 files changed, 917 insertions(+), 155 deletions(-)
+ upnpsoap.c                    |   72 ++++++-
+ 14 files changed, 929 insertions(+), 157 deletions(-)
  create mode 100644 UPNP_QCMAP_Client.cpp
  create mode 100644 UPNP_QCMAP_Client.h
  create mode 100644 config.h
- mode change 100644 => 100755 getifstats.h
+ mode change 100644 => 100755 miniupnpd.conf
+ mode change 100644 => 100755 upnpsoap.c
 
 diff --git a/Makefile.linux b/Makefile.linux
 index 900f702..4f2254f 100644
@@ -869,9 +870,7 @@ index 0000000..e31d95e
 +
 +#endif
 diff --git a/getifstats.h b/getifstats.h
-old mode 100644
-new mode 100755
-index e14b853..61e5bf8
+index e14b853..cecaa49 100644
 --- a/getifstats.h
 +++ b/getifstats.h
 @@ -7,12 +7,18 @@
@@ -1157,7 +1156,9 @@ index 1dd3ff3..1243568 100644
  	while(upnphttphead.lh_first != NULL)
  	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
-index e34e088..1562f9b 100644
+old mode 100644
+new mode 100755
+index e34e088..ad8757e
 --- a/miniupnpd.conf
 +++ b/miniupnpd.conf
 @@ -1,6 +1,6 @@
@@ -1179,7 +1180,7 @@ index e34e088..1562f9b 100644
  # port for HTTP (descriptions and SOAP) traffic. set 0 for autoselect.
  port=0
  
-@@ -40,7 +39,7 @@ enable_upnp=yes
+@@ -40,11 +39,11 @@ enable_upnp=yes
  #lease_file=/var/log/upnp.leases
  
  # name of this service, default is "`uname -s` Router"
@@ -1187,13 +1188,19 @@ index e34e088..1562f9b 100644
 +friendly_name=9x25 MobileAP UPnP
  
  # bitrates reported by daemon in bits per second
- bitrate_up=1000000
+-bitrate_up=1000000
+-bitrate_down=10000000
++#bitrate_up=1000000
++#bitrate_down=10000000
+
+ # "secure" mode : when enabled, UPnP client are allowed to add mappings only
+ # to their IP.
 @@ -91,7 +90,7 @@ clean_ruleset_interval=600
  #quickrules=no
 
  # uuid : generate your own with "make genuuid"
 -uuid=3d3cec3a-8cf0-11e0-98ee-001a6bd2d07b
-+uuid=dcb9c05f-e425-426c-9d3e-96481a238bc9
++uuid=e3c41abc-5951-4924-a650-b49ded3450dc
 
  # serial and model number the daemon will report to clients
  # in its XML description
@@ -1594,7 +1601,9 @@ index b549824..db8f6ac 100644
                                 unsigned int * number);
  
 diff --git a/upnpsoap.c b/upnpsoap.c
-index c61ea05..0f3cc0d 100644
+old mode 100644
+new mode 100755
+index c61ea05..a05c18a
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
 @@ -88,8 +88,11 @@ GetTotalBytesSent(struct upnphttp * h, const char * action)
@@ -1649,19 +1658,35 @@ index c61ea05..0f3cc0d 100644
  	bodylen = snprintf(body, sizeof(body), resp,
  	         action, "urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1",
  	         r<0?0:data.ipackets, action);
-@@ -192,7 +204,11 @@ GetCommonLinkProperties(struct upnphttp * h, const char * action)
- 			if(upstream_bitrate == 0) upstream_bitrate = data.baudrate;
+@@ -184,6 +196,7 @@ GetCommonLinkProperties(struct upnphttp * h, const char * action)
+	                             * Initializing, Unavailable (Optional) */
+	char ext_ip_addr[INET_ADDRSTRLEN];
+
++#ifndef QCMAP
+	if((downstream_bitrate == 0) || (upstream_bitrate == 0))
+	{
+		if(getifstats(ext_if_name, &data) >= 0)
+@@ -193,6 +206,19 @@ GetCommonLinkProperties(struct upnphttp * h, const char * action)
  		}
  	}
-+#ifndef QCMAP
 	if(getifaddr(ext_if_name, ext_ip_addr, INET_ADDRSTRLEN, NULL, NULL) < 0) {
 +#else
++	if(getIfaceStats(&data) >= 0)
++	{
++		downstream_bitrate = data.downstream_bitrate;
++		upstream_bitrate = data.upstream_bitrate;
++	}
++	else
++	{
++		downstream_bitrate = 0;
++		upstream_bitrate = 0;
++	}
 +	if(getIPAddr(ext_ip_addr, INET_ADDRSTRLEN) < 0) {
 +#endif
  		status = "Down";
  	}
  	bodylen = snprintf(body, sizeof(body), resp,
-@@ -220,8 +236,11 @@ GetStatusInfo(struct upnphttp * h, const char * action)
+@@ -220,8 +246,11 @@ GetStatusInfo(struct upnphttp * h, const char * action)
 	/* ConnectionStatus possible values :
  	 * Unconfigured, Connecting, Connected, PendingDisconnect,
  	 * Disconnecting, Disconnected */
@@ -1674,7 +1699,7 @@ index c61ea05..0f3cc0d 100644
  	uptime = (time(NULL) - startup_time);
  	bodylen = snprintf(body, sizeof(body), resp,
  		action, SERVICE_TYPE_WANIPC,
-@@ -270,10 +289,16 @@ GetExternalIPAddress(struct upnphttp * h, const char * action)
+@@ -270,10 +299,16 @@ GetExternalIPAddress(struct upnphttp * h, const char * action)
  	{
  		strncpy(ext_ip_addr, use_ext_ip_addr, INET_ADDRSTRLEN);
  	}
@@ -1691,7 +1716,7 @@ index c61ea05..0f3cc0d 100644
  		strncpy(ext_ip_addr, "0.0.0.0", INET_ADDRSTRLEN);
  	}
  #else
-@@ -410,7 +435,11 @@ AddPortMapping(struct upnphttp * h, const char * action)
+@@ -410,7 +445,11 @@ AddPortMapping(struct upnphttp * h, const char * action)
  	       action, eport, int_ip, iport, protocol, desc, leaseduration,
  	       r_host ? r_host : "NULL");
  
@@ -1704,7 +1729,7 @@ index c61ea05..0f3cc0d 100644
  
  	ClearNameValueList(&data);
  
-@@ -546,7 +575,11 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
+@@ -546,7 +585,11 @@ AddAnyPortMapping(struct upnphttp * h, const char * action)
  	/* TODO : accept a different external port
  	 * have some smart strategy to choose the port */
  	for(;;) {
@@ -1717,7 +1742,7 @@ index c61ea05..0f3cc0d 100644
  		if(r==-2 && eport < 65535) {
  			eport++;
  		} else {
-@@ -764,7 +797,10 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
+@@ -764,7 +807,10 @@ DeletePortMappingRange(struct upnphttp * h, const char * action)
  		return;
  	}
  
@@ -1729,7 +1754,7 @@ index c61ea05..0f3cc0d 100644
 	                                           protocol, &number);
  	for(i = 0; i < number; i++)
  	{
-@@ -974,7 +1010,10 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
+@@ -974,7 +1020,10 @@ http://www.upnp.org/schemas/gw/WANIPConnection-v2.xsd">
  	memcpy(body+bodylen, list_start, sizeof(list_start));
  	bodylen += (sizeof(list_start) - 1);
  
@@ -1741,7 +1766,7 @@ index c61ea05..0f3cc0d 100644
  	                                           protocol, &list_size);
  	/* loop through port mappings */
  	for(i = 0; number > 0 && i < list_size; i++)
-@@ -1149,8 +1188,11 @@ QueryStateVariable(struct upnphttp * h, const char * action)
+@@ -1149,8 +1198,11 @@ QueryStateVariable(struct upnphttp * h, const char * action)
 	else if(strcmp(var_name, "ConnectionStatus") == 0)
  	{
  		const char * status;
