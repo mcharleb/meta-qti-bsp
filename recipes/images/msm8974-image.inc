@@ -45,7 +45,7 @@ IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
 #IMAGE_INSTALL += "mm-video-oss"
 #IMAGE_INSTALL += "camera-hal"
-#IMAGE_INSTALL += "open-source-kernel-tests"
+IMAGE_INSTALL += "open-source-kernel-tests"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
