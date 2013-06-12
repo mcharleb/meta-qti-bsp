@@ -1,0 +1,58 @@
+From 9a6767fb4a51466b25c8c835a0970a2ec59e03df Mon Sep 17 00:00:00 2001
+From: Tyler Wear <twear@codeaurora.org>
+Date: Wed, 12 Jun 2013 15:02:51 -0700
+Subject: [PATCH 1/1] certification-fixes
+
+---
+ minissdp.c |    1 +
+ upnphttp.c |   10 +++++++++-
+ 2 files changed, 10 insertions(+), 1 deletions(-)
+ mode change 100644 => 100755 minissdp.c
+ mode change 100644 => 100755 upnphttp.c
+
+diff --git a/minissdp.c b/minissdp.c
+old mode 100644
+new mode 100755
+index 81ae23e..2a03833
+--- a/minissdp.c
++++ b/minissdp.c
+@@ -330,6 +330,7 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+			//DEBUG DPRINTF(E_DEBUG, L_SSDP, "Sending NOTIFY:\n%s", bufr);
+			n = sendto(s, bufr, l, 0,
+				(struct sockaddr *)&sockname, sizeof(struct sockaddr_in) );
++			_usleep(20000);
+			if(n < 0)
+			{
+				DPRINTF(E_ERROR, L_SSDP, "sendto(udp_notify=%d, %s): %s\n", s, host, strerror(errno));
+diff --git a/upnphttp.c b/upnphttp.c
+old mode 100644
+new mode 100755
+index b368cd9..5395416
+--- a/upnphttp.c
++++ b/upnphttp.c
+@@ -1980,13 +1980,21 @@ SendResp_dlnafile(struct upnphttp * h, char * object)
+	              last_file.mime);
+	if( h->reqflags & FLAG_RANGE )
+	{
++		DPRINTF(E_WARN, L_HTTP, "Ranges = %d %d\n", h->req_RangeStart, h->req_RangeEnd);
+		if( !h->req_RangeEnd || h->req_RangeEnd == size )
+		{
+			h->req_RangeEnd = size - 1;
+		}
+-		if( (h->req_RangeStart > h->req_RangeEnd) || (h->req_RangeStart < 0) )
++		if( h->req_RangeStart < 0 )
+		{
+			DPRINTF(E_WARN, L_HTTP, "Specified range was invalid!\n");
++			Send416(h);
++			close(sendfh);
++			goto error;
++		}
++		if( h->req_RangeStart > h->req_RangeEnd )
++		{
++			DPRINTF(E_WARN, L_HTTP, "Bad Request!\n");
+			Send400(h);
+			close(sendfh);
+			goto error;
+--
+1.7.8.3
+
