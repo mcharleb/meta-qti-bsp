@@ -14,7 +14,7 @@ PR = "r2"
 
 SRC_URI = "\
     http://miniupnp.free.fr/files/download.php?file=${PN}-${PV}.tar.gz \
-    file://0002-qcmap-enabled.patch \
+	file://0001-certification-fixes.patch \
 "
 
 SRC_URI[md5sum] = "2b913c53fbeb562731e84b66b3ce704f"
