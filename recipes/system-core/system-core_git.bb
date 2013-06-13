@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
+DEPENDS = "zlib"
+
 PR = "r8"
 
 inherit autotools
@@ -73,7 +75,7 @@ FILES_${PN}-adbd-dbg = "/sbin/.debug/adbd"
 FILES_${PN}-adbd     = "/sbin/adbd ${sysconfdir}/init.d/adbd"
 
 PACKAGES =+ "${PN}-usb"
-FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${bindir}/usb_composition ${bindir}/usb/compositions/* ${bindir}/usb/*"
+FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${bindir}/usb_composition ${bindir}/usb_composition_switch ${bindir}/usb/compositions/* ${bindir}/usb/*"
 
 PACKAGES =+ "${PN}-liblog-dbg ${PN}-liblog ${PN}-liblog-dev ${PN}-liblog-static"
 FILES_${PN}-liblog-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
