@@ -1,0 +1,435 @@
+From 26a01c1f8a6eefa02a36e2fb3407017fa0208f3c Mon Sep 17 00:00:00 2001
+From: Tyler Wear <twear@codeaurora.org>
+Date: Fri, 14 Jun 2013 11:43:03 -0700
+Subject: [PATCH 1/1] upstream-fixes
+
+---
+ minissdp.c       |  103 ++++++++++++++++++++++++++++++++++++------------------
+ miniupnpd.c      |   41 +++++++++++++++++++---
+ upnpdescgen.c    |    8 ++--
+ upnpevents.c     |    2 +-
+ upnpglobalvars.c |    4 ++-
+ upnpglobalvars.h |    4 ++-
+ upnpreplyparse.c |    6 ++--
+ upnpreplyparse.h |    2 +-
+ upnpsoap.c       |   10 ++++-
+ 9 files changed, 128 insertions(+), 52 deletions(-)
+ mode change 100644 => 100755 minissdp.c
+ mode change 100644 => 100755 miniupnpd.c
+ mode change 100644 => 100755 upnpdescgen.c
+ mode change 100644 => 100755 upnpevents.c
+ mode change 100644 => 100755 upnpglobalvars.c
+ mode change 100644 => 100755 upnpglobalvars.h
+ mode change 100644 => 100755 upnpredirect.c
+ mode change 100644 => 100755 upnpreplyparse.c
+ mode change 100644 => 100755 upnpreplyparse.h
+ mode change 100644 => 100755 upnpsoap.c
+
+diff --git a/minissdp.c b/minissdp.c
+old mode 100644
+new mode 100755
+index 8645524..85ba410
+--- a/minissdp.c
++++ b/minissdp.c
+@@ -318,7 +318,7 @@ EXT:
+ static void
+ SendSSDPAnnounce2(int s, const struct sockaddr * addr,
+                   const char * st, int st_len, const char * suffix,
+-                  const char * host, unsigned short port)
++                  const char * host, unsigned short port, const char * uuidvalue)
+ {
+	int l, n;
+	char buf[512];
+@@ -405,22 +405,28 @@ SendSSDPAnnounce2(int s, const struct sockaddr * addr,
+ static struct {
+	const char * s;
+	const int version;
++	const char * uuid;
+ } const known_service_types[] =
+ {
+-	{"upnp:rootdevice", 0},
+-	{"urn:schemas-upnp-org:device:InternetGatewayDevice:", IGD_VER},
+-	{"urn:schemas-upnp-org:device:WANConnectionDevice:", 1},
+-	{"urn:schemas-upnp-org:device:WANDevice:", 1},
+-	{"urn:schemas-upnp-org:service:WANCommonInterfaceConfig:", 1},
+-	{"urn:schemas-upnp-org:service:WANIPConnection:", WANIPC_VER},
+-	{"urn:schemas-upnp-org:service:WANPPPConnection:", 1},
++	{"upnp:rootdevice", 0, uuidvalue_igd},
++	{"urn:schemas-upnp-org:device:InternetGatewayDevice:", IGD_VER, uuidvalue_igd},
++	{"urn:schemas-upnp-org:device:WANConnectionDevice:", 1, uuidvalue_wcd},
++	{"urn:schemas-upnp-org:device:WANDevice:", 1, uuidvalue_wan},
++	{"urn:schemas-upnp-org:service:WANCommonInterfaceConfig:", 1, uuidvalue_wan},
++	{"urn:schemas-upnp-org:service:WANIPConnection:", WANIPC_VER, uuidvalue_wcd},
++#ifndef UPNP_STRICT
++   /* We use WAN IP Connection, not PPP connection,
++    * but buggy control points may try to use WanPPPConnection
++    * anyway */
++	{"urn:schemas-upnp-org:service:WANPPPConnection:", 1, uuidvalue_wcd},
++#endif
+ #ifdef ENABLE_L3F_SERVICE
+-	{"urn:schemas-upnp-org:service:Layer3Forwarding:", 1},
++	{"urn:schemas-upnp-org:service:Layer3Forwarding:", 1, uuidvalue_igd},
+ #endif
+ #ifdef ENABLE_6FC_SERVICE
+-	{"url:schemas-upnp-org:service:WANIPv6FirewallControl:", 1},
++	{"url:schemas-upnp-org:service:WANIPv6FirewallControl:", 1, uuidvalue_igd},
+ #endif
+-	{0, 0}
++	{0, 0, 0}
+ };
+
+ static void
+@@ -538,13 +544,18 @@ SendSSDPNotifies(int s, const char * host, unsigned short port,
+     			snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
+     		SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
+     		               known_service_types[i].s, ver_str,	/* NT: */
+-    		               uuidvalue, "::", known_service_types[i].s, /* ver_str,	USN: */
++                           known_service_types[i].uuid, "::",
++                           known_service_types[i].s, /* ver_str,  USN: */
+     		               lifetime, ipv6);
+-    		if(i==0) /* rootdevice */
+-    			SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
+-    			               uuidvalue, "",	/* NT: */
+-    			               uuidvalue, "", "", /* ver_str,	USN: */
+-    			               lifetime, ipv6);
++
++			if(0==memcmp(known_service_types[i].s,
++						 "urn:schemas-upnp-org:device", sizeof("urn:schemas-upnp-org:device")-1))
++			{
++				SendSSDPNotify(s, (struct sockaddr *)&sockname, host, port,
++							   known_service_types[i].uuid, "",  /* NT: */
++							   known_service_types[i].uuid, "", "", /* ver_str,  USN: */
++							   lifetime, ipv6);
++			}
+     		i++;
+		}
+	}
+@@ -757,7 +768,8 @@ ProcessSSDPData(int s, const char *bufr, int n,
+					syslog(LOG_INFO, "Single search found");
+					SendSSDPAnnounce2(s, sender,
+					                  st, st_len, "",
+-					                  announced_host, port);
++					                  announced_host, port,
++									  known_service_types[i].uuid);
+					break;
+				}
+			}
+@@ -775,19 +787,39 @@ ProcessSSDPData(int s, const char *bufr, int n,
+					l = (int)strlen(known_service_types[i].s);
+					SendSSDPAnnounce2(s, sender,
+					                  known_service_types[i].s, l, ver_str,
+-					                  announced_host, port);
++					                  announced_host, port,
++									  known_service_types[i].uuid);
+				}
+				/* also answer for uuid */
+-				SendSSDPAnnounce2(s, sender, uuidvalue, strlen(uuidvalue), "",
+-				                  announced_host, port);
++				SendSSDPAnnounce2(s, sender, uuidvalue_igd, strlen(uuidvalue_igd), "",
++				                  announced_host, port, uuidvalue_igd);
++				SendSSDPAnnounce2(s, sender, uuidvalue_wan, strlen(uuidvalue_wan), "",
++				                  announced_host, port, uuidvalue_wan);
++				SendSSDPAnnounce2(s, sender, uuidvalue_wcd, strlen(uuidvalue_wcd), "",
++				                  announced_host, port, uuidvalue_wcd);
+			}
+			/* responds to request by UUID value */
+-			l = (int)strlen(uuidvalue);
+-			if(l==st_len && (0 == memcmp(st, uuidvalue, l)))
++			l = (int)strlen(uuidvalue_igd);
++			if(l==st_len)
+			{
+-				syslog(LOG_INFO, "ssdp:uuid found");
+-				SendSSDPAnnounce2(s, sender, st, st_len, "",
+-				                  announced_host, port);
++				if(0 == memcmp(st, uuidvalue_igd, l))
++				{
++				  syslog(LOG_INFO, "ssdp:uuid (IGD) found");
++				  SendSSDPAnnounce2(s, sender, st, st_len, "",
++								   announced_host, port, uuidvalue_igd);
++				}
++				else if(0 == memcmp(st, uuidvalue_wan, l))
++				{
++				  syslog(LOG_INFO, "ssdp:uuid (WAN) found");
++				  SendSSDPAnnounce2(s, sender, st, st_len, "",
++								   announced_host, port, uuidvalue_wan);
++				}
++				else if(0 == memcmp(st, uuidvalue_wcd, l))
++				{
++				  syslog(LOG_INFO, "ssdp:uuid (WCD) found");
++				  SendSSDPAnnounce2(s, sender, st, st_len, "",
++								   announced_host, port, uuidvalue_wcd);
++				}
+			}
+		}
+		else
+@@ -901,19 +933,22 @@ SendSSDPGoodbye(int * sockets, int n_sockets)
+									  (struct sockaddr *)&sockname,
+ #endif
+									  known_service_types[i].s, ver_str,	/* NT: */
+-									  uuidvalue, "::", known_service_types[i].s, /* ver_str, USN: */
++									  known_service_types[i].uuid, "::",
++									  known_service_types[i].s, /* ver_str, USN: */
+									  ipv6);
+-				if(i==0)	/* root device */
++
++				if(0==memcmp(known_service_types[i].s,
++							 "urn:schemas-upnp-org:device", sizeof("urn:schemas-upnp-org:device")-1))
+				{
+					ret += SendSSDPbyebye(sockets[j],
+ #ifdef ENABLE_IPV6
+-										  ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
++									  ipv6 ? (struct sockaddr *)&sockname6 : (struct sockaddr *)&sockname,
+ #else
+-										  (struct sockaddr *)&sockname,
++									  (struct sockaddr *)&sockname,
+ #endif
+-										  uuidvalue, "",	/* NT: */
+-										  uuidvalue, "", "", /* ver_str, USN: */
+-										  ipv6);
++									  known_service_types[i].uuid, "",	/* NT: */
++									  known_service_types[i].uuid, "", "", /* ver_str, USN: */
++									  ipv6);
+				}
+			}
+		}
+@@ -963,7 +998,7 @@ SubmitServicesToMiniSSDPD(const char * host, unsigned short port) {
+		else
+			snprintf(ver_str, sizeof(ver_str), "%d", known_service_types[i].version);
+		l = snprintf(strbuf, sizeof(strbuf), "%s::%s%s",
+-		             uuidvalue, known_service_types[i].s, ver_str);
++		             known_service_types[i].uuid, known_service_types[i].s, ver_str);
+		if(l<0) {
+			syslog(LOG_WARNING, "SubmitServicesToMiniSSDPD: snprintf %m");
+			continue;
+diff --git a/miniupnpd.c b/miniupnpd.c
+old mode 100644
+new mode 100755
+index 1243568..935f512
+--- a/miniupnpd.c
++++ b/miniupnpd.c
+@@ -643,6 +643,35 @@ parselan_error:
+	return -1;
+ }
+
++/* fill uuidvalue_wan and uuidvalue_wcd based on uuidvalue_igd */
++void complete_uuidvalues(void)
++{
++	size_t len;
++	len = strlen(uuidvalue_igd);
++	memcpy(uuidvalue_wan, uuidvalue_igd, len+1);
++	switch(uuidvalue_wan[len-1]) {
++		case '9':
++			uuidvalue_wan[len-1] = 'a';
++			break;
++		case 'f':
++			uuidvalue_wan[len-1] = '0';
++			break;
++		default:
++			uuidvalue_wan[len-1]++;
++	}
++	memcpy(uuidvalue_wcd, uuidvalue_wan, len+1);
++	switch(uuidvalue_wcd[len-1]) {
++		case '9':
++			uuidvalue_wcd[len-1] = 'a';
++			break;
++		case 'f':
++			uuidvalue_wcd[len-1] = '0';
++			break;
++		default:
++			uuidvalue_wcd[len-1]++;
++	}
++}
++
+ /* init phase :
+  * 1) read configuration file
+  * 2) read command line arguments
+@@ -770,8 +799,9 @@ init(int argc, char * * argv, struct runtime_vars * v)
+				break;
+ #endif
+			case UPNPUUID:
+-				strncpy(uuidvalue+5, ary_options[i].value,
+-				        strlen(uuidvalue+5) + 1);
++				strncpy(uuidvalue_igd+5, ary_options[i].value,
++				        strlen(uuidvalue_igd+5) + 1);
++				complete_uuidvalues();
+				break;
+			case UPNPSERIAL:
+				strncpy(serialnumber, ary_options[i].value, SERIALNUMBER_MAX_LEN);
+@@ -866,9 +896,10 @@ init(int argc, char * * argv, struct runtime_vars * v)
+				fprintf(stderr, "Option -%c takes one argument.\n", argv[i][1]);
+			break;
+		case 'u':
+-			if(i+1 < argc)
+-				strncpy(uuidvalue+5, argv[++i], strlen(uuidvalue+5) + 1);
+-			else
++			if(i+1 < argc) {
++				strncpy(uuidvalue_igd+5, argv[++i], strlen(uuidvalue_igd+5) + 1);
++				complete_uuidvalues();
++			} else
+				fprintf(stderr, "Option -%c takes one argument.\n", argv[i][1]);
+			break;
+		case 'z':
+diff --git a/upnpdescgen.c b/upnpdescgen.c
+old mode 100644
+new mode 100755
+index 2f37a59..f2e7625
+--- a/upnpdescgen.c
++++ b/upnpdescgen.c
+@@ -154,7 +154,7 @@ static const struct XMLElt rootDesc[] =
+	{"/modelNumber", modelnumber},
+	{"/modelURL", ROOTDEV_MODELURL},
+	{"/serialNumber", serialnumber},
+-	{"/UDN", uuidvalue},	/* required */
++	{"/UDN", uuidvalue_igd},	/* required */
+	/* see if /UPC is needed. */
+ #ifdef ENABLE_6FC_SERVICE
+ #define SERVICES_OFFSET 63
+@@ -201,7 +201,7 @@ static const struct XMLElt rootDesc[] =
+	{"/modelNumber", WANDEV_MODELNUMBER},
+	{"/modelURL", WANDEV_MODELURL},
+	{"/serialNumber", serialnumber},
+-	{"/UDN", uuidvalue},
++	{"/UDN", uuidvalue_wan},
+	{"/UPC", WANDEV_UPC},	/* UPC (=12 digit barcode) is optional */
+ /* 30 */
+	{"serviceList", INITHELPER(32,1)},
+@@ -229,7 +229,7 @@ static const struct XMLElt rootDesc[] =
+	{"/modelNumber", WANCDEV_MODELNUMBER},
+	{"/modelURL", WANCDEV_MODELURL},
+	{"/serialNumber", serialnumber},
+-	{"/UDN", uuidvalue},
++	{"/UDN", uuidvalue_wcd},
+	{"/UPC", WANCDEV_UPC},	/* UPC (=12 digit Barcode) is optional */
+ #ifdef ENABLE_6FC_SERVICE
+	{"serviceList", INITHELPER(51,2)},
+@@ -1219,7 +1219,7 @@ genEventVars(int * len, const struct serviceDesc * s, const char * servns)
+				break;
+			case DEFAULTCONNECTIONSERVICE_MAGICALVALUE:
+				/* DefaultConnectionService magical value */
+-				str = strcat_str(str, len, &tmplen, uuidvalue);
++				str = strcat_str(str, len, &tmplen, uuidvalue_wcd);
+ #ifdef IGD_V2
+				str = strcat_str(str, len, &tmplen, ":WANConnectionDevice:2,urn:upnp-org:serviceId:WANIPConn1");
+ #else
+diff --git a/upnpevents.c b/upnpevents.c
+old mode 100644
+new mode 100755
+index 0027d99..934a6f8
+--- a/upnpevents.c
++++ b/upnpevents.c
+@@ -110,7 +110,7 @@ newSubscriber(const char * eventurl, const char * callback, int callbacklen)
+	tmp->callback[callbacklen] = '\0';
+	/* make a dummy uuid */
+	/* TODO: improve that */
+-	strncpy(tmp->uuid, uuidvalue, sizeof(tmp->uuid));
++	strncpy(tmp->uuid, uuidvalue_igd, sizeof(tmp->uuid));
+	tmp->uuid[sizeof(tmp->uuid)-1] = '\0';
+	snprintf(tmp->uuid+37, 5, "%04lx", random() & 0xffff);
+	return tmp;
+diff --git a/upnpglobalvars.c b/upnpglobalvars.c
+old mode 100644
+new mode 100755
+index 18efbee..bba285c
+--- a/upnpglobalvars.c
++++ b/upnpglobalvars.c
+@@ -36,7 +36,9 @@ int runtime_flags = 0;
+
+ const char * pidfilename = "/var/run/miniupnpd.pid";
+
+-char uuidvalue[] = "uuid:00000000-0000-0000-0000-000000000000";
++char uuidvalue_igd[] = "uuid:00000000-0000-0000-0000-000000000000";
++char uuidvalue_wan[] = "uuid:00000000-0000-0000-0000-000000000000";
++char uuidvalue_wcd[] = "uuid:00000000-0000-0000-0000-000000000000";
+ char serialnumber[SERIALNUMBER_MAX_LEN] = "00000000";
+
+ char modelnumber[MODELNUMBER_MAX_LEN] = "1";
+diff --git a/upnpglobalvars.h b/upnpglobalvars.h
+old mode 100644
+new mode 100755
+index 04811d0..661cade
+--- a/upnpglobalvars.h
++++ b/upnpglobalvars.h
+@@ -54,7 +54,9 @@ extern int runtime_flags;
+
+ extern const char * pidfilename;
+
+-extern char uuidvalue[];
++extern char uuidvalue_igd[];
++extern char uuidvalue_wan[];
++extern char uuidvalue_wcd[];
+
+ #define SERIALNUMBER_MAX_LEN (10)
+ extern char serialnumber[];
+diff --git a/upnpredirect.c b/upnpredirect.c
+old mode 100644
+new mode 100755
+diff --git a/upnpreplyparse.c b/upnpreplyparse.c
+old mode 100644
+new mode 100755
+index e9a4998..6da19bb
+--- a/upnpreplyparse.c
++++ b/upnpreplyparse.c
+@@ -37,11 +37,11 @@ NameValueParserEndElt(void * d, const char * name, int l)
+	if(strcmp(data->curelt, "NewPortListing") != 0)
+	{
+		int l;
+-		/* standard case. Limited to 63 chars strings */
++		/* standard case. Limited to n chars strings */
+		l = data->cdatalen;
+	    nv = malloc(sizeof(struct NameValue));
+-	    if(l>63)
+-	        l = 63;
++	    if(l>(int)sizeof(nv->value))
++	        l = sizeof(nv->value) - 1;
+	    strncpy(nv->name, data->curelt, 64);
+		nv->name[63] = '\0';
+		if(data->cdata != NULL)
+diff --git a/upnpreplyparse.h b/upnpreplyparse.h
+old mode 100644
+new mode 100755
+index 32582b9..7c7900e
+--- a/upnpreplyparse.h
++++ b/upnpreplyparse.h
+@@ -21,7 +21,7 @@ extern "C" {
+ struct NameValue {
+     LIST_ENTRY(NameValue) entries;
+     char name[64];
+-    char value[64];
++    char value[128];
+ };
+
+ struct NameValueParserData {
+diff --git a/upnpsoap.c b/upnpsoap.c
+old mode 100644
+new mode 100755
+index f9842ef..07967d9
+--- a/upnpsoap.c
++++ b/upnpsoap.c
+@@ -1087,8 +1087,14 @@ SetDefaultConnectionService(struct upnphttp * h, const char * action)
+		 * 721 InvalidServiceID
+		 * 723 InvalidConnServiceSelection */
+ #ifdef UPNP_STRICT
+-		if(0 != memcmp(uuidvalue, p, sizeof("uuid:00000000-0000-0000-0000-000000000000") - 1)) {
++		char * service;
++		service = strchr(p, ',');
++		if(0 != memcmp(uuidvalue_wcd, p, sizeof("uuid:00000000-0000-0000-0000-000000000000") - 1))
+			SoapError(h, 720, "InvalidDeviceUUID");
++		else if(service == NULL || 0 != strcmp(service+1, SERVICE_ID_WANIPC))
++		{
++			SoapError(h, 721, "InvalidServiceID");
++
+		} else
+ #endif
+		{
+@@ -1118,7 +1124,7 @@ GetDefaultConnectionService(struct upnphttp * h, const char * action)
+	int bodylen;
+
+	bodylen = snprintf(body, sizeof(body), resp,
+-	                   action, uuidvalue, action);
++	                   action, uuidvalue_wcd, action);
+	BuildSendAndCloseSoapResp(h, body, bodylen);
+ }
+ #endif
+--
+1.7.8.3
+
