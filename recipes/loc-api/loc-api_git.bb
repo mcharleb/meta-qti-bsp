@@ -13,3 +13,10 @@ EXTRA_OECONF = "--with-libhardware-includes=${STAGING_INCDIR} \
                 --with-glib"
 
 S = "${WORKDIR}/gps"
+
+CPPFLAGS += "-I${WORKSPACE}/base/include"
+
+do_install_append() {
+   mkdir -p ${D}/usr/include/loc-api/libloc_api_50001
+   cp -pPr ${S}/loc_api/ulp/inc/ulp.h ${D}/usr/include/loc-api/libloc_api_50001
+}
