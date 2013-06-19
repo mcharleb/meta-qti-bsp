@@ -4,7 +4,7 @@ DESCRIPTION = "X.Org X server -- MSM display driver"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-PR = "r5"
+PR = "r6"
 
 SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
@@ -21,7 +21,8 @@ DEPENDS = "${RDEPENDS} \
            dri2proto \
            xf86driproto \
            glproto \
-           xproto"
+           xproto \
+           libtbm"
 
 DEPENDS += "virtual/kernel"
 
