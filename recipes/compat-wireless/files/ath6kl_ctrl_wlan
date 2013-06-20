@@ -27,184 +27,244 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#Starts the WLAN over HSIC
-
 export KERNEL=`uname -r`
 export MODULE_BASE=/lib/modules/$KERNEL/updates
-export RETRY_LIMIT=3
-export start_ap1=0
-export num_dev=2
-FILE_PATH="/etc/wlan_config"
+export RETRY_LIMIT=5
+HELP="Usage $0 {start | stop | restart} <ap | ap,ap | sta,ap>"
+CONF_FILE="/etc/wlan_config"
 DEVICE_PATTERN="device=AR6003"
-CHIP="ar6004"
+CHIP="AR6004"
 SDIO_POLLING_PATH="/sys/devices/msm_sdcc.3/polling"
-MODE="ap"
 INTERFACE_NAME="wlan"
-AR6003_HOSTAPD_CONF="/etc/AR6003_hostapd.conf"
-AR6004_HOSTAPD_CONF="/etc/AR6004_hostapd.conf"
-HOSTAPD_CONF="/etc/hostapd.conf"
 
-case "$1" in
+#Default configuration files available
+AR6003_HOSTAPD_CONF="/etc/AR6003_hostapd.conf"
+AR6003_AP1_HOSTAPD_CONF="/etc/AR6003_AP1_hostapd.conf"
+AR6004_HOSTAPD_CONF="/etc/AR6004_hostapd.conf"
+AR6004_AP1_HOSTAPD_CONF="/etc/AR6004_AP1_hostapd.conf"
+
+#This is per QCMAP default configuration
+#Can be changed per application requirement
+HOSTAPD_CONF="/etc/hostapd.conf"
+HOSTAPD_AP1_CONF="/etc/hostapd-wlan1.conf"
+HOSTAPD_STA_AP_CONF="/etc/sta_mode_hostapd.conf"
+
+do_ctrl_ar6004_hsic () {
+    case "$1" in
     start)
         echo "Starting WLAN... $@"
         shift
-
-	if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ] || [ "$1" == "ap" ]; then
-		MODE="$1"
-	fi
-
+        start_ap1=0
+        devmode=1
         if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ]; then
             start_ap1=1
-	    num_dev=2
+            devmode=2
             shift
         elif [ "$1" == "ap" ]; then
-	    num_dev=1
             shift
         elif [ "$1" == "ap,sta" ]; then
-            $0 help
-            exit
+            return 1
         fi
 
-	if [ -r "$FILE_PATH" ]; then
-		grep -iq "$DEVICE_PATTERN" "$FILE_PATH"
-		ret=$?
-		if [ $ret -eq 0 ]; then
-			CHIP="ar6003"
-		else
-			CHIP="ar6004"
-		fi
-	fi
+        set -e
+        echo hsic 2000 > /sys/bus/platform/devices/usb_bam/inactivity_timer
+        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
+        insmod $MODULE_BASE/compat/compat.ko
+        insmod $MODULE_BASE/net/wireless/cfg80211.ko
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko devmode=$devmode $@
+        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko
+        set +e
 
-	if [ "$CHIP" == "ar6003" ]; then
-		echo "AR6003 chip detected"
+        c=1
+        ifconfig wlan0 up 2>  /dev/null
+        rc=$?
+        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]; do
+            sleep 1
+            ifconfig wlan0 up 2> /dev/null
+            rc=$?
+            c=`expr $c + 1`
+        done
 
-		if [ -w "$SDIO_POLLING_PATH" ]; then
-			echo 1 > "$SDIO_POLLING_PATH"
+        if [ $c -gt $RETRY_LIMIT ]; then
+            echo "WLAN bring-up failed!"
+            exit 1
+        fi
 
-			set -e
-			modprobe ar6000 targetconf="router" devmode="$MODE" ifname="$INTERFACE_NAME" $@
-			set +e
+        if [ $start_ap1 -eq 1 ]; then
+            echo "Adding second AP interface(wlan1)"
+            iw dev wlan0 interface add wlan1 type __ap
+            ifconfig wlan1 up 2> /dev/null
+        fi
 
-			sleep 1
-
-			rm -f "$HOSTAPD_CONF"
-			ln -s "$AR6003_HOSTAPD_CONF" "$HOSTAPD_CONF"
-
-			ifconfig wlan0 up 2> /dev/null
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				sleep 1
-				ifconfig wlan0 up 2> /dev/null
-			fi
-
-			if [ "$MODE" == "ap,ap" ] || [ "$MODE" == "sta,ap" ]; then
-				ifconfig wlan1 up 2> /dev/null
-			fi
-			echo "Starting CXMAPP..."
-			cxmapp --init
-			cxmapp --ar6003 &
-		else
-			echo "Cannot write to $SDIO_POLLING_PATH"
-			exit 1
-		fi
-
-	else
-		echo "AR6004 chip detected"
-
-	        set -e
-	        c=1
-            echo hsic 2000 > /sys/bus/platform/devices/usb_bam/inactivity_timer
-	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/bind
-	        insmod $MODULE_BASE/compat/compat.ko
-	        insmod $MODULE_BASE/net/wireless/cfg80211.ko
-	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_core.ko devmode=$num_dev $@
-	        insmod $MODULE_BASE/drivers/net/wireless/ath/ath6kl/ath6kl_usb.ko
-	        set +e
-
-		rm -f "$HOSTAPD_CONF"
-		ln -s "$AR6004_HOSTAPD_CONF" "$HOSTAPD_CONF"
-
-	        ifconfig wlan0 up 2>  /dev/null
-	        rc=$?
-	        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]
-	        do
-	            sleep 1
-	            ifconfig wlan0 up 2> /dev/null
-	            rc=$?
-	            c=`expr $c + 1`
-	        done
-
-	        if [ $c -gt $RETRY_LIMIT ]; then
-	            echo "WLAN bring-up failed!"
-	            exit
-	        fi
-
-	        if [ $start_ap1 -eq 1 ]; then
-	            echo "Adding second AP interface(wlan1)"
-	            iw dev wlan0 interface add wlan1 type __ap
-	            ifconfig wlan1 up > /dev/null
-	        fi
-
-		echo "Starting CXMAPP..."
-		cxmapp --init
-		cxmapp &
-          echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-          echo 998400 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-          echo 998400 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-	fi
+        echo "Starting CXMAPP..."
+        cxmapp --init
+        cxmapp &
         ;;
 
     start_ftm)
-        $0 start debug_quirks=0x10
+        do_ctrl_ar6004_hsic start debug_quirks=0x10
         ;;
 
     stop)
         echo "Stopping WLAN..."
         killall -15 cxmapp
 
-        echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-        echo 300000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-        echo 998400 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-
-        if [ -r "$FILE_PATH" ]; then
-                grep -iq "$DEVICE_PATTERN" "$FILE_PATH"
-                ret=$?
-                if [ $ret -eq 0 ]; then
-                        CHIP="ar6003"
-                else
-                        CHIP="ar6004"
-                fi
-        fi
-
-        if [ "$CHIP" == "ar6003" ]; then
-                if [ -w "$SDIO_POLLING_PATH" ]; then
-                        echo 0 > "$SDIO_POLLING_PATH"
-                        rmmod ar6000
-
-                else
-                        echo "Cannot write to $SDIO_POLLING_PATH"
-                        exit 1
-                fi
-	else
-	        rmmod ath6kl_usb
-	        rmmod ath6kl_core
-	        rmmod cfg80211
-	        rmmod compat
-	        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
-            echo hsic 0 > /sys/bus/platform/devices/usb_bam/inactivity_timer
-	fi
+        rmmod ath6kl_usb
+        rmmod ath6kl_core
+        rmmod cfg80211
+        rmmod compat
+        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+        echo hsic 0 > /sys/bus/platform/devices/usb_bam/inactivity_timer
         ;;
 
     restart)
-        $0 stop
+        do_ctrl_ar6004_hsic stop
         shift
-        $0 start $@
+        do_ctrl_ar6004_hsic start $@
+
+        if [ $? -ne 0 ]; then
+            return 1
+        fi
         ;;
 
     *)
-        echo "Usage $0 {start | stop | restart} <ap | ap,ap | sta,ap>" >&2
-        exit 1
+        return 1
         ;;
-esac
+    esac
+
+    return 0
+}
+
+
+do_ctrl_ar6003 () {
+    case "$1" in
+    start)
+        echo "Starting WLAN... $@"
+        shift
+        MODE="ap"
+        if [ "$1" == "ap,ap" ] || [ "$1" == "sta,ap" ] || [ "$1" == "ap" ]; then
+            MODE="$1"
+            shift
+        elif [ "$1" == "ap,sta" ]; then
+            return 1
+        fi
+
+        if [ -w $SDIO_POLLING_PATH ]; then
+            echo 1 > $SDIO_POLLING_PATH
+        else
+            echo "Cannot write to $SDIO_POLLING_PATH"
+            exit 1
+        fi
+
+        set -e
+        modprobe ar6000 targetconf="router" devmode=$MODE ifname=$INTERFACE_NAME $@
+        set +e
+
+        sleep 1
+        c=1
+        ifconfig wlan0 up 2>  /dev/null
+        rc=$?
+        while [ $rc -ne 0 -a $c -le $RETRY_LIMIT ]; do
+            sleep 1
+            ifconfig wlan0 up 2> /dev/null
+            rc=$?
+            c=`expr $c + 1`
+        done
+
+        if [ $c -gt $RETRY_LIMIT ]; then
+            echo "WLAN bring-up failed!"
+            exit 1
+        fi
+
+        if [ $MODE == "ap,ap" ] || [ $MODE == "sta,ap" ]; then
+            ifconfig wlan1 up 2> /dev/null
+        fi
+
+        echo 0 > $SDIO_POLLING_PATH
+
+        echo "Starting CXMAPP..."
+        cxmapp --init
+        cxmapp --ar6003 &
+        ;;
+
+    start_ftm)
+        do_ctrl_ar6003 start testmode=1
+        ;;
+
+    stop)
+        echo "Stopping WLAN..."
+        killall -15 cxmapp
+
+        echo 0 > $SDIO_POLLING_PATH
+        rmmod ar6000
+        ;;
+
+    restart)
+        do_ctrl_ar6003 stop
+        shift
+        do_ctrl_ar6003 start $@
+
+        if [ $? -ne 0 ]; then
+            return 1
+        fi
+        ;;
+
+    *)
+        return 1
+        ;;
+    esac
+}
+
+do_configure_ar6004() {
+    if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+        ln -f -s $AR6004_HOSTAPD_CONF $HOSTAPD_CONF
+        if [ "$2"  == "ap,ap" ]; then
+            ln -f -s $AR6004_AP1_HOSTAPD_CONF $HOSTAPD_AP1_CONF
+        fi
+        if [ "$2"  == "sta,ap" ]; then
+            ln -f -s $AR6004_AP1_HOSTAPD_CONF $HOSTAPD_STA_AP_CONF
+        fi
+    fi
+}
+
+do_configure_ar6003() {
+    if [ "$1" == "start" ] || [ "$1" == "restart" ]; then
+        ln -f -s $AR6003_HOSTAPD_CONF $HOSTAPD_CONF
+        if [ "$2"  == "ap,ap" ]; then
+            ln -f -s $AR6003_AP1_HOSTAPD_CONF $HOSTAPD_AP1_CONF
+        fi
+        if [ "$2"  == "sta,ap" ]; then
+            ln -f -s $AR6003_AP1_HOSTAPD_CONF $HOSTAPD_STA_AP_CONF
+        fi
+    fi
+}
+
+if [ -r $CONF_FILE ]; then
+    grep -iq $DEVICE_PATTERN $CONF_FILE
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        CHIP="AR6003"
+    else
+        CHIP="AR6004"
+    fi
+fi
+
+echo "$CHIP chip detected!"
+
+if [ $CHIP == "AR6003" ]; then
+    do_ctrl_ar6003 $@
+    if [ $? -ne 0 ]; then
+        echo $HELP >&2
+        exit 1
+    fi
+    do_configure_ar6003 $@
+else
+    do_ctrl_ar6004_hsic $@
+    if [ $? -ne 0 ]; then
+        echo $HELP >&2
+        exit 1
+    fi
+    do_configure_ar6004 $@
+fi
 
 exit 0
