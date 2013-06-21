@@ -18,6 +18,7 @@ SRC_URI = "\
     file://0001-upstream-fixes.patch \
     file://0001-enable-backhaul.patch \
     file://0001-enable-http-date.patch \
+    file://0001-presentation-page.patch \
 "
 
 SRC_URI[md5sum] = "2b913c53fbeb562731e84b66b3ce704f"
