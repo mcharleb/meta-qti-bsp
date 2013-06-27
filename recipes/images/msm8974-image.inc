@@ -47,6 +47,7 @@ IMAGE_INSTALL += "mm-video-oss"
 #IMAGE_INSTALL += "camera-hal"
 IMAGE_INSTALL += "open-source-kernel-tests"
 IMAGE_INSTALL += "libtbm-msm"
+IMAGE_INSTALL += "libgenlock"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
