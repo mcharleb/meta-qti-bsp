@@ -4,12 +4,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r13"
+PR = "r14"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-core-oss"
-RDEPENDS = "mm-video"
+RDEPENDS = "mm-video-prop"
 
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"
