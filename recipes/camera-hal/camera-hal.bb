@@ -16,8 +16,8 @@ DEPENDS += "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-camera"
 DEPENDS += "mm-still"
-DEPENDS += "mm-image-codec"
-#DEPENDS += "mm-video-oss"
+DEPENDS += "mm-video-oss"
+DEPENDS_append_msm8974 += "mm-image-codec"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -28,6 +28,8 @@ ARM_INSTRUCTION_SET = "arm"
 
 CFLAGS += "-I${STAGING_INCDIR}/jpeg/inc"
 CFLAGS += "-I${STAGING_INCDIR}/cameracommon"
+CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include"
+CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include/media"
 
 EXTRA_OECONF_append = " --enable-debug=no"
 
@@ -36,9 +38,22 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target=msm8974', '', d)}"
 
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
-EXTRA_OECONF_append = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ ""
+EXTRA_OECONF_append_msm8960 = " --with-additional-include-directives="-I${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/mm-still/omx/inc/""
+EXTRA_OECONF_append_msm8974 = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ ""
 
-FILES_${PN} += "/usr/lib/*"
+FILES_${PN}_append_msm8960 += "/usr/lib/hw/*"
+FILES_${PN}_append_msm8974 += "/usr/lib/*"
 
 # The camera-hal package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
+
+do_install_append_msm8960() {
+   mkdir -p ${D}/usr/lib/hw
+
+   # Move and rename libcamera.so files to hw/machine-specific names.
+   cp ${D}/usr/lib/libcamera.so.0.0.0 ${D}/usr/lib/hw/libcamera.so
+
+   pushd ${D}/usr/lib/hw
+   ln -s libcamera.so ./camera.msm8960.so
+   popd
+}
