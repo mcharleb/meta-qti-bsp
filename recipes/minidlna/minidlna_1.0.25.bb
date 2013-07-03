@@ -9,13 +9,14 @@ DEPENDS = "miniupnpd libvorbis sqlite-autoconf libexif libjpeg-turbo libid3tag f
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r1"
+PR = "r2"
 
 SRC_URI = "\
     http://sourceforge.net/projects/minidlna/files/minidlna/${PV}/${PN}_${PV}_src.tar.gz \
     file://0001-make.patch \
     file://0001-patch.patch \
     file://0001-certification-fixes.patch \
+    file://0001-mpeg-codec-fix.patch \
 "
 
 SRC_URI[md5sum] = "d966256baf2f9b068b9de871ab5dade5"
