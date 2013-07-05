@@ -1,5 +1,5 @@
 DESCRIPTION = "Miscellaneous files for the base system."
-PR = "r4"
+PR = "r5"
 
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://host.conf;md5=a61b9f6548d337c1cc1e5a4de39f7b7f"
