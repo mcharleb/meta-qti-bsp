@@ -3,7 +3,6 @@
 # our yaffs2 image...
 DEPENDS = " \
     virtual/kernel \
-    virtual/bootloader \
     pkgconfig-native \
     gtk-doc-native \
     gettext-native \
@@ -12,6 +11,7 @@ DEPENDS = " \
     kernel-tests \
     dtbtool-native \
 "
+DEPENDS += ${@base_conditional('MACHINE', 'mdmkrypton', '', 'virtual/bootloader', d)}
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
