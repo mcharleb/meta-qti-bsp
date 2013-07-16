@@ -13,9 +13,6 @@
 # %% the '%' char itself
 #
 
-# Device node permission
-ACTION=="add"    RUN+="/etc/udev/scripts/set-dev-nodes.sh"
-
 # Media automounting
 KERNEL=="mmcblk[1-9]*", SUBSYSTEM=="block", ACTION=="add"    RUN+="/etc/udev/scripts/mount.sh"
 KERNEL=="mmcblk[1-9]*", SUBSYSTEM=="block", ACTION=="remove" RUN+="/etc/udev/scripts/mount.sh"
@@ -40,3 +37,5 @@ ACTION=="add", DEVPATH=="/devices/*", ENV{MODALIAS}=="?*", RUN+="/sbin/modprobe 
 # Create a symlink to any touchscreen input device
 SUBSYSTEM=="input", KERNEL=="event[0-9]*", ATTRS{modalias}=="input:*-e0*,3,*a0,1,*18,*", SYMLINK+="input/touchscreen0"
 
+# Device node permission
+ACTION=="add", ENV{MODALIAS}=="?*", RUN+="/etc/udev/scripts/set-dev-nodes.sh"
