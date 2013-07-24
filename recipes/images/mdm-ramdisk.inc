@@ -26,7 +26,6 @@ do_ramdisk_create() {
         ln -s bin sbin
         cp ${IMAGE_ROOTFS}/bin/busybox bin/
         cp ${IMAGE_ROOTFS}/sbin/adbd sbin/
-        cp -r ${IMAGE_ROOTFS}/usr/kernel-tests usr/
         cp ${IMAGE_ROOTFS}/lib/libc.so.6 lib/libc.so.6
         cp ${IMAGE_ROOTFS}/lib/libm.so.6 lib/libm.so.6
         cp ${IMAGE_ROOTFS}/lib/librt.so.1 lib/librt.so.1

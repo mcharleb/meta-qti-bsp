@@ -1,3 +1,4 @@
+require mdm-ramdisk.inc
 # Force a few additional dependencies in the mix so that we get the needed
 # recipes to build in the right order so we can make the bootimg file and
 # our yaffs2 image...
@@ -17,6 +18,11 @@ DEPENDS += ${@base_conditional('MACHINE', 'mdmkrypton', '', 'virtual/bootloader'
 IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
 
 # Make the bootimg image file using the information available in the sysroot...
+do_rootfs_append_mdmkrypton() {
+    # Make ramdisk
+    do_ramdisk_create
+}
+
 do_rootfs_append() {
     # Make bootimage
     ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
