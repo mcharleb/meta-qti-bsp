@@ -59,6 +59,8 @@ IMAGE_INSTALL += "strace"
 IMAGE_INSTALL += "loc-api"
 #IMAGE_INSTALL += "msm7k"
 
+IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/lib/modules ${IMAGE_ROOTFS}/usr/lib;"
+
 IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
 IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
 
