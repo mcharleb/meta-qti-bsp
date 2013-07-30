@@ -17,6 +17,7 @@ SRC_URI = "\
     file://0001-patch.patch \
     file://0001-certification-fixes.patch \
     file://0001-mpeg-codec-fix.patch \
+    file://0001-events-fix.patch \
 "
 
 SRC_URI[md5sum] = "d966256baf2f9b068b9de871ab5dade5"
