@@ -1,0 +1,38 @@
+From c1a7fff99e05109b3ae90dd6f6ba124c0f8de6fa Mon Sep 17 00:00:00 2001
+From: Tyler Wear <twear@codeaurora.org>
+Date: Tue, 23 Jul 2013 12:45:02 -0700
+Subject: [PATCH 1/1] events-fix
+
+---
+ minidlnapath.h |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 minidlnapath.h
+
+diff --git a/minidlnapath.h b/minidlnapath.h
+old mode 100644
+new mode 100755
+index 4043d0f..a794f3d
+--- a/minidlnapath.h
++++ b/minidlnapath.h
+@@ -37,15 +37,15 @@
+
+ #define CONTENTDIRECTORY_PATH			"/ContentDir.xml"
+ #define CONTENTDIRECTORY_CONTROLURL		"/ctl/ContentDir"
+-#define CONTENTDIRECTORY_EVENTURL		"/evt/ContentDir"
++#define CONTENTDIRECTORY_EVENTURL		""
+
+ #define CONNECTIONMGR_PATH			"/ConnectionMgr.xml"
+ #define CONNECTIONMGR_CONTROLURL		"/ctl/ConnectionMgr"
+-#define CONNECTIONMGR_EVENTURL			"/evt/ConnectionMgr"
++#define CONNECTIONMGR_EVENTURL			""
+
+ #define X_MS_MEDIARECEIVERREGISTRAR_PATH	"/X_MS_MediaReceiverRegistrar.xml"
+ #define X_MS_MEDIARECEIVERREGISTRAR_CONTROLURL	"/ctl/X_MS_MediaReceiverRegistrar"
+-#define X_MS_MEDIARECEIVERREGISTRAR_EVENTURL	"/evt/X_MS_MediaReceiverRegistrar"
++#define X_MS_MEDIARECEIVERREGISTRAR_EVENTURL	""
+
+ #endif
+
+--
+1.7.8.3
+
