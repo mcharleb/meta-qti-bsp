@@ -9,8 +9,9 @@ PROVIDES = "virtual/bootloader"
 SRC_URI  = "file://${WORKSPACE}/bootable/bootloader/lk \
             file://mdm9615-ld.patch"
 S        = "${WORKDIR}/${PN}"
-PR       = "r7"
+PR       = "r8"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 #re-use non-perf settings
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
