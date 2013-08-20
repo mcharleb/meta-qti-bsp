@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) 2012, The Linux Foundation. All rights reserved.
+# Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -31,8 +31,20 @@
 
 set -e
 
+soc_id=`cat /sys/devices/system/soc/soc0/id`
+
 echo -n "Turning on backlight: "
-echo 255 > /sys/class/leds/lcd-backlight/brightness
+
+#8974 uses Toshiba WLED, min value 0, max 4095.
+if [ "$soc_id" = "126" ]; then
+    echo -n "for 8974"
+    echo 1620 > /sys/class/leds/wled:backlight/brightness
+else
+#8960 backlight min value 0, max 255.
+    echo -n "for 8960"
+    echo 255 > /sys/class/leds/lcd-backlight/brightness
+fi
+
 echo "done"
 
 exit 0

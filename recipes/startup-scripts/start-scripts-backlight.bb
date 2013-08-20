@@ -6,7 +6,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 SRC_URI +="file://backlight"
 
-PR = "r4"
+PR = "r5"
 
 inherit update-rc.d
 
