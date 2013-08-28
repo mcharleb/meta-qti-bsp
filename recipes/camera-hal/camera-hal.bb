@@ -3,7 +3,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
-PR = "r5"
+PR = "r6"
 
 SRC_URI = "file://${WORKSPACE}/camera-hal"
 
@@ -18,6 +18,7 @@ DEPENDS += "mm-camera"
 DEPENDS += "mm-still"
 DEPENDS += "mm-video-oss"
 DEPENDS_append_msm8974 += "mm-image-codec"
+DEPENDS += "dlog"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -31,7 +32,7 @@ CFLAGS += "-I${STAGING_INCDIR}/cameracommon"
 CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include"
 CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include/media"
 
-EXTRA_OECONF_append = " --enable-debug=no"
+EXTRA_OECONF_append = " --enable-debug=no --with-dlog"
 
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm7627a', ' --enable-target=msm7627a', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target=msm8960', '', d)}"
