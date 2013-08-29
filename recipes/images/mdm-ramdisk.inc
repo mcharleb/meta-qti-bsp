@@ -31,16 +31,23 @@ do_ramdisk_create() {
         cp ${IMAGE_ROOTFS}/lib/librt.so.1 lib/librt.so.1
         cp ${IMAGE_ROOTFS}/lib/libpthread.so.0 lib/libpthread.so.0
         cp ${IMAGE_ROOTFS}/lib/ld-linux.so.3 lib/ld-linux.so.3
+        cp ${IMAGE_ROOTFS}/lib/libgcc_s.so.1 lib/libgcc_s.so.1
+        cp ${IMAGE_ROOTFS}/lib/libdl.so.2 lib/libdl.so.2
+        cp ${IMAGE_ROOTFS}/etc/init.d/mdev etc/init.d/
+        cp ${IMAGE_ROOTFS}/etc/mdev.conf etc/
+        cp -r ${IMAGE_ROOTFS}/etc/mdev etc/
         cp ${COREBASE}/meta-msm/recipes/busybox/files/fstab etc/
         cp ${COREBASE}/meta-msm/recipes/busybox/files/inittab etc/
         cp ${COREBASE}/meta-msm/recipes/busybox/files/profile etc/
         cp ${COREBASE}/meta-msm/recipes/busybox/files/rcS etc/init.d
+        cat etc/init.d/mdev >> etc/init.d/rcS
 
         ln -s bin/busybox init
         ln -s busybox bin/sh
         ln -s busybox bin/echo
         ln -s busybox bin/mount
         ln -s busybox bin/umount
+        ln -s busybox bin/mdev
 
         #gen_initramfs_list.sh expects to be run from kernel directory
         cd ${STAGING_KERNEL_DIR}
