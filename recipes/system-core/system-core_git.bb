@@ -37,9 +37,13 @@ do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
    install -m 0755 ${S}/usb/usb_composition -D ${D}${bindir}/
+   install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${bindir}/
    install -m 0755 ${S}/usb/target -D ${D}${bindir}/usb/target
    install -d ${D}${bindir}/usb/compositions/
    install -m 0755 ${S}/usb/compositions/* -D ${D}${bindir}/usb/compositions/
+   install -d ${D}${bindir}/usb/debuger/
+   install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${bindir}/usb/debuger/
+   install -m 0755 ${S}/usb/debuger/help -D ${D}${bindir}/usb/debuger/
    ln -s /usr/bin/usb/compositions/9025 ${D}${bindir}/usb/boot_hsusb_composition
    ln -s /usr/bin/usb/compositions/empty ${D}${bindir}/usb/boot_hsic_composition
 }
@@ -75,7 +79,7 @@ FILES_${PN}-adbd-dbg = "/sbin/.debug/adbd"
 FILES_${PN}-adbd     = "/sbin/adbd ${sysconfdir}/init.d/adbd"
 
 PACKAGES =+ "${PN}-usb"
-FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${bindir}/usb_composition ${bindir}/usb_composition_switch ${bindir}/usb/compositions/* ${bindir}/usb/*"
+FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${bindir}/usb_composition ${bindir}/usb_composition_switch ${bindir}/usb/compositions/* ${bindir}/usb/*  ${bindir}/usb_debug ${bindir}/usb/debuger/*"
 
 PACKAGES =+ "${PN}-liblog-dbg ${PN}-liblog ${PN}-liblog-dev ${PN}-liblog-static"
 FILES_${PN}-liblog-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
