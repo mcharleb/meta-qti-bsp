@@ -48,7 +48,7 @@ do_rootfs_append() {
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
         --ramdisk /dev/null \
-        --cmdline "noinitrd root=/dev/mtdblock16 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3" \
+        --cmdline "noinitrd root=/dev/mtdblock17 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3" \
         --base 0x00300000 \
         --tags-addr 0x06800000 \
         --ramdisk_offset 0x0 \
