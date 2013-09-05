@@ -8,7 +8,7 @@ SRC_URI += "file://files/50-log.rules"
 
 DEPENDS = "zlib"
 
-PR = "r8"
+PR = "r9"
 
 inherit autotools
 
@@ -21,6 +21,7 @@ inherit update-rc.d
 
 EXTRA_OECONF_append_msm8960 = " --with-host-os=${HOST_OS}"
 EXTRA_OECONF_append_msm8974 = " --with-host-os=${HOST_OS}"
+EXTRA_OECONF_append_msm8610 = " --with-host-os=${HOST_OS}"
 
 do_install_append() {
    install -m 0755 -d ${D}${includedir}/cutils
@@ -55,6 +56,12 @@ do_install_append_msm8960 () {
 }
 
 do_install_append_msm8974 () {
+	install -d ${DEPLOY_DIR}/host/linux/bin
+	install ${D}/usr/bin/adb ${DEPLOY_DIR}/host/linux/bin
+	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
+}
+
+do_install_append_msm8610 () {
 	install -d ${DEPLOY_DIR}/host/linux/bin
 	install ${D}/usr/bin/adb ${DEPLOY_DIR}/host/linux/bin
 	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
