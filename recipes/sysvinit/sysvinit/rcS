@@ -9,8 +9,9 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 runlevel=S
 prevlevel=N
+DISPLAY=:0.0
 umask 022
-export PATH runlevel prevlevel
+export PATH runlevel prevlevel DISPLAY
 
 #	Make sure proc is mounted
 #
