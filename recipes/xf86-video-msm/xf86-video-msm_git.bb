@@ -24,7 +24,7 @@ DEPENDS = "${RDEPENDS} \
            xproto \
            libtbm"
 
-DEPENDS += "virtual/kernel"
+DEPENDS += "virtual/kernel xdbg"
 
 #TODO: remove this once adreno200 symlinks are fixed
 INSANE_SKIP_${PN} = "dev-deps"
