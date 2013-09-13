@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e4dac5c6ab169aa212feb5028853a579"
 
 
 SECTION = "net"
-DEPENDS = "zlib libpcre"
+DEPENDS = "zlib libpcre openssl"
 RDEPENDS_${PN} += " \
                lighttpd-module-access \
                lighttpd-module-alias \
@@ -18,14 +18,18 @@ RDEPENDS_${PN} += " \
                lighttpd-module-staticfile \
                lighttpd-module-cgi \
                lighttpd-module-auth \
+               lighttpd-module-redirect \
                lighttpd-module-evasive \
 "
 
-PR = "r1"
+PR = "r2"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.bz2 \
         file://index.html.lighttpd \
         file://lighttpd.conf \
+        file://mdm9625.com.key \
+        file://mdm9625.com.pem \
+        file://openssl.cnf \
         file://lighttpd.user \
         file://lighttpd \
 "
@@ -41,7 +45,8 @@ EXTRA_OECONF = " \
              --with-pcre \
              --without-webdav-props \
              --without-webdav-locks \
-             --without-openssl \
+             --with-openssl \
+             --with-openssl-libs=/usr/lib \
              --disable-static \
 "
 
@@ -54,6 +59,9 @@ do_install_append() {
     install -d ${D}${sysconfdir}/init.d ${D}/www/logs ${D}/www/pages/dav ${D}/www/var
     install -m 0755 ${WORKDIR}/lighttpd ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/lighttpd.conf ${D}${sysconfdir}
+    install -m 0755 ${WORKDIR}/mdm9625.com.key ${D}${sysconfdir}
+    install -m 0755 ${WORKDIR}/mdm9625.com.pem ${D}${sysconfdir}
+    install -m 0755 ${WORKDIR}/openssl.cnf ${D}${sysconfdir}
     install -m 0755 ${WORKDIR}/lighttpd.user ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/index.html.lighttpd ${D}/www/pages/index.html
 }
