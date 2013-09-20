@@ -1,6 +1,6 @@
 inherit native
 
-PR = "r1"
+PR = "r2"
 
 MY_PN = "dtbtool"
 
@@ -13,7 +13,7 @@ PROVIDES = "dtbtool-native"
 # Handle do_fetch ourselves...  The automated tools don't work nicely with this...
 do_fetch () {
 	install -d ${S}
-	cp -rf ${WORKSPACE}/system/core/${MY_PN}/* ${S}
+	cp -rf ${WORKSPACE}/device/qcom/common/${MY_PN}/* ${S}
 	cp -f ${THISDIR}/files/makefile ${S}
 }
 
