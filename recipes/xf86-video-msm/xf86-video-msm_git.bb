@@ -8,8 +8,10 @@ PR = "r6"
 
 SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
+AS = "${WORKSPACE}/adreno200"
 
 EXTRA_OECONF_append += "--with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include"
+EXTRA_OECONF_append += "--with-c2d=${AS}"
 
 RDEPENDS += "xserver-xorg"
 
@@ -24,7 +26,7 @@ DEPENDS = "${RDEPENDS} \
            xproto \
            libtbm"
 
-DEPENDS += "virtual/kernel xdbg libdri2"
+DEPENDS += "virtual/kernel xdbg libdri2 adreno200"
 
 #TODO: remove this once adreno200 symlinks are fixed
 INSANE_SKIP_${PN} = "dev-deps"
@@ -32,5 +34,3 @@ INSANE_SKIP_${PN} = "dev-deps"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 ARM_INSTRUCTION_SET = "arm"
-
-CFLAGS += " -Wno-error "
