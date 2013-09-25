@@ -1,6 +1,6 @@
 inherit native
 
-PR = "r2"
+PR = "r3"
 
 MY_PN = "dtbtool"
 
@@ -15,6 +15,12 @@ do_fetch () {
 	install -d ${S}
 	cp -rf ${WORKSPACE}/device/qcom/common/${MY_PN}/* ${S}
 	cp -f ${THISDIR}/files/makefile ${S}
+}
+
+do_fetch_msm8974 () {
+        install -d ${S}
+        cp -rf ${WORKSPACE}/system/core/${MY_PN}/* ${S}
+        cp -f ${THISDIR}/files/makefile ${S}
 }
 
 do_install() {
