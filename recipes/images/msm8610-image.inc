@@ -44,6 +44,8 @@ IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
 IMAGE_INSTALL += "open-source-kernel-tests"
 IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "libtbm-msm"
+IMAGE_INSTALL += "libgenlock"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
