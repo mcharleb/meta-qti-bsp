@@ -41,6 +41,8 @@ do_ramdisk_create() {
         cp ${COREBASE}/meta-msm/recipes/busybox/files/profile etc/
         cp ${COREBASE}/meta-msm/recipes/busybox/files/rcS etc/init.d
         cat etc/init.d/mdev >> etc/init.d/rcS
+        cp ${IMAGE_ROOTFS}/bin/qrngd bin/qrngd
+        cp ${IMAGE_ROOTFS}/bin/qrngtest bin/qrngtest
 
         ln -s bin/busybox init
         ln -s busybox bin/sh
