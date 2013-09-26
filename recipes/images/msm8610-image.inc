@@ -42,6 +42,7 @@ IMAGE_INSTALL += "alsa-utils-speakertest"
 IMAGE_INSTALL += "alsa-utils-midi"
 IMAGE_INSTALL += "udev"
 IMAGE_INSTALL += "libstdc++"
+IMAGE_INSTALL += "open-source-kernel-tests"
 IMAGE_INSTALL += "init-audio"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
