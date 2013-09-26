@@ -46,6 +46,8 @@ IMAGE_INSTALL += "open-source-kernel-tests"
 IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "libtbm-msm"
 IMAGE_INSTALL += "libgenlock"
+IMAGE_INSTALL += "start-scripts-backlight"
+IMAGE_INSTALL += "start-scripts-usbnet"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
