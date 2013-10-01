@@ -7,7 +7,7 @@ SRC_URI = "file://${WORKSPACE}/mm-video-oss/mm-core"
 
 inherit autotools
 
-PR = "r10"
+PR = "r11"
 
 S = "${WORKDIR}/mm-core"
 
@@ -23,6 +23,7 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm7627a', ' --enable-target-msm7627a=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-target-msm8610=yes', '', d)}"
 
 FILES_${PN} = "\
     /usr/lib/* \
