@@ -30,6 +30,7 @@
 export KERNEL=`uname -r`
 export MODULE_BASE=/lib/modules/$KERNEL/updates
 export RETRY_LIMIT=5
+export ENUM_RETRY_LIMIT=1
 HELP="Usage $0 {start | stop | restart} <ap | ap,ap | sta,ap>"
 CONF_FILE="/etc/wlan_config"
 DEVICE_PATTERN="device=AR6003"
@@ -48,6 +49,8 @@ AR6004_AP1_HOSTAPD_CONF="/etc/AR6004_AP1_hostapd.conf"
 HOSTAPD_CONF="/etc/hostapd.conf"
 HOSTAPD_AP1_CONF="/etc/hostapd-wlan1.conf"
 HOSTAPD_STA_AP_CONF="/etc/sta_mode_hostapd.conf"
+retry=0
+AR6004_DEVID="0cf3:9374"
 
 do_ctrl_ar6004_hsic () {
     case "$1" in
@@ -87,6 +90,20 @@ do_ctrl_ar6004_hsic () {
 
         if [ $c -gt $RETRY_LIMIT ]; then
             echo "WLAN bring-up failed!"
+            lsusb | grep -q $AR6004_DEVID
+            if [ $? -ne 0 -a $retry -lt $ENUM_RETRY_LIMIT ]; then
+                echo "Enumeration failure, try again!"
+                do_ctrl_ar6004_hsic stop
+                sleep 1
+                if [ $start_ap1 -eq 1 ]; then
+                    #Assume sta,ap mode as first interface is sta interface
+                    #irrespective of sta,ap or ap,ap request
+                    do_ctrl_ar6004_hsic start sta,ap $@
+                else
+                    do_ctrl_ar6004_hsic start $@
+                fi
+                retry=`expr $retry + 1`
+            fi
             exit 1
         fi
 
@@ -122,9 +139,7 @@ do_ctrl_ar6004_hsic () {
         shift
         do_ctrl_ar6004_hsic start $@
 
-        if [ $? -ne 0 ]; then
-            return 1
-        fi
+        return $?
         ;;
 
     *)
