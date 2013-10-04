@@ -50,6 +50,8 @@ IMAGE_INSTALL += "start-scripts-backlight"
 IMAGE_INSTALL += "start-scripts-usbnet"
 IMAGE_INSTALL += "mm-image-codec"
 IMAGE_INSTALL += "camera-hal"
+IMAGE_INSTALL += "mm-core-oss"
+IMAGE_INSTALL += "mm-video-oss"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
