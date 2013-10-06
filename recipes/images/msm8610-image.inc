@@ -48,6 +48,8 @@ IMAGE_INSTALL += "libtbm-msm"
 IMAGE_INSTALL += "libgenlock"
 IMAGE_INSTALL += "start-scripts-backlight"
 IMAGE_INSTALL += "start-scripts-usbnet"
+IMAGE_INSTALL += "mm-image-codec"
+IMAGE_INSTALL += "camera-hal"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
