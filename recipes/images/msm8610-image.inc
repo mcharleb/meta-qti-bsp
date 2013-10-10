@@ -85,7 +85,7 @@ do_rootfs_append() {
 	${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
 		--ramdisk /dev/null \
-		--cmdline "noinitrd root=${MACHINE_ROOTDEV} rw init=/sbin/init --verbose loglevel=7 console=${MACHINE_CONSOLE},115200,n8 androidboot.hardware=qcom" \
+		--cmdline "noinitrd root=${MACHINE_ROOTDEV} rw init=/sbin/init --verbose loglevel=7 console=${MACHINE_CONSOLE},115200,n8 androidboot.hardware=qcom mem=256M@0x00000000 nr_cpus=2" \
 		--base ${MACHINE_KERNEL_BASE} \
 		--tags-addr ${MACHINE_KERNEL_TAGS_OFFSET} \
 		--output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
