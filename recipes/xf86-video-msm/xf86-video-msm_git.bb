@@ -4,7 +4,7 @@ DESCRIPTION = "X.Org X server -- MSM display driver"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-PR = "r7"
+PR = "r8"
 
 SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
@@ -30,9 +30,8 @@ DEPENDS = "${RDEPENDS} \
            virtual/kernel \
            xdbg \
            xf86driproto \
-           xproto"
-
-DEPENDS += "${@base_conditional('BASEMACHINE', 'msm8974', 'adreno200', '', d)}"
+           xproto \
+           adreno200"
 
 #TODO: remove this once adreno200 symlinks are fixed
 INSANE_SKIP_${PN} = "dev-deps"
