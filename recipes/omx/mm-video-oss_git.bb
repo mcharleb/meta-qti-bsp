@@ -4,13 +4,12 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 SRC_URI = "file://${WORKSPACE}/mm-video-oss"
 
-PR = "r16"
+PR = "r17"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-core-oss"
 DEPENDS += "adreno200"
-RDEPENDS = "mm-video-prop"
 INSANE_SKIP = 1
 
 # Need the kernel headers
@@ -31,6 +30,7 @@ EXTRA_OECONF_append = " --with-common-includes=${STAGING_INCDIR}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-target-msm8610=yes', '', d)}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
 CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
