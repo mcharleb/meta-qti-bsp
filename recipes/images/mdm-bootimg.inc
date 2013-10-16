@@ -37,13 +37,20 @@ do_rootfs_append() {
 
     ${STAGING_BINDIR_NATIVE}/dtbtool ${STAGING_KERNEL_DIR}/arch/arm/boot/dts/ -o ${STAGING_DIR_TARGET}/boot/masterDTB -p ${STAGING_KERNEL_DIR}/scripts/dtc/ -v
 
+    kernelbase=0x00000000
+    kernelsize=`awk --non-decimal-data '/ _end/ {end="0x" $1} /_stext/ {beg="0x" $1} END {size1=end-beg+4096; size=and(size1,compl(4095)); printf("%#x",size)}' ${STAGING_DIR_TARGET}/boot/System.map-${ver}`
+    __kernelbase=`echo ${kernelbase} | sed 's/0x//'`
+    __kernelsize=`echo ${kernelsize} | sed 's/0x//'`
+    __ramdiskbase=`echo "ibase=16; ${__kernelsize}+${__kernelbase}" | bc`
+    ramdiskbase="0x"`echo "obase=16;${__ramdiskbase}" | bc`
+
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
-        --ramdisk /dev/null \
-        --cmdline "noinitrd root=/dev/mtdblock17 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3" \
-        --base 0x00300000 \
-        --tags-addr 0x06800000 \
-        --ramdisk_offset 0x0 \
+        --ramdisk ${DEPLOY_DIR_IMAGE}/${PN}-initrd.gz \
+        --cmdline "noinitrd root=/dev/mtdblock15 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 mem=16M@0x00000000 mem=17M@0x06D00000 mem=128M@0x08000000" \
+        --base ${kernelbase} \
+        --tags-addr 0x00900000 \
+        --ramdisk_offset ${ramdiskbase} \
         --output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
 }
