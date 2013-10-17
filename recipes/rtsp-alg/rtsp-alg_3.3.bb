@@ -3,7 +3,7 @@ DESCRIPTION = "RSTP ALG"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;md5=afa391a5db8f879772af6fead894dac1"
 
-PR = "r0"
+PR = "r1"
 
 KERNEL_VERSION = "${@get_kernelversion('${STAGING_KERNEL_DIR}')}"
 
@@ -15,12 +15,14 @@ FILES_${PN} += "\
     ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/netfilter/nf_conntrack_rtsp.ko \
     "
 
-SRC_URI = "git://github.com/maru-sama/rtsp-linux-v2.6.git;protocol=git;tag=3.3 \
+SRC_URI = "http://github.com/maru-sama/rtsp-linux-v2.6/archive/${PV}.tar.gz \
 		file://Makefile.patch \
 "
+SRC_URI[md5sum]    = "e59284768c8dec69dbace22196e9dee8"
+SRC_URI[sha256sum] = "2f5e516790bc6e5f10b020643fff2746fdfec3c503a70b64b21e5acdc49ccd42"
 
 
-S = "${WORKDIR}/git"
+S = "${WORKDIR}/rtsp-linux-v2.6-${PV}"
 do_configure() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS CC LD CPP
 	oe_runmake 'MODPATH="${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net"' \
