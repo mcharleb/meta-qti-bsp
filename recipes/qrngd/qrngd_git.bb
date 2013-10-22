@@ -19,4 +19,6 @@ inherit update-rc.d
 
 do_install_append() {
         install -m 0755 ${WORKDIR}/qrngd/start_qrngd -D ${D}${sysconfdir}/init.d/qrngd
+        install -m 0755 ${S}/qrngd -D ${D}/bin/qrngd
+        install -m 0755 ${S}/qrngtest -D ${D}/bin/qrngtest
 }
