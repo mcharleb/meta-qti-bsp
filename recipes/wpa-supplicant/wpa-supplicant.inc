@@ -8,7 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 FILES_${PN} += "\
         /usr/sbin \
         "
-INC_PR = "r2"
+INC_PR = "r3"
 
 DEPENDS = "openssl libnl"
 
@@ -17,5 +17,5 @@ SRC_URI = "file://${WORKSPACE}/external/hostap"
 S = "${WORKDIR}/hostap/wpa_supplicant"
 
 do_install() {
-    make install DESTDIR=${D}
+    make install DESTDIR=${D} BINDIR=${sbindir}/
 }
