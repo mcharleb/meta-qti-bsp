@@ -104,7 +104,7 @@ do_savedefconfig() {
 addtask savedefconfig after do_configure
 
 do_compile () {
-	oe_runmake ${KERNEL_IMAGETYPE} O=${O}
+	oe_runmake O=${O}
 	uses_modules && oe_runmake modules O=${O}
 }
 
