@@ -15,7 +15,7 @@ DEPENDS = " \
 DEPENDS += ${@base_conditional('MACHINE', 'mdmkrypton', '', 'virtual/bootloader', d)}
 
 # Image output types
-IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
+IMAGE_FSTYPES = "tar.gz ext4 yaffs2 ${INITRAMFS_FSTYPES}"
 
 # Make the bootimg image file using the information available in the sysroot...
 do_rootfs_append_mdmkrypton() {
