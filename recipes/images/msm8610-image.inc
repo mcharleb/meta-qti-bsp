@@ -53,6 +53,9 @@ IMAGE_INSTALL += "camera-hal"
 IMAGE_INSTALL += "mm-core-oss"
 IMAGE_INSTALL += "mm-video-oss"
 IMAGE_INSTALL += "wcnss"
+IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "dhcp-client"
+IMAGE_INSTALL += "wlan-opensource"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
