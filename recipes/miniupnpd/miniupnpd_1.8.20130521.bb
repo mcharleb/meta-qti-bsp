@@ -10,10 +10,10 @@ DEPENDS = "data"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r3"
+PR = "r4"
 
 SRC_URI = "\
-    http://miniupnp.free.fr/files/download.php?file=${PN}-${PV}.tar.gz \
+    https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
     file://0001-upstream-fixes.patch \
     file://0001-enable-backhaul.patch \
