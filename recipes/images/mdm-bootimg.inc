@@ -4,6 +4,7 @@ require mdm-ramdisk.inc
 # our yaffs2 image...
 DEPENDS = " \
     virtual/kernel \
+    virtual/bootloader \
     pkgconfig-native \
     gtk-doc-native \
     gettext-native \
@@ -12,7 +13,6 @@ DEPENDS = " \
     kernel-tests \
     dtbtool-native \
 "
-DEPENDS += ${@base_conditional('MACHINE', 'mdmkrypton', '', 'virtual/bootloader', d)}
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz ext4 yaffs2 ${INITRAMFS_FSTYPES}"
