@@ -47,10 +47,10 @@ do_rootfs_append() {
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
-        --ramdisk ${DEPLOY_DIR_IMAGE}/${PN}-initrd.gz \
+        --ramdisk /dev/null \
         --cmdline "noinitrd root=/dev/mtdblock15 rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 mem=16M@0x00000000 mem=17M@0x06D00000 mem=128M@0x08000000" \
         --base ${kernelbase} \
-        --tags-addr 0x00900000 \
-        --ramdisk_offset ${ramdiskbase} \
+        --tags-addr 0x00f00000 \
+        --ramdisk_offset 0x0 \
         --output ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img
 }
