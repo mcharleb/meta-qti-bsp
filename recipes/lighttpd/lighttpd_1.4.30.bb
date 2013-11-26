@@ -22,7 +22,7 @@ RDEPENDS_${PN} += " \
                lighttpd-module-evasive \
 "
 
-PR = "r2"
+PR = "r3"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.bz2 \
         file://index.html.lighttpd \
@@ -62,7 +62,7 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/mdm9625.com.key ${D}${sysconfdir}
     install -m 0755 ${WORKDIR}/mdm9625.com.pem ${D}${sysconfdir}
     install -m 0755 ${WORKDIR}/openssl.cnf ${D}${sysconfdir}
-    install -m 0755 ${WORKDIR}/lighttpd.user ${D}${sysconfdir}
+    install -m 0770 ${WORKDIR}/lighttpd.user ${D}/www/lighttpd.user
     install -m 0644 ${WORKDIR}/index.html.lighttpd ${D}/www/pages/index.html
 }
 
