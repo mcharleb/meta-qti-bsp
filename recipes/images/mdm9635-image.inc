@@ -11,7 +11,7 @@ DEPENDS = " \
 "
 
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
+IMAGE_FSTYPES = "tar.gz ubi ${INITRAMFS_FSTYPES} "
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
@@ -92,5 +92,5 @@ IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/
 
 do_rootfs_append() {
 
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.yaffs2 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.yaffs2
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ubi
 }
