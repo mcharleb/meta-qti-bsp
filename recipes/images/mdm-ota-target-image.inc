@@ -20,6 +20,10 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/META
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM
+mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RADIO
+
+# copy radio directory content into RADIO directory
+cp -r ${WORKSPACE}/oe-core/meta-msm/recipes/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS}/RADIO/.
 
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
