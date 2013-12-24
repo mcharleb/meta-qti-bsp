@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 SRC_URI = "file://${WORKSPACE}/system/core"
 SRC_URI += "file://files/50-log.rules"
 
-DEPENDS = "zlib"
+DEPENDS = "zlib openssl glib-2.0 libcap"
 
-PR = "r9"
+PR = "r10"
 
 inherit autotools
 
