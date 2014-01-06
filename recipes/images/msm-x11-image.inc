@@ -2,7 +2,6 @@
 
 XSERVER = "xserver-xorg \
            xf86-input-evdev \
-           xf86-video-msm \
            xcb-util \
            libxcb-dri2 \
            libxcb-xfixes \

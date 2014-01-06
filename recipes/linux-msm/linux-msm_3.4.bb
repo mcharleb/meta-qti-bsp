@@ -8,7 +8,7 @@ inherit linux-kernel-base localgit
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(msm7627a|msm8655|msm8960|msm8960-perf|msm8974|msm8974-perf|msm8610|msm8610-perf)"
+COMPATIBLE_MACHINE = "(msm7627a|msm8655|msm8960|msm8960-perf|msm8974|msm8974-perf|msm8610|msm8610-perf|msm8226|msm8226-perf)"
 
 # Moved to here from the distro.conf file because it really kind of belongs
 # here and we're moving more to being a BSP with the MSM linux distro...
@@ -16,12 +16,13 @@ KERNEL_IMAGETYPE = "Image"
 KERNEL_IMAGETYPE_msm8960 = "zImage"
 KERNEL_IMAGETYPE_msm8974 = "zImage"
 KERNEL_IMAGETYPE_msm8610 = "zImage"
+KERNEL_IMAGETYPE_msm8226 = "zImage"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r8"
+PR = "r9"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc"
