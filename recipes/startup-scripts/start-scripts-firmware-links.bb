@@ -13,6 +13,7 @@ PR = "r2"
 inherit update-rc.d
 
 INITSCRIPT_NAME = "firmware-links.sh"
+INITSCRIPT_PARAMS_mdmkrypton = "start 01 2 3 4 5 . stop 99 0 1 6 ."
 
 do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/firmware-links.sh -D ${D}${sysconfdir}/init.d/firmware-links.sh
