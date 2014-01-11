@@ -122,26 +122,26 @@ string_mask = nombstr
 # req_extensions = v3_req # The extensions to add to a certificate request
 
 [ req_distinguished_name ]
-C                      = IN
-ST                     = Andhrapradesh
-L                      = Hyderabad
-O                      = Qualcomm Inc
-OU                     = MobileAP
+C                      = US
+ST                     = Middle Earth
+L                      = Mordor
+O                      = The One Ring Ltd
+OU                     = YourID
 CN                     = webserver
-emailAddress           = mobileap@qti.qualcomm.com
+emailAddress           = yourid@yoursite.com
 #countryName           = "prompt"
-#countryName_default   = IN
+#countryName_default   = US
 #countryName_min       = 2
 #countryName_max       = 2
 #
 #stateOrProvinceName		= State or Province Name (full name)
-#stateOrProvinceName_default	= Andhrapradesh
+#stateOrProvinceName_default	= Middle Earth
 #
 #localityName			= Locality Name (eg, city)
-#localityName_default		= Hyderabad
+#localityName_default		= Mordor
 #
 #0.organizationName		= Organization Name (eg, company)
-#0.organizationName_default	= Qualcomm Inc
+#0.organizationName_default	= The One Ring Ltd
 
 # we can do this but it is not needed normally :-)
 #1.organizationName		= Second Organization Name (eg, company)
@@ -151,11 +151,11 @@ emailAddress           = mobileap@qti.qualcomm.com
 #organizationalUnitName_default	=MobileAP
 
 #commonName			= Common Name (eg, YOUR name)
-#commonName_default		= lighttpd webserver
+#commonName_default		= webserver
 #commonName_max			= 64
 
 #emailAddress			= Email Address
-#emailAddress_default		= mobileap@qti.qualcomm.com
+#emailAddress_default		= yourid@yoursite.com
 #emailAddress_max		= 64
 
 # SET-ex3			= SET extension number 3
