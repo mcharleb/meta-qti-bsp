@@ -6,9 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 PR = "r0"
 
 # Provide a baseline
-SRC_URI_mdmkrypton = "file://${WORKSPACE}/device/qcom/krypton"
+SRC_URI_mdm9635 = "file://${WORKSPACE}/device/qcom/krypton"
 SRC_URI ?= "file://${WORKSPACE}/device/qcom/krypton"
 
 # Update for each machine
-S_mdmkrypton = "${WORKDIR}/krypton"
+S_mdm9635 = "${WORKDIR}/krypton"
 S ?= "${WORKDIR}/krypton"

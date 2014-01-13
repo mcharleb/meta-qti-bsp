@@ -18,10 +18,6 @@ DEPENDS = " \
 IMAGE_FSTYPES = "tar.gz ext4 yaffs2 ${INITRAMFS_FSTYPES}"
 
 # Make the bootimg image file using the information available in the sysroot...
-do_rootfs_append_mdmkrypton() {
-    # Make ramdisk
-    do_ramdisk_create
-}
 
 do_rootfs_append() {
     # Make bootimage
