@@ -36,12 +36,11 @@ export KERNEL=`uname -r`
 case "$1" in
 start)
     echo -n "Starting init_qcom_audio: "
-    insmod /usr/lib/modules/$KERNEL/kernel/arch/arm/mach-msm/qdsp6v2/adsp-loader.ko
+    echo 1 > /sys/kernel/boot_adsp/boot 
     echo "done"
     ;;
   stop)
     echo -n "Stopping init_qcom_audio: "
-    rmmod /usr/lib/modules/$KERNEL/kernel/arch/arm/mach-msm/qdsp6v2/adsp-loader.ko
     echo "done"
     ;;
   restart)

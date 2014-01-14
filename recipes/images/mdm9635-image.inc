@@ -34,7 +34,7 @@ IMAGE_INSTALL += "hostap-daemon-qcacld"
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
-#IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
 
 IMAGE_INSTALL += "iptables"
