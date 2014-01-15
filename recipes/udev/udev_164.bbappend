@@ -1,4 +1,4 @@
-PRINC = "10"
+PRINC = "11"
 
 FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
 
@@ -11,6 +11,8 @@ SRC_URI_append_msm8974 += "file://${BASEMACHINE}/local.rules \
                            file://${BASEMACHINE}/set-dev-nodes.sh"
 SRC_URI_append_msm8610 += "file://${BASEMACHINE}/local.rules \
                            file://${BASEMACHINE}/set-dev-nodes.sh"
+SRC_URI_append_msm8226 += "file://${BASEMACHINE}/local.rules \
+                           file://${BASEMACHINE}/set-dev-nodes.sh"
 
 do_install_append_msm8974 () {
      install -d ${D}${sysconfdir}/udev/scripts/
@@ -18,6 +20,11 @@ do_install_append_msm8974 () {
 }
 
 do_install_append_msm8610 () {
+     install -d ${D}${sysconfdir}/udev/scripts/
+     install -m 0755 ${FILESEXTRAPATHS}/${BASEMACHINE}/set-dev-nodes.sh ${D}${sysconfdir}/udev/scripts/set-dev-nodes.sh
+}
+
+do_install_append_msm8226 () {
      install -d ${D}${sysconfdir}/udev/scripts/
      install -m 0755 ${FILESEXTRAPATHS}/${BASEMACHINE}/set-dev-nodes.sh ${D}${sysconfdir}/udev/scripts/set-dev-nodes.sh
 }
