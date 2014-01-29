@@ -50,6 +50,10 @@ IMAGE_INSTALL += "open-source-kernel-tests"
 #IMAGE_INSTALL += "libgenlock"
 #IMAGE_INSTALL += "mm-image-codec"
 IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "wcnss"
+IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "dhcp-client"
+IMAGE_INSTALL += "wlan-opensource"
 
 # Convenience: build a compatible GDB and install gdbserver on the image
 DEPENDS += "gdb-cross"
