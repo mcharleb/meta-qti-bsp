@@ -48,7 +48,7 @@ pkg_postinst_${PN}-shutdown () {
 pkg_postinst_${PN}-powerconfig () {
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         update-rc.d $OPT -f power_config remove
-        update-rc.d $OPT power_config start 50 2 3 4 5 . stop 50 0 1 6 .
+        update-rc.d $OPT power_config start 99 2 3 4 5 . stop 50 0 1 6 .
 }
 
 pkg_postinst () {
