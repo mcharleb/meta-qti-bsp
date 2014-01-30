@@ -14,7 +14,7 @@ inherit autotools
 
 S = ${WORKDIR}/init-audio
 INITSCRIPT_NAME = "init_qcom_audio"
-INITSCRIPT_PARAMS = "start 30 2 3 4 5 . stop 80 0 1 6 ."
+INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 1 0 1 6 ."
 
 do_install() {
     install -m 0755 ${S}/../files/init_qcom_audio -D ${D}${sysconfdir}/init.d/init_qcom_audio
@@ -31,5 +31,5 @@ do_install_msm8610() {
 pkg_postinst() {
     [ -n "$$D" ] && OPT="-r $D" || OPT="-s"
     update-rc.d $OPT -f init_qcom_audio
-    update-rc.d $OPT init_qcom_audio start 30 2 3 4 5 . stop 80 0 1 6 .
+    update-rc.d $OPT init_qcom_audio start 99 2 3 4 5 . stop 1 0 1 6 .
 }
