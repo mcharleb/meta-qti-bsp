@@ -1,9 +1,8 @@
 # List of packages to be installed by msm-x11-image
 
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
 XSERVER = "xserver-xorg \
            xf86-input-evdev \
+           xf86-video-msm \
            xcb-util \
            libxcb-dri2 \
            libxcb-xfixes \
@@ -11,9 +10,6 @@ XSERVER = "xserver-xorg \
            libx11-xcb \
            xserver-xf86-config "
 
-XF86_VIDEO_MSM = "${@ '' if BASEMACHINE == 'msm8226' else 'xf86-video-msm'}"
-
-IMAGE_INSTALL += "${XF86_VIDEO_MSM}"
 IMAGE_INSTALL += "${XSERVER}"
 IMAGE_INSTALL += "${POKY_BASE_INSTALL}"
 
