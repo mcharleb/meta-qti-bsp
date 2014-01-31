@@ -22,6 +22,11 @@ do_install_append_msm8610() {
    cp -pPr ${S}/firmware_bin/* ${D}/lib/firmware/wlan/prima
 }
 
+do_install_append_msm8226() {
+   mkdir -p ${D}/lib/firmware/wlan/prima
+   cp -pPr ${S}/firmware_bin/* ${D}/lib/firmware/wlan/prima
+}
+
 INITSCRIPT_NAME = "set_wcnss_mode"
 INITSCRIPT_PARAMS = "start 80 2 3 4 5 . stop 20 0 1 6 ."
 
