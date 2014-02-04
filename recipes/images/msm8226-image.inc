@@ -59,7 +59,7 @@ IMAGE_INSTALL += "wlan-opensource"
 DEPENDS += "gdb-cross"
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "strace"
-#IMAGE_INSTALL += "loc-api"
+IMAGE_INSTALL += "loc-api"
 #IMAGE_INSTALL += "msm7k"
 
 IMAGE_PREPROCESS_COMMAND += "mv ${IMAGE_ROOTFS}/lib/modules ${IMAGE_ROOTFS}/usr/lib;"
