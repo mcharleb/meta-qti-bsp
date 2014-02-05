@@ -33,9 +33,6 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
-mkdir -p /firmware
-mount -t yaffs2 /dev/mtdblock9 /firmware
-
 # Check for images and set up symlinks
 cd /firmware/image
 
