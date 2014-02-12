@@ -18,7 +18,8 @@ BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 LIBGCC_9615-cdp    = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
 LIBGCC_mdm9625     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
-LIBGCC_mdm9635  = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
+LIBGCC_mdm9635     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
+LIBGCC_msm8226     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
 
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_9615-cdp = "mdm9615"
