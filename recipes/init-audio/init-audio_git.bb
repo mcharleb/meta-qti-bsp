@@ -3,6 +3,8 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 PR = "r4"
 
+DEPENDS_append_mdm9635 +="alsa-intf"
+
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
