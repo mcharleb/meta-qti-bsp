@@ -3,7 +3,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
-PR = "r7"
+PR = "r8"
 
 SRC_URI = "file://${WORKSPACE}/camera-hal \
            file://camera_parameters_header_include_patch.txt \
@@ -42,6 +42,8 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm7627a', ' --enable
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target=msm8960', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target=msm8974', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-target=msm8610', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8226', ' --enable-target=msm8226', '', d)}"
+EXTRA_OECONF_append = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/hardware/libhardware/include -I${WORKSPACE}/base/include -I${WORKSPACE}/system/core/include -I${WORKSPACE}/mm-video-oss/libstagefrighthw""
 
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
 EXTRA_OECONF_append_msm8960 = " --with-additional-include-directives="-I${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/mm-still/omx/inc/""
@@ -55,6 +57,7 @@ CPPFLAGS += "-I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 FILES_${PN}_append_msm8960 += "/usr/lib/hw/*"
 FILES_${PN}_append_msm8974 += "/usr/lib/*"
 FILES_${PN}_append_msm8610 += "/usr/lib/*"
+FILES_${PN}_append_msm8226 += "/usr/lib/*"
 
 # The camera-hal package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
