@@ -10,6 +10,7 @@ DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-core-oss"
 DEPENDS += "adreno200"
+RDEPENDS = "mm-video-prop"
 INSANE_SKIP = 1
 
 # Need the kernel headers
@@ -31,6 +32,7 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)}"
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-target-msm8610=yes', '', d)}"
+EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8226', ' --enable-target-msm8226=yes', '', d)}"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
 CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
