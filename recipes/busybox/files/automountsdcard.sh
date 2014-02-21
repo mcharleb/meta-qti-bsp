@@ -1,21 +1,29 @@
 #! /bin/sh
 
-if [ "$1" == "" ]; then
-    exit 1
-fi
+destdir=/media/card
 
-mmcblk=`ls /dev | grep $1 | wc -l`
-mounted=`mount | grep $1 | wc -l`
+umount_partition()
+{
+        if grep -qs "^/dev/$1 " /proc/mounts ; then
+                umount "${destdir}";
+        fi
+}
 
-if [ $mmcblk -ge 1 ]; then
-    if [ $mounted -le 0 ]; then
-        mount /dev/$1 /media/card
-    fi
-fi
+mount_partition()
+{
+        if ! mount -t auto -o sync "/dev/$1" "${destdir}"; then
+                # failed to mount
+                exit 1
+        fi
+}
 
-if [ $mmcblk -le 0 ]; then
-    if [ $mounted -ge 0 ]; then
-        umount /media/card
-    fi
-fi
+case "${ACTION}" in
+add|"")
+        umount_partition ${MDEV}
+        mount_partition ${MDEV}
+        ;;
+remove)
+        umount_partition ${MDEV}
+        ;;
+esac
 
