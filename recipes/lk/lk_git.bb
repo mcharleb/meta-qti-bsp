@@ -6,8 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=0835ade698e0bcf8506ecda2f7b4f302"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 PROVIDES = "virtual/bootloader"
-SRC_URI  = "file://${WORKSPACE}/bootable/bootloader/lk \
-            file://mdm9615-ld.patch"
+SRC_URI  = "file://${WORKSPACE}/bootable/bootloader/lk"
 S        = "${WORKDIR}/${PN}"
 PR       = "r11"
 
