@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 FILES_${PN} += "${base_libdir}/firmware/wlan/*"
 
-PR = "r2"
+PR = "r3"
 
 SRC_URI = "file://${WORKSPACE}/wlan/qcacld-2.0"
 
@@ -21,4 +21,7 @@ do_install() {
     install -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${FIRMWARE_PATH}/
     install -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${FIRMWARE_PATH}/
     install -m 0644 ${S}/firmware_bin/WCNSS_qcom_wlan_nv.bin ${FIRMWARE_PATH}/
+    touch ${FIRMWARE_PATH}/wlan_mac.bin
+
+    install -m 0644 CORE/SVC/external/wlan_nlink_common.h -D ${D}${includedir}/qcacld/wlan_nlink_common.h
 }
