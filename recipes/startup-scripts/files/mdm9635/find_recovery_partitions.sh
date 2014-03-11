@@ -46,9 +46,7 @@ FindAndMount () {
    UpdateRecoveryVolume $1 $2 $3
 }
 
-FindAndMount userdata /data yaffs2
 FindAndMount cache /cache yaffs2
-FindAndMount system /system yaffs2
 FindAndMount misc /misc mtd
 FindAndMount modem /firmware yaffs2
 
