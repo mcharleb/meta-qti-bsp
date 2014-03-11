@@ -1,7 +1,17 @@
-# The mkbootimg production process.
-require mdm-bootimg.inc
+# Rootfs creation.
+
+DEPENDS = " \
+             virtual/kernel \
+             virtual/bootloader \
+             pkgconfig-native \
+             gtk-doc-native \
+             gettext-native \
+             yaffs2-utils-native \
+             kernel-tests \
+"
 
 # The OE-Core minimal boot image files.
+IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
@@ -78,3 +88,7 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
 IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
 
+do_rootfs_append() {
+
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.yaffs2 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.yaffs2
+}

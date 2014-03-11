@@ -20,9 +20,9 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM
 
 # copy the boot\recovery images
-cp ${DEPLOY_DIR_IMAGE}/mdm-image-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
+cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/boot.img
 
-cp ${DEPLOY_DIR_IMAGE}/${PN}-boot-${MACHINE}.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
+cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
 
 # copy the contents of system rootfs
 cp -r ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/mdm-image-1.0-r0/rootfs/. ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM/.
@@ -39,7 +39,7 @@ echo /recovery mtd     recovery >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.
 echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab
 
 #Copy contents of userdata rootfs
-cp -r ${TMPDIR}/rootfs/mdm9625-usr-image/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
+cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
 #Remove fota dir and ipth_dme binary from userdata. We dont want to update them
 rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/fota
 rm ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
