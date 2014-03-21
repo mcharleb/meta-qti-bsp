@@ -45,8 +45,8 @@ IMAGE_INSTALL += "hostap-daemon-qcacld"
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
 IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "iproute2"
-
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "iw"
 #IMAGE_INSTALL += "jquery"
