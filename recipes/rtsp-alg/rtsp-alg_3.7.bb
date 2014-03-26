@@ -1,7 +1,7 @@
 inherit autotools linux-kernel-base module
 DESCRIPTION = "RSTP ALG"
 LICENSE = "GPLv2"
-LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;md5=afa391a5db8f879772af6fead894dac1"
+LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;md5=36ca2796518e389a90260ef560cdab1f"
 
 PR = "r1"
 
@@ -15,14 +15,14 @@ FILES_${PN} += "\
     ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/netfilter/nf_conntrack_rtsp.ko \
     "
 
-SRC_URI = "http://github.com/maru-sama/rtsp-linux-v2.6/archive/${PV}.tar.gz \
+SRC_URI = "http://github.com/maru-sama/rtsp-linux/archive/${PV}.tar.gz \
 		file://Makefile.patch \
 "
-SRC_URI[md5sum]    = "e59284768c8dec69dbace22196e9dee8"
-SRC_URI[sha256sum] = "2f5e516790bc6e5f10b020643fff2746fdfec3c503a70b64b21e5acdc49ccd42"
+SRC_URI[md5sum]    = "5cc2be642a0d6ff8817d72d459e76606"
+SRC_URI[sha256sum] = "bd14b5f8f0bc8db3db93735b2a7eca2790454c2dc200d95becd283b043b8b94d"
 
 
-S = "${WORKDIR}/rtsp-linux-v2.6-${PV}"
+S = "${WORKDIR}/rtsp-linux-${PV}"
 do_configure() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS CC LD CPP
 	oe_runmake 'MODPATH="${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net"' \
