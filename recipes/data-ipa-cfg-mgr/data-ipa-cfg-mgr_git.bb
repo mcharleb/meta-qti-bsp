@@ -22,7 +22,7 @@ S = "${WORKDIR}/data-ipa-cfg-mgr"
 pkg_postinst () {
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         update-rc.d $OPT -f start_ipacm_le remove
-        update-rc.d $OPT start_ipacm_le start 90 2 3 4 5 . stop 10 0 1 6 .
+        update-rc.d $OPT start_ipacm_le start 38 S . stop 62 0 1 6 .
 
 }
 
