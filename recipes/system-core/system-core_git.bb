@@ -15,7 +15,7 @@ inherit autotools
 S = "${WORKDIR}/core"
 
 INITSCRIPT_NAME = "adbd"
-INITSCRIPT_PARAMS = "start 38 S 2 3 4 5 S . stop 62 0 1 6 ."
+INITSCRIPT_PARAMS = "start 38 S . stop 62 0 1 6 ."
 
 inherit update-rc.d
 
