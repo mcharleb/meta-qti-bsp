@@ -48,10 +48,8 @@ EXTRA_OECONF = " \
              --disable-static \
 "
 
-inherit autotools pkgconfig update-rc.d gettext
+inherit autotools pkgconfig gettext
 
-INITSCRIPT_NAME = "lighttpd"
-INITSCRIPT_PARAMS = "defaults 70"
 
 do_install_append() {
     install -d ${D}${sysconfdir}/init.d ${D}/www/logs ${D}/www/pages/dav ${D}/www/var
