@@ -154,12 +154,17 @@ do_deploy () {
     kernelbase=0x00000000
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-
+    machine=`echo ${MACHINE}`
+     __cmdparams='noinitrd  rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
+    if [ "${machine}" == "mdm9635" ]; then
+       __cmdparams+=' msm_rtb.filter=0x37'
+    fi
+    cmdparams=`echo ${__cmdparams}`
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
         --ramdisk /dev/null \
-        --cmdline "noinitrd  rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37"\
+        --cmdline "${cmdparams}" \
         --base ${kernelbase} \
         --tags-addr 0x00f00000 \
         --ramdisk_offset 0x0 \
