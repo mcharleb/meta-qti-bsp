@@ -12,10 +12,7 @@ SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(bb.dat
            file://init \
            file://dnsmasq.conf"
 
-inherit update-rc.d
 
-INITSCRIPT_NAME = "dnsmasq"
-INITSCRIPT_PARAMS = "defaults"
 
 do_install () {
         oe_runmake "PREFIX=${D}${prefix}" \
