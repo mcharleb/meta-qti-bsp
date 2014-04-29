@@ -10,7 +10,7 @@ DEPENDS = "data"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r4"
+PR = "r5"
 
 SRC_URI = "\
     https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
@@ -20,6 +20,7 @@ SRC_URI = "\
     file://0001-enable-http-date.patch \
     file://0001-presentation-page.patch \
     file://0001-port-desc.patch \
+    file://0002-certification-fixes.patch \
 "
 
 SRC_URI[md5sum] = "2b913c53fbeb562731e84b66b3ce704f"
