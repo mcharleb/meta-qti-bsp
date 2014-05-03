@@ -1,4 +1,11 @@
 # Rootfs creation.
+require mdm-ramdisk.inc
+
+do_rootfs_append() {
+
+    do_ramdisk_create
+
+}
 
 DEPENDS = " \
              virtual/kernel \
@@ -75,7 +82,7 @@ IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "rtsp-alg"
 #IMAGE_INSTALL += "start-scripts-find-partitions"
 #IMAGE_INSTALL += "start-scripts-firmware-links"
-#IMAGE_INSTALL += "system-core-adbd"
+IMAGE_INSTALL += "system-core-adbd"
 #IMAGE_INSTALL += "system-core-usb"
 #IMAGE_INSTALL += "system-core-liblog"
 #IMAGE_INSTALL += "system-core-libcutils"
