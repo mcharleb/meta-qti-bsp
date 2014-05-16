@@ -82,7 +82,6 @@ do_configure () {
 	rm -rf ${STAGING_KERNEL_DIR}/*
 	rm -f ${O}
 	ln -s ${STAGING_KERNEL_DIR} ${O}
-	__do_clean_make
 	oe_runmake ${KERNEL_DEFCONFIG} O=${O}
 }
 
@@ -108,6 +107,26 @@ addtask savedefconfig after do_configure
 do_compile () {
 	oe_runmake O=${O}
 	uses_modules && oe_runmake modules O=${O}
+}
+
+do_quic_compile () {
+
+__do_quic_deploy
+do_deploy
+
+}
+
+addtask quic_compile after do_compile
+
+__do_quic_deploy () {
+
+    KERNEL_VERSION=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${O}/include/generated/utsrelease.h`
+
+    install -d ${STAGING_DIR_TARGET}/boot
+	for f in System.map Module.symvers vmlinux; do
+    	          install -m 0644 ${O}/${f} ${STAGING_DIR_TARGET}/boot/${f}-${KERNEL_VERSION}
+	done
+	install -m 0644 ${O}/arch/${TARGET_ARCH}/boot/${KERNEL_IMAGETYPE} ${STAGING_DIR_TARGET}/boot/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 }
 
 __do_clean_make () {
