@@ -39,6 +39,7 @@ do_install_append() {
    install -m 0755 ${S}/adb/adbd -D ${D}/sbin/adbd
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
+   install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_qcom_post
    install -m 0755 ${S}/usb/usb_composition -D ${D}${bindir}/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${bindir}/
    install -m 0755 ${S}/usb/target -D ${D}${bindir}/usb/target
@@ -101,4 +102,7 @@ FILES_${PN}-liblog-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
 FILES_${PN}-liblog        = "${libdir}/liblog.so.* ${bindir}/logcat ${sysconfdir}/udev/rules.d/50-log.rules"
 FILES_${PN}-liblog-dev    = "${libdir}/liblog.so ${libdir}/liblog.la"
 FILES_${PN}-liblog-static = "${libdir}/liblog.a"
+
+PACKAGES =+ "${PN}-init-qcom-post"
+FILES_${PN}-init-qcom-post = " ${sysconfdir}/init.d/init_qcom_post"
 
