@@ -2,6 +2,8 @@
 # yaffs2 image file and propagates the /usr part of the filesystem
 # over to it.
 
+DEPENDS += "mdm-image"
+
 OTA_TARGET_BASENAME = "${MACHINE}-ota-target-image"
 OTA_TARGET_IMAGE_ROOTFS = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME}"
 OUTPUT_FILE = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME}.zip"
@@ -42,7 +44,7 @@ echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fs
 cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
 #Remove fota dir and ipth_dme binary from userdata. We dont want to update them
 rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/fota
-rm ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
+rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
