@@ -3,7 +3,7 @@ inherit linux-kernel-base localgit
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(9615-cdp|mdm9625|mdm9625-perf|mdm9635|mdm9635-perf|mdmzirc)"
+COMPATIBLE_MACHINE = "(9615-cdp|mdm9625|mdm9625-perf|mdm9635|mdm9635-perf|mdmzirc|mdmferrum)"
 
 # Moved to here from the distro.conf file because it really kind of belongs
 # here and we're moving more to being a BSP with the MSM linux distro...
@@ -17,6 +17,7 @@ KERNEL_DEFCONFIG_mdm9625-perf  = "msm9625-perf_defconfig"
 KERNEL_DEFCONFIG_mdm9635       = "mdm9630_defconfig"
 KERNEL_DEFCONFIG_mdm9635-perf  = "mdm9630-perf_defconfig"
 KERNEL_DEFCONFIG_mdmzirc       = "msmzirc_defconfig"
+KERNEL_DEFCONFIG_mdmferrum     = "mdmferrum_defconfig"
 KERNEL_DEFCONFIG              ?= "msm9625_defconfig"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -185,8 +186,8 @@ do_deploy () {
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
         --ramdisk /dev/null \
         --cmdline "${cmdparams}" \
-        --base ${kernelbase} \
-        --tags-addr 0x07100000 \
+        --base ${MACHINE_KERNEL_BASE} \
+        --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET} \
         --ramdisk_offset 0x0 \
         --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
