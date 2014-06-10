@@ -27,7 +27,7 @@
 
 # filename              partition
 
-#NON-HLOS.bin           modem
+NON-HLOS.yaffs2         modem
 
 sbl1.mbn                sbl
 tz.mbn                  tz
