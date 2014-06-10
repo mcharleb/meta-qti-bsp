@@ -11,7 +11,7 @@ umount_partition()
 
 mount_partition()
 {
-        if ! mount -t auto -o sync "/dev/$1" "${destdir}"; then
+        if ! mount -t auto "/dev/$1" "${destdir}"; then
                 # failed to mount
                 exit 1
         fi
