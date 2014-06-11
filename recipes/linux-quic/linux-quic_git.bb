@@ -186,7 +186,7 @@ do_deploy () {
         --ramdisk /dev/null \
         --cmdline "${cmdparams}" \
         --base ${kernelbase} \
-        --tags-addr 0x06E00000 \
+        --tags-addr 0x07100000 \
         --ramdisk_offset 0x0 \
         --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
