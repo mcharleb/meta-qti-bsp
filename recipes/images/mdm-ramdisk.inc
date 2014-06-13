@@ -33,6 +33,8 @@ do_ramdisk_create() {
         cp ${IMAGE_ROOTFS}/lib/ld-linux.so.3 lib/ld-linux.so.3
         cp ${IMAGE_ROOTFS}/lib/libgcc_s.so.1 lib/libgcc_s.so.1
         cp ${IMAGE_ROOTFS}/lib/libdl.so.2 lib/libdl.so.2
+        cp ${IMAGE_ROOTFS}/lib/libresolv.so.2 lib/libresolv.so.2
+        cp ${USR_IMAGE_ROOTFS}/lib/libcrypto.so.1.0.0 lib/libcrypto.so.1.0.0
         cp ${IMAGE_ROOTFS}/etc/init.d/mdev etc/init.d/
         cp ${IMAGE_ROOTFS}/etc/mdev.conf etc/
         cp -r ${IMAGE_ROOTFS}/etc/mdev etc/
