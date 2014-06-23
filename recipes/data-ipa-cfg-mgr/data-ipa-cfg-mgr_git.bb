@@ -13,7 +13,7 @@ DEPENDS += "libnetfilter-conntrack"
 DEPENDS += "virtual/kernel"
 
 EXTRA_OECONF = "--with-kernel=${STAGING_KERNEL_DIR} \
-                --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
+                --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include --with-glib"
 
 SRC_URI = "file://${WORKSPACE}/data-ipa-cfg-mgr"
 
