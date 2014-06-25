@@ -12,3 +12,6 @@ IMAGE_INIT_MANAGER = "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS = ""
 
 inherit core-image
+
+# Variables for switching to ubifs (for system partition)
+MKUBIFS_ARGS = "-m 2048 -e 126976 -c 300 -F"

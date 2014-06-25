@@ -31,13 +31,23 @@
 FindAndMount () {
    partition=$1
    dir=$2
-   mtd_block_device=`cat /proc/mtd | grep -i $partition | sed 's/^mtd/mtdblock/' | awk -F ':' '{print $1}'`
+   partition_type=$3
+   ubi_device_number=$4
+
+   mtd_block_number=`cat /proc/mtd | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "Detected block device : $dir for $partition"
    mkdir -p $dir
-   mount -t yaffs2 /dev/$mtd_block_device $dir
+
+   if [ "$partition_type" = "ubifs" ]
+   then
+      ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
+      mount -t $partition_type /dev/ubi"$ubi_device_number"_0 $dir -o bulk_read
+   else
+      mount -t $partition_type /dev/mtdblock$mtd_block_number $dir
+   fi
 }
 
-FindAndMount userdata /usr
-FindAndMount cache /cache
-FindAndMount modem /firmware
+FindAndMount modem /firmware ubifs 2
+FindAndMount userdata /usr ubifs 1
+FindAndMount cache /cache yaffs2
 exit 0
