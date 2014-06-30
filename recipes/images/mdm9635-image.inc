@@ -1,17 +1,9 @@
 # Rootfs creation.
-
-DEPENDS = " \
-             virtual/kernel \
-             virtual/bootloader \
-             pkgconfig-native \
-             gtk-doc-native \
-             gettext-native \
-             yaffs2-utils-native \
-             kernel-tests \
-"
+require mdm-bootimg.inc
 
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES} "
+IMAGE_FSTYPES += "yaffs2"
+
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
@@ -87,8 +79,6 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 #IMAGE_INSTALL += "mkisofs"
-IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
-IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
 
 do_rootfs_append() {
 
