@@ -16,6 +16,9 @@ DEPENDS = " \
              kernel-tests \
 "
 
+# Variables for switching to ubifs (for system partition)
+MKUBIFS_ARGS = "-m 2048 -e 126976 -c 300 -F"
+
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES} ubi"
 IMAGE_INSTALL += "task-core-boot"

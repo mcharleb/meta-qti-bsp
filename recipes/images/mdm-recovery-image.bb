@@ -14,6 +14,3 @@ IMAGE_INITSCRIPTS = ""
 require mdm-ota-target-image.inc
 
 inherit core-image
-
-# Variable for switching to ubifs (for recoveryfs partition)
-MKUBIFS_ARGS = "-m 2048 -e 126976 -c 183 -F"
