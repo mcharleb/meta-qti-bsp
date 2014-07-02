@@ -156,6 +156,7 @@ do_install () {
     	cp -rf ${D}/* ${STAGING_DIR_TARGET}
 }
 
+
 do_deploy () {
 # Make bootimage
     ver=`sed -r 's/#define UTS_RELEASE "(.*)"/\1/' ${STAGING_KERNEL_DIR}/include/generated/utsrelease.h`
@@ -174,13 +175,9 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     machine=`echo ${MACHINE}`
-     __cmdparams='noinitrd  rw rootfstype=ubifs rootflags=bulk_read ubi.fm_autoconvert=1 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
-
+     __cmdparams='noinitrd  rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
     if [ "${machine}" == "mdm9635" ]; then
-        __cmdparams+=' root=ubi0:mdm9635-rootfs'
-        __cmdparams+=' msm_rtb.filter=0x37'
-    elif [ "${machine}" == "mdm9635-perf" ]; then
-          __cmdparams+=' root=ubi0:mdm9635-perf-rootfs'
+       __cmdparams+=' msm_rtb.filter=0x37'
     fi
     cmdparams=`echo ${__cmdparams}`
     # Updated base address according to new memory map.
