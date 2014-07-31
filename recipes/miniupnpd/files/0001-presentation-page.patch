@@ -1,43 +1,17 @@
-From 4db2d9388d00b61f5e380b7250540c5671b5bb52 Mon Sep 17 00:00:00 2001
+From 54ef0d53b83c394b1627581fe963c602f969b194 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Fri, 21 Jun 2013 13:09:03 -0700
+Date: Thu, 31 Jul 2014 11:13:30 -0700
 Subject: [PATCH 1/1] presentation-page
 
 ---
- miniupnpd.conf |    4 ++--
- upnphttp.c     |   23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+), 2 deletions(-)
- mode change 100644 => 100755 miniupnpd.conf
+ upnphttp.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
  mode change 100644 => 100755 upnphttp.c
 
-diff --git a/miniupnpd.conf b/miniupnpd.conf
-old mode 100644
-new mode 100755
-index 058da75..5a527cd
---- a/miniupnpd.conf
-+++ b/miniupnpd.conf
-@@ -17,7 +17,7 @@
- #listening_ip=192.168.0.1/24
- listening_ip=bridge0
- # port for HTTP (descriptions and SOAP) traffic. set 0 for autoselect.
--port=0
-+port=8201
-
- # path to the unix socket used to communicate with MiniSSDPd
- # If running, MiniSSDPd will manage M-SEARCH answering.
-@@ -54,7 +54,7 @@ secure_mode=no
- # If set to an empty string, no presentationURL element will appear
- # in the XML description of the device, which prevents MS Windows
- # from displaying an icon in the "Network Connections" panel.
--#presentation_url=http://www.mylan/index.php
-+presentation_url=/192.168.225.1:8201
-
- # report system uptime instead of daemon uptime
- system_uptime=yes
 diff --git a/upnphttp.c b/upnphttp.c
 old mode 100644
 new mode 100755
-index 31456e3..942d0d2
+index f869fe5..dcbfb13
 --- a/upnphttp.c
 +++ b/upnphttp.c
 @@ -28,6 +28,7 @@
@@ -45,13 +19,14 @@ index 31456e3..942d0d2
  #include "upnpevents.h"
  #include "upnputils.h"
 +#include "upnpglobalvars.h"
-
- struct upnphttp *
- New_upnphttp(int s)
-@@ -537,6 +538,24 @@ ProcessHTTPUnSubscribe_upnphttp(struct upnphttp * h, const char * path)
+ 
+ #ifdef ENABLE_HTTPS
+ #include <openssl/err.h>
+@@ -690,6 +691,26 @@ ProcessHTTPUnSubscribe_upnphttp(struct upnphttp * h, const char * path)
  }
  #endif
-
+ 
++#ifdef QCMAP
 +static void
 +SendResp_presentation(struct upnphttp * h)
 +{
@@ -69,21 +44,24 @@ index 31456e3..942d0d2
 +	SendResp_upnphttp(h);
 +	CloseSocket_upnphttp(h);
 +}
++#endif
 +
  /* Parse and process Http Query
   * called once all the HTTP headers have been received,
   * so it is guaranteed that h->req_buf contains the \r\n\r\n
-@@ -630,6 +649,10 @@ ProcessHttpQuery_upnphttp(struct upnphttp * h)
-			return;
-		}
+@@ -783,6 +804,12 @@ ProcessHttpQuery_upnphttp(struct upnphttp * h)
+ 			return;
+ 		}
  #endif
++#ifdef QCMAP
 +		else if(0 == memcmp(HttpUrl, presentationurl, 19)) {
 +			SendResp_presentation(h);
 +			return;
 +		}
-		syslog(LOG_NOTICE, "%s not found, responding ERROR 404", HttpUrl);
-		Send404(h);
-	}
---
-1.7.8.3
++#endif
+ 		syslog(LOG_NOTICE, "%s not found, responding ERROR 404", HttpUrl);
+ 		Send404(h);
+ 	}
+-- 
+1.8.2.1
 
