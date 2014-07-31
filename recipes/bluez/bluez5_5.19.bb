@@ -1,0 +1,36 @@
+require bluez5.inc
+
+PR = "r0"
+
+SRC_URI += "file://bluetooth.conf"
+
+SRC_URI[md5sum] = "2a575ec06aeaeadca9605b2f8173e00a"
+SRC_URI[sha256sum] = "92bf4ce87d58014794ef6b22dc0a13b0b19acdf9c96870391c935d1e01a43ffa"
+
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+INHIBIT_PACKAGE_STRIP = "1"
+
+do_install_append() {
+        install -m 0644 ${S}/profiles/network/network.conf ${D}/${sysconfdir}/bluetooth/
+        install -m 0644 ${S}/profiles/input/input.conf ${D}/${sysconfdir}/bluetooth/
+        # at_console doesn't really work with the current state of OE, so punch some more holes so people can actually use BT
+        install -m 0644 ${WORKDIR}/bluetooth.conf ${D}/${sysconfdir}/dbus-1/system.d/
+}
+
+RDEPENDS_${PN}-dev = "bluez-hcidump"
+
+PACKAGES =+ "libasound-module-bluez"
+
+FILES_libasound-module-bluez = "\
+  ${libdir}/alsa-lib/libasound_module_ctl_bluetooth.so \
+  ${libdir}/alsa-lib/libasound_module_pcm_bluetooth.so \
+  ${datadir}/alsa\
+"
+FILES_${PN} += "\
+  ${base_libdir}/udev/ \
+  ${base_libdir}/systemd/ \
+"
+FILES_${PN}-dev += "\
+  ${libdir}/alsa-lib/libasound_module_ctl_bluetooth.la \
+  ${libdir}/alsa-lib/libasound_module_pcm_bluetooth.la \
+"
