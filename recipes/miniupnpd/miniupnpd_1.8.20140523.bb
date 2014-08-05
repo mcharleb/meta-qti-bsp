@@ -13,18 +13,14 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 PR = "r5"
 
 SRC_URI = "\
-    https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
+    http://miniupnp.free.fr/files/download.php?file=${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
-    file://0001-upstream-fixes.patch \
-    file://0001-enable-backhaul.patch \
-    file://0001-enable-http-date.patch \
     file://0001-presentation-page.patch \
     file://0001-port-desc.patch \
-    file://0002-certification-fixes.patch \
 "
 
-SRC_URI[md5sum] = "2b913c53fbeb562731e84b66b3ce704f"
-SRC_URI[sha256sum] = "2fc003b0d53a9209389843d32d574f7f0b2886c9609840640ca5e2aa1fd73d4e"
+SRC_URI[md5sum] = "fcac89e11da091b1cc61f43d83c9e4f5"
+SRC_URI[sha256sum] = "e72cd1e515aa9e6281e519e1814fe74e7689f5da71ce463a996a17e787ffe490"
 
 do_compile () {
     cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR} INCDIR=${STAGING_INCDIR}
