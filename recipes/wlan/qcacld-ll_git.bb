@@ -20,7 +20,6 @@ do_install() {
     install -d ${FIRMWARE_PATH}
     install -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${FIRMWARE_PATH}/
     install -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${FIRMWARE_PATH}/
-    install -m 0644 ${S}/firmware_bin/WCNSS_qcom_wlan_nv.bin ${FIRMWARE_PATH}/
     touch ${FIRMWARE_PATH}/wlan_mac.bin
 
     install -m 0644 CORE/SVC/external/wlan_nlink_common.h -D ${D}${includedir}/qcacld/wlan_nlink_common.h
