@@ -1,26 +1,13 @@
 # Rootfs creation.
+require mdm-bootimg.inc
 require mdm-ramdisk.inc
-
-do_rootfs_append() {
-
-    do_ramdisk_create
-
-}
-
-DEPENDS = " \
-             virtual/kernel \
-             pkgconfig-native \
-             gtk-doc-native \
-             gettext-native \
-             yaffs2-utils-native \
-             kernel-tests \
-"
 
 # Variables for switching to ubifs (for system partition)
 MKUBIFS_ARGS = "-m 2048 -e 126976 -c 300 -F"
 
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES} ubi"
+IMAGE_FSTYPES += "ubi ext4"
+
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
@@ -94,11 +81,10 @@ IMAGE_INSTALL += "system-core-adbd"
 #IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
 #IMAGE_INSTALL += "wpa-supplicant-qcacld"
-IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
-IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
 
 do_rootfs_append() {
+    do_ramdisk_create
 
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.yaffs2 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.yaffs2
+    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ubi
 }
