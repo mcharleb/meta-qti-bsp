@@ -3,6 +3,7 @@
 # our images...
 DEPENDS = " \
              virtual/kernel \
+             virtual/bootloader \
              pkgconfig-native \
              gtk-doc-native \
              gettext-native \
