@@ -196,6 +196,10 @@ do_deploy () {
     if [ "${machine}" == "mdm9635" ]; then
        __cmdparams+=' msm_rtb.filter=0x37'
     fi
+    if [ "${machine}" == "mdmferrum" ]; then
+       __cmdparams+=' msm_rtb.filter=0x37'
+       __cmdparams+=' maxcpus=1'
+    fi
     cmdparams=`echo ${__cmdparams}`
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
