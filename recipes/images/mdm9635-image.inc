@@ -77,6 +77,7 @@ IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
+IMAGE_INSTALL += "bluez5"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 #IMAGE_INSTALL += "mkisofs"
 
