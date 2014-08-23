@@ -39,8 +39,7 @@ cd /firmware/image
 # Get the list of files in /firmware/image
 # for which sym links have to be created
 
-fwfiles=$(ls modem* adsp* *.bin mba*)
-modem_fwfiles=$(ls modem_fw.mdt)
+fwfiles=$(ls modem* adsp* *.tlv *.bin mba*)
 
 # Check if the links with similar names
 # have been created in /lib/firmware
@@ -104,6 +103,18 @@ case $linksNeeded in
       case `ls *.bin 2>/dev/null` in
          *.bin)
             for imgfile in *.bin
+            do
+               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+            done
+            ;;
+         *)
+            echo "PIL no wcnss image found"
+            ;;
+      esac
+
+      case `ls *.tlv 2>/dev/null` in
+         *.tlv)
+            for imgfile in *.tlv
             do
                ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
