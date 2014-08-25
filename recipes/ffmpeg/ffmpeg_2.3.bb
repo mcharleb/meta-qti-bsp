@@ -11,8 +11,8 @@ PR = "r0"
 SRC_URI = "\
     http://www.ffmpeg.org/releases/${PN}-${PV}.tar.gz \
 "
-SRC_URI[md5sum] = "482fef35f78830640bdae4db51218923"
-SRC_URI[sha256sum] = "6dac7a6536171bd4c2eeb667f500d65a9c4bd9420b3f5be66adddc364cf24bd1"
+SRC_URI[md5sum] = "d63e952716c27e23927bfd64518d6dee"
+SRC_URI[sha256sum] = "f3b437dbdf9f1519fa5e0a923428e77ba3babefbcfeda9aebb7cd72ae8924c1d"
 
 EXTRA_OEMAKE = ""
 
@@ -44,7 +44,7 @@ do_configure () {
     --disable-demuxer=thp --disable-demuxer=tiertexseq --disable-demuxer=tta --disable-demuxer=txd \
     --disable-demuxer=vmd --disable-demuxer=voc --disable-demuxer=wc3 --disable-demuxer=wsaud \
     --disable-demuxer=wsvqa --disable-demuxer=xa --disable-demuxer=yuv4mpegpipe --enable-demuxer=matroska \
-    --disable-altivec --disable-vis --enable-fft --libdir=${base_libdir} --shlibdir=${base_libdir} \
+    --disable-altivec --enable-fft --libdir=${base_libdir} --shlibdir=${base_libdir} \
     --prefix=${base_libdir} --incdir=${includedir}
 }
 
