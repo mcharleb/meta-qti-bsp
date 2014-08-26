@@ -14,14 +14,15 @@ PR = "r4"
 SRC_URI = "\
     http://sourceforge.net/projects/minidlna/files/minidlna/${PV}/${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
+    file://0001-M-DMS.patch \
 "
 
-SRC_URI[md5sum] = "653405555ac3f8eb4aacc54c1be7b5fa"
-SRC_URI[sha256sum] = "9b70082fd6a12e16cea1558ffff05c07e12ef0c405ee806721e75ce1ce9ad037"
+SRC_URI[md5sum] = "879027192c89e5376cdd2ae2d1aa33b4"
+SRC_URI[sha256sum] = "ed42d5cadf9488a95a0107341918879ef8ce4c650e19337688c46cdcd484bc4e"
 
 do_install_append () {
     sed -i s:#network_interface=eth0:network_interface=bridge0,ppp0:g minidlna.conf
-    sed -i s:"#friendly_name=My DLNA Server":"friendly_name=9x25 MobileAP DLNA":g minidlna.conf
+    sed -i s:"#friendly_name=My DLNA Server":"friendly_name=9x35 MobileAP DLNA":g minidlna.conf
     install -d ${D}${sysconfdir}
     install --mode=0644 -b ${WORKDIR}/${PN}-${PV}/${PN}.conf ${D}${sysconfdir}    
     install -d ${D}${sysconfdir}/init.d/
