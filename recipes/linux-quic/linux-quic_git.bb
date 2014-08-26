@@ -4,6 +4,7 @@ DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 COMPATIBLE_MACHINE = "(9615-cdp|mdm9625|mdm9625-perf|mdm9635|mdm9635-perf|mdmzirc|mdmferrum)"
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 # Moved to here from the distro.conf file because it really kind of belongs
 # here and we're moving more to being a BSP with the MSM linux distro...
@@ -192,14 +193,20 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     machine=`echo ${MACHINE}`
-     __cmdparams='noinitrd  rw rootfstype=yaffs2 console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
+     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
     if [ "${machine}" == "mdm9635" ]; then
        __cmdparams+=' msm_rtb.filter=0x37'
     fi
+
     if [ "${machine}" == "mdmferrum" ]; then
        __cmdparams+=' msm_rtb.filter=0x37'
        __cmdparams+=' maxcpus=1'
     fi
+
+    if [ "${BASEMACHINE}" != "mdmzirc" ]; then
+        __cmdparams+=' rootfstype=yaffs2'
+    fi
+
     cmdparams=`echo ${__cmdparams}`
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
