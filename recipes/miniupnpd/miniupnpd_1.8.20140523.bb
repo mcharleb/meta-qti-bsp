@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 PR = "r5"
 
 SRC_URI = "\
-    http://miniupnp.free.fr/files/download.php?file=${PN}-${PV}.tar.gz \
+    https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
     file://0001-presentation-page.patch \
     file://0001-port-desc.patch \
