@@ -30,7 +30,6 @@ BOOTLOADER_NAME_msm8960 = "emmc_appsboot"
 BOOTLOADER_NAME_msm8974 = "emmc_appsboot"
 BOOTLOADER_NAME_msm8610 = "emmc_appsboot"
 BOOTLOADER_NAME_msm8226 = "emmc_appsboot"
-BOOTLOADER_NAME_mdmzirc = "emmc_appsboot"
 
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 EXTRA_OEMAKE_append_9615-cdp = " LIBGCC='${LIBGCC}'"
