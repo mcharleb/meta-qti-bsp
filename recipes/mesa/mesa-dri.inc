@@ -13,11 +13,11 @@ CXXFLAGS     += "-I${STAGING_INCDIR}/c++/${TARGET_SYS}"
 EXTRA_OECONF += "--with-driver=dri --disable-egl --disable-gallium --without-gallium-drivers --with-dri-drivers=${DRIDRIVERS}"
 
 python populate_packages_prepend() {
-	import os.path
+    import os.path
 
-	dri_drivers_root = os.path.join(d.getVar('libdir', 1), "dri")
+    dri_drivers_root = os.path.join(d.getVar('libdir', 1), "dri")
 
-	do_split_packages(d, dri_drivers_root, '^(.*)_dri\.so$', 'mesa-dri-driver-%s', 'Mesa %s DRI driver', extra_depends='')
+    do_split_packages(d, dri_drivers_root, '^(.*)_dri\.so$', 'mesa-dri-driver-%s', 'Mesa %s DRI driver', extra_depends='')
 }
 
 PACKAGES_DYNAMIC = "mesa-dri-driver-*"

@@ -5,7 +5,7 @@ require mdm-bootimg.inc
 IMAGE_FSTYPES += "yaffs2"
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
-IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
+IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-intf"

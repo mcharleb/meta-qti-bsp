@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=53b4a999993871a28ab1488fdbd2e73e"
 SECTION = "console/network"
 PRIORITY = "optional"
 
-PR = "r0"
+PR = "r1"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "dc6f7b484f207dc712bfca81645f45120cb6aee3380e77a1771e9c34a9
 
 ac_cv_linux_vers = "${ac_cv_linux_vers=2}"
 
-CFLAGS += -I${STAGING_KERNEL_DIR}/source/include
+CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include"
 
 EXTRA_OECONF = "--without-crypto \
         ${@base_contains('DISTRO_FEATURES', 'ipv6', '--enable-ipv6', '--disable-ipv6', d)}"

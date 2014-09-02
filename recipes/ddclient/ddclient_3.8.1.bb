@@ -10,22 +10,18 @@ SRC_URI[md5sum] = "7fa417bc65f8f0e6ce78418a4f631988"
 SRC_URI[sha256sum] = "77a82668a53fdbed1e05ad6febe6dbefb093e3922afb20b993d4ad9ee868258f"
 
 
-PR = "r4"
 inherit autotools pkgconfig
 
 S = "${WORKDIR}/ddclient-${PV}"
 
 #All the DDClient development is on sourceforge.met
-PR = "r4"
+PR = "r5"
 
 SRC_URI = "\
     ${SOURCEFORGE_MIRROR}/ddclient/ddclient-${PV}.tar.bz2 \
     file://ddclient_conf.patch" 
 
-RDEPENDS_${PN} = "perl perl-module-strict perl-module-dynaloader perl-module-sys perl-module-getopt-long perl-module-vars perl-module-warnings-register perl-module-warnings perl-module-carp perl-module-exporter perl-module-constant perl-module-exporter-heavy perl-module-sys-hostname perl-module-xsloader perl-module-autoloader perl-module-io-select perl-module-io-socket perl-module-io-handle perl-module-symbol perl-module-selectsaver perl-module-io perl-module-socket perl-module-errno perl-module-config perl-module-io-socket-inet perl-module-io-socket-unix perl-module-integer perl-module-overload"
-
-
-#SRC_URI = "http://sourceforge.net/projects/ddclient/files/latest/download/ddclient/ddclient-3.8.1/ddclient-3.8.1.tar.gz"
+RDEPENDS_${PN} = "perl perl-module-strict perl-module-dynaloader perl-module-getopt-long perl-module-vars perl-module-warnings-register perl-module-warnings perl-module-carp perl-module-exporter perl-module-constant perl-module-exporter-heavy perl-module-sys-hostname perl-module-xsloader perl-module-autoloader perl-module-io-select perl-module-io-socket perl-module-io-handle perl-module-symbol perl-module-selectsaver perl-module-io perl-module-socket perl-module-errno perl-module-config perl-module-io-socket-inet perl-module-io-socket-unix perl-module-integer perl-module-overload"
 
 do_install() {
    install -m 0755 ${S}/ddclient -D ${D}${sbindir}/ddclient

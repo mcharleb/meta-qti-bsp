@@ -1,12 +1,16 @@
 include wpa-supplicant.inc
 
-PR = "${INC_PR}.0"
+PR = "${INC_PR}.2"
 
-SRC_URI = "file://${WORKSPACE}/external/wpa_supplicant_8"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://external/wpa_supplicant_8/"
 SRC_URI += "file://defconfig-qcacld"
 
-S = "${WORKDIR}/wpa_supplicant_8/wpa_supplicant"
+DEPENDS += "qmi"
+
+S = "${WORKDIR}/external/wpa_supplicant_8/wpa_supplicant"
 
 do_configure() {
     install -m 0644 ${WORKDIR}/defconfig-qcacld .config
+    echo "CFLAGS +=\"-I${STAGING_INCDIR}/libnl3\"" >> .config
 }

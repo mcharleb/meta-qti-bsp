@@ -91,13 +91,13 @@ RDEPENDS_avahi-systemd = "avahi-daemon"
 RDEPENDS_avahi-daemon = "sysvinit-pidof"
 
 # uclibc has no nss
-RRECOMMENDS_avahi-daemon_append_libc-glibc = "libnss-mdns"
+RRECOMMENDS_avahi-daemon_append_libc-glibc = " libnss-mdns"
 RRECOMMENDS_${PN}_append_libc-glibc = "libnss-mdns"
 
 RRECOMMENDS_avahi-dev = "expat-dev libcap-dev libdaemon-dev dbus-dev glib-2.0-dev update-rc.d-dev"
 RRECOMMENDS_avahi-dev_append_libc-glibc = " gettext-dev"
 
-RRECOMMENDS_avahi-dev[nodeprrecs] = 1
+RRECOMMENDS_avahi-dev[nodeprrecs] = "1"
 
 CONFFILES_avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
 
@@ -108,6 +108,9 @@ INITSCRIPT_NAME_avahi-dnsconfd = "avahi-dnsconfd"
 INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 22 19"
 
 do_install() {
+        bbnote install -d ${D}${bindir}
+        install -d ${D}${bindir}
+	
 	autotools_do_install
 
 	# don't install /var/run when populating rootfs. Do it through volatile
@@ -143,10 +146,10 @@ pkg_postinst_avahi-daemon () {
 	fi
 }
 
+# can't do this offline
 pkg_postinst_avahi-autoipd () {
-	# can't do this offline
 	if [ "x$D" != "x" ]; then
-		exit 1
+		exit 0
 	fi
 	grep "^avahi-autoipd:" /etc/group > /dev/null || addgroup avahi-autoipd
 	grep "^avahi-autoipd:" /etc/passwd > /dev/null || adduser --disabled-password --system --home /var/lib/avahi-autoipd --no-create-home avahi-autoipd --ingroup avahi-autoipd -g "Avahi autoip daemon"
@@ -162,10 +165,10 @@ pkg_postrm_avahi-autoipd () {
 	delgroup avahi-autoipd || true
 }
 
+# can't do this offline
 pkg_postinst_avahi-systemd() {
-	# can't do this offline
 	if [ "x$D" != "x" ]; then
-		exit 1
+		exit 0
 	fi
 	
 	systemctl enable avahi-daemon.service
@@ -174,7 +177,7 @@ pkg_postinst_avahi-systemd() {
 pkg_postrm_avahi-systemd() {
 	# can't do this offline
 	if [ "x$D" != "x" ]; then
-		exit 1
+		exit 0
 	fi
 
 	systemctl disable avahi-daemon.service

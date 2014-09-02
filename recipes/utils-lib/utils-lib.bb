@@ -1,17 +1,18 @@
+inherit autotools
+
 DESCRIPTION = "util library"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
-PR = "r1"
+PR = "r2"
 
-SRC_URI = "file://${WORKSPACE}/base/libs/utils \
-           file://string_fix_patch.txt \
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://base/libs/utils \
+           file://string_fix_patch.txt;patch=1 \
  "
 
-S = "${WORKDIR}/utils"
-
-inherit autotools
+S = "${WORKDIR}/base/libs/utils"
 
 DEPENDS += "system-core"
 
@@ -27,9 +28,9 @@ FILES_${PN} += "/usr/lib/*"
 # package contains symlinks that trip up insane
 INSANE_SKIP_${PN} = "dev-so"
 
-do_configure_prepend() {
-    # Apply patch to string class
-    pushd ${S}/..
-    patch -p0 < string_fix_patch.txt
-    popd
-}
+#do_configure_prepend() {
+# Apply patch to string class
+#pushd ${S}/..
+#patch -p0 < string_fix_patch.txt
+#popd
+#}

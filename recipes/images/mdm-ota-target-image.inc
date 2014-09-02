@@ -7,6 +7,7 @@ DEPENDS += "mdm-image"
 OTA_TARGET_BASENAME = "${MACHINE}-ota-target-image"
 OTA_TARGET_IMAGE_ROOTFS = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME}"
 OUTPUT_FILE = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME}.zip"
+BASE_IMAGE_ROOTFS = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
 #OUTPUT_FILE = "${OTA_TARGET_BASENAME}.zip"
 
 do_rootfs_append(){
@@ -22,6 +23,7 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/RADIO
 
+echo "base image rootfs: ${BASE_IMAGE_ROOTFS}"
 # copy radio directory content into RADIO directory
 cp -r ${WORKSPACE}/oe-core/meta-msm/recipes/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS}/RADIO/.
 
@@ -30,11 +32,12 @@ cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_I
 
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS}/BOOTABLE_IMAGES/recovery.img
 
+
 # copy the contents of system rootfs
-cp -r ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/mdm-image-1.0-r0/rootfs/. ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM/.
+cp -r ${BASE_IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS}/SYSTEM/.
 
 #copy contents of recovery rootfs
-cp -r ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/mdm-recovery-image-1.0-r0/rootfs/. ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/.
+cp -r ${IMAGE_ROOTFS}/. ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/.
 
 #generate recovery.fstab which is used by the updater-script
 #echo #mount point fstype device [device2] >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fstab

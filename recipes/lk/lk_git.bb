@@ -6,8 +6,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=0835ade698e0bcf8506ecda2f7b4f302"
 HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 PROVIDES = "virtual/bootloader"
-SRC_URI  = "file://${WORKSPACE}/bootable/bootloader/lk"
-S        = "${WORKDIR}/${PN}"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI  = "file://bootable/bootloader/lk/"
+S        = "${WORKDIR}/bootable/bootloader/${PN}"
 PR       = "r12"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -15,10 +16,10 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 #re-use non-perf settings
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
-LIBGCC_9615-cdp    = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
-LIBGCC_mdm9625     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
-LIBGCC_mdm9635     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
-LIBGCC_msm8226     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.6.3/libgcc.a"
+LIBGCC_9615-cdp    = "${STAGING_LIBDIR}/${TARGET_SYS}/4.8.1/libgcc.a"
+LIBGCC_mdm9625     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.8.1/libgcc.a"
+LIBGCC_mdm9635     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.8.1/libgcc.a"
+LIBGCC_msm8226     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.8.1/libgcc.a"
 
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_9615-cdp = "mdm9615"

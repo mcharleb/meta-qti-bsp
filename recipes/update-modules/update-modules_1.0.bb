@@ -5,11 +5,11 @@ LIC_FILES_CHKSUM="file://update-modules;startline=3;endline=5;md5=a907c58943cce6
 PACKAGE_ARCH = "all"
 INHIBIT_DEFAULT_DEPS = "1"
 RDEPENDS_${PN} = "${@base_contains("MACHINE_FEATURES", "kernel26",  "module-init-tools-depmod","modutils-depmod",d)} "
-PR = "r11"
+PR = "r12"
 
-SRC_URI = "file://update-modules-1.0/update-modules"
+SRC_URI = "file://update-modules"
 
-pkg_postinst() {
+pkg_postinst_${PN}() {
 if [ "x$D" != "x" ]; then
 	exit 1
 fi

@@ -2,12 +2,13 @@ DESCRIPTION = "WCNSS platform"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 LICENSE = "BSD"
 
-PR = "r0"
+PR = "r1"
 
-SRC_URI = "file://${WORKSPACE}/qcom-opensource/wlan/prima/firmware_bin \
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://qcom-opensource/wlan/prima/firmware_bin \
            file://set_wcnss_mode"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/qcom-opensource/wlan/prima/firmware_bin"
 
 inherit update-rc.d
 
@@ -19,7 +20,7 @@ do_install() {
 
 do_install_append_msm8610() {
    mkdir -p ${D}/lib/firmware/wlan/prima
-   cp -pPr ${S}/firmware_bin/* ${D}/lib/firmware/wlan/prima
+   cp -pPr ${S}/* ${D}/lib/firmware/wlan/prima
 }
 
 do_install_append_msm8226() {

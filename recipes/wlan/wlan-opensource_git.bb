@@ -1,17 +1,18 @@
+inherit module
+
 DESCRIPTION = "Qualcomm Atheros WLAN Host Driver Module"
 SECTION = "kernel/modules"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 LICENSE = "BSD"
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS = "virtual/kernel wireless-tools"
 
-SRC_URI = "file://${WORKSPACE}/qcom-opensource/wlan/prima"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://qcom-opensource/wlan/prima"
 
-S = "${WORKDIR}/prima"
-
-inherit module
+S = "${WORKDIR}/qcom-opensource/wlan/prima"
 
 EXTRA_OEMAKE += "CONFIG_PRONTO_WLAN=m \
                  KERNEL_BUILD=1"

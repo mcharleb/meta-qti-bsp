@@ -6,10 +6,11 @@ LICENSE = "QUALCOMM-Proprietary"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta-qcom/files/qcom-licenses/\
 QUALCOMM-Proprietary;md5=92b1d0ceea78229551577d4284669bb8"
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS = "libdrm"
 
-SRC_URI = "file://${WORKSPACE}/libtbm"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://libtbm"
 
 S = "${WORKDIR}/libtbm"

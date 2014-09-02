@@ -2,14 +2,12 @@ inherit autotools update-rc.d
 DESCRIPTION = "Modem init"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
-PR = "r4"
+PR = "r5"
 
-#re-use non-perf settings
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://init_mss/"
 
-SRC_URI = "file://${WORKSPACE}/init_mss"
-
-S = "${WORKDIR}/init_mss"
+S = "${WORKDIR}/init_mss/"
 
 INITSCRIPT_NAME = "init_sys_mss"
 INITSCRIPT_PARAMS = "start 60 S ."

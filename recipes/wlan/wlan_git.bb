@@ -10,11 +10,12 @@ FILES_${PN} += "\
     ${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/wireless/ar6000.ko \
     "
 
-PR = "r1"
+PR = "r2"
 
 DEPENDS = "virtual/kernel wireless-tools"
 
-SRC_URI = "file://${WORKSPACE}/wlan"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://wlan"
 
 S = "${WORKDIR}/wlan/host"
 

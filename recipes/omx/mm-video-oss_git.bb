@@ -1,17 +1,20 @@
+inherit autotools
+
 DESCRIPTION = "OpenMAX video for MSM chipsets"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
-SRC_URI = "file://${WORKSPACE}/mm-video-oss"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://mm-video-oss"
 
-PR = "r17"
+PR = "r19"
 
 DEPENDS = "virtual/kernel"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-core-oss"
 DEPENDS += "adreno200"
-RDEPENDS = "mm-video-prop"
-INSANE_SKIP = 1
+RDEPENDS_${PN} = "mm-video-prop"
+INSANE_SKIP = "1"
 
 # Need the kernel headers
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -19,8 +22,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 S = "${WORKDIR}/mm-video-oss"
 
 LV = "1.0.0"
-
-inherit autotools
 
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"

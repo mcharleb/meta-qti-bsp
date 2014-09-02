@@ -7,7 +7,7 @@ PRIORITY = "optional"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r0"
+PR = "r1"
 
 SRC_URI = "\
     http://downloads.sourceforge.net/project/${PN}/${PV}/${PN}-${PV}.tar.gz \
@@ -16,9 +16,8 @@ SRC_URI = "\
 SRC_URI[md5sum] = "f61e60ff01381ece4d2fe65eeb52669e"
 SRC_URI[sha256sum] = "cb3323f054a02cedad193bd0ca418d46934447f995d19e678ea64f78e4903770"
 
-PROVIDES = "jpeg"s
+PROVIDES = "jpeg"
 
-inherit autotools pkgconfig
 
 EXTRA_OECONF = "--with-jpeg8 "
 
