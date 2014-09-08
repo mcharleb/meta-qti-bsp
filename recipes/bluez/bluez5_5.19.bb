@@ -3,7 +3,8 @@ require bluez5.inc
 PR = "r0"
 
 SRC_URI += "file://bluetooth.conf"
-SRC_URI += "file://0001-bluetooth-Add-bluetooth-support-for-QCA6174-chip.patch"
+SRC_URI += "file://0001-bluetooth-Add-bluetooth-support-for-QCA6174-chip.patch \
+            file://0002-bluetooth-Enable-3Mbps-baud-rate-support.patch"
 
 SRC_URI[md5sum] = "2a575ec06aeaeadca9605b2f8173e00a"
 SRC_URI[sha256sum] = "92bf4ce87d58014794ef6b22dc0a13b0b19acdf9c96870391c935d1e01a43ffa"
