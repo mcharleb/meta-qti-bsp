@@ -1,13 +1,13 @@
 inherit autotools linux-kernel-base module
 
 DESCRIPTION = "Linux Wireless compatibility package"
-HOMEPAGE = "http://wireless.kernel.org/en/users/Download";
+HOMEPAGE = "http://wireless.kernel.org/en/users/Download"
 SECTION = "kernel/modules"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 DEPENDS = "virtual/kernel"
-RDEPENDS = "wireless-tools"
+RDEPENDS_${PN} = "wireless-tools"
 
 INC_PR = "r1"
 

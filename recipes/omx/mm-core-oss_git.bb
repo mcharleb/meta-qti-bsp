@@ -1,15 +1,15 @@
+inherit autotools
 DESCRIPTION = "OpenMAX core for MSM chipsets"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-SRC_URI = "file://${WORKSPACE}/mm-video-oss/mm-core"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://mm-video-oss/mm-core"
 
-inherit autotools
+PR = "r12"
 
-PR = "r11"
-
-S = "${WORKDIR}/mm-core"
+S = "${WORKDIR}/mm-video-oss/mm-core"
 
 LV = "1.0.0"
 

@@ -22,9 +22,10 @@ RDEPENDS_${PN} += " \
                lighttpd-module-evasive \
 "
 
-PR = "r4"
+PR = "r5"
 
 SRC_URI = "http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-${PV}.tar.bz2 \
+        file://acconfigure.patch \
         file://index.html.lighttpd \
         file://lighttpd.conf \
         file://openssl.cnf \
@@ -44,7 +45,7 @@ EXTRA_OECONF = " \
              --without-webdav-props \
              --without-webdav-locks \
              --with-openssl \
-             --with-openssl-libs=/usr/lib \
+             --with-openssl-libs=${STAGING_LIBDIR} \
              --disable-static \
 "
 
@@ -67,6 +68,6 @@ CONFFILES_${PN} = "${sysconfdir}/lighttpd.conf"
 PACKAGES_DYNAMIC = "lighttpd-module-*"
 
 python populate_packages_prepend () {
-        lighttpd_libdir = bb.data.expand('${libdir}', d)
-        do_split_packages(d, lighttpd_libdir, '^mod_(.*)\.so$', 'lighttpd-module-%s', 'Lighttpd module for %s', extra_depends='')
+    lighttpd_libdir = bb.data.expand('${libdir}', d)
+    do_split_packages(d, lighttpd_libdir, '^mod_(.*)\.so$', 'lighttpd-module-%s', 'Lighttpd module for %s', extra_depends='')
 }

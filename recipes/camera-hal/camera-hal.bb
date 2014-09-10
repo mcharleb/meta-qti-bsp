@@ -5,7 +5,8 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
 PR = "r8"
 
-SRC_URI = "file://${WORKSPACE}/camera-hal \
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://camera-hal \
            file://camera_parameters_header_include_patch.txt \
            file://dlog-replace-utils-patch.txt \
  "

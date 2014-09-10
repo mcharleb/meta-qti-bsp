@@ -4,10 +4,11 @@ DESCRIPTION = "Genlock"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-PR = "r2"
+PR = "r3"
 
-SRC_URI = "file://${WORKSPACE}/graphics/libgenlock"
-S = "${WORKDIR}/libgenlock"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://graphics/libgenlock"
+S = "${WORKDIR}/graphics/libgenlock"
 
 DEPENDS += "virtual/kernel"
 

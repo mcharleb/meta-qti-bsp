@@ -1,23 +1,22 @@
+inherit autotools update-rc.d
+
 DESCRIPTION = "Android system/core components"
 HOMEPAGE = "http://developer.android.com/"
 LICENSE = "Apache-2.0"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-SRC_URI = "file://${WORKSPACE}/system/core"
-SRC_URI += "file://files/50-log.rules"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI   = "file://system/core/"
+SRC_URI  += "file://50-log.rules"
+
+S = "${WORKDIR}/system/core"
+PR = "r15"
+
+INSANE_SKIP_${PN}-libcutils-static = "staticdev"
+INSANE_SKIP_${PN}-liblog-static = "staticdev"
 
 DEPENDS = "zlib openssl glib-2.0 libcap"
-
-PR = "r12"
-
-inherit autotools
-
-S = "${WORKDIR}/core"
-
-INITSCRIPT_NAME = "adbd"
-INITSCRIPT_PARAMS = "start 38 S . stop 62 0 1 6 ."
-
-inherit update-rc.d
 
 EXTRA_OECONF_append_msm8960 = " --with-host-os=${HOST_OS}"
 EXTRA_OECONF_append_msm8974 = " --with-host-os=${HOST_OS}"
@@ -32,7 +31,7 @@ do_install_append() {
    install -m 0644 -D ${S}/include/pixelflinger/format.h ${D}${includedir}/pixelflinger/format.h
    install -m 0644 -D ${S}/include/pixelflinger/pixelflinger.h ${D}${includedir}/pixelflinger/pixelflinger.h
 
-   install -m 0644 -D ${S}/../files/50-log.rules ${D}${sysconfdir}/udev/rules.d/50-log.rules
+   install -m 0644 -D ${S}/../../50-log.rules ${D}${sysconfdir}/udev/rules.d/50-log.rules
 
    # Prefer adbd to be located in /sbin for historical reasons
    rm ${D}${bindir}/adbd
@@ -76,13 +75,13 @@ do_install_append_msm8226 () {
 	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
 }
 
-pkg_postinst () {
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-        update-rc.d $OPT -f ${INITSCRIPT_NAME} remove
-        update-rc.d $OPT ${INITSCRIPT_NAME} ${INITSCRIPT_PARAMS}
-        update-rc.d $OPT -f usb remove
-        update-rc.d $OPT usb start 37 S .
-}
+INITSCRIPT_PACKAGES = "${PN}-adbd"
+INITSCRIPT_NAME_${PN}-adbd = "adbd"
+INITSCRIPT_PARAMS_${PN}-adbd = "start 38 S . stop 62 0 1 6 ."
+
+INITSCRIPT_PACKAGES =+ "${PN}-usb"
+INITSCRIPT_NAME_${PN}-usb = "usb"
+INITSCRIPT_PARAMS_${PN}-usb = "start 37 S ."
 
 PACKAGES =+ "${PN}-libcutils-dbg ${PN}-libcutils ${PN}-libcutils-dev ${PN}-libcutils-static"
 FILES_${PN}-libcutils-dbg    = "${libdir}/.debug/libcutils.*"

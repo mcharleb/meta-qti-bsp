@@ -1,17 +1,17 @@
-inherit autotools
+inherit autotools update-rc.d
 
-PR = "r1"
+PR = "r3"
 
 DESCRIPTION = "Userspace Logging service"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-SRC_URI = "file://${WORKSPACE}/dlog"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://dlog"
 
-S = ${WORKDIR}/dlog
+S = "${WORKDIR}/dlog"
 
-inherit update-rc.d
 
 INITSCRIPT_NAME = "dlog"
 INITSCRIPT_PARAMS = "start 01 2 3 4 5 . stop 99 0 1 6 ."
@@ -24,7 +24,7 @@ do_install_append() {
 	install -m 0755 ${S}/dlog.sh -D ${D}${sysconfdir}/init.d/${INITSCRIPT_NAME}
 }
 
-pkg_postinst () {
+pkg_postinst_${PN} () {
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
         # remove all rc.d-links potentially created from alternatives
         update-rc.d $OPT -f ${INITSCRIPT_NAME} remove

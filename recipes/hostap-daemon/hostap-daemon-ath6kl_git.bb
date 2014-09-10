@@ -1,6 +1,6 @@
 include hostap-daemon.inc
 
-PR = "${INC_PR}.2"
+PR = "${INC_PR}.3"
 
 SRC_URI += "file://defconfig-ath6kl"
 

@@ -14,13 +14,14 @@ FILES_${PN}-dbg += "\
         /usr/sbin/.debug \
         "
 
-PR = "r3"
+PR = "r4"
 
 DEPENDS = "openssl qmi"
 
-SRC_URI = "file://${WORKSPACE}/external/hostap"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://external/hostap"
 
-S = "${WORKDIR}/hostap"
+S = "${WORKDIR}/external/hostap"
 
 SUPPLICANT_CONFIG = "${S}/wpa_supplicant/.config"
 HOSTAPD_CONFIG = "${S}/hostapd/.config"

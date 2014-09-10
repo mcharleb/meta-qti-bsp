@@ -8,10 +8,11 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 DEPENDS = "libnfnetlink libnetfilter-conntrack"
 
-PR = "r0"
+PR = "r1"
 
 SRC_URI = " \
 	http://netfilter.org/projects/conntrack-tools/files/conntrack-tools-${PV}.tar.bz2 \
+        file://conntrack-tools-NULL.patch \
 "
 
 SRC_URI[md5sum] = "8a60f02a177fc31fe40cc992c4de90e2"

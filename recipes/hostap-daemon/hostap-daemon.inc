@@ -12,9 +12,9 @@ INC_PR = "r3"
 
 DEPENDS = "openssl libnl"
 
-SRC_URI = "file://${WORKSPACE}/external/hostap"
+SRC_URI = "file://${WORKSPACE}/external/hostap/"
 
-S = "${WORKDIR}/hostap/hostapd"
+S = "${WORKDIR}/external/hostap/hostapd/"
 
 do_install() {
     make install DESTDIR=${D} BINDIR=${sbindir}/

@@ -1,15 +1,16 @@
+inherit autotools
+
 DESCRIPTION = "mm-image-codec"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PV = "1.0.0"
-PR = "r1"
+PR = "r2"
 
-SRC_URI = "file://${WORKSPACE}/camera-hal/mm-image-codec"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://camera-hal/mm-image-codec"
 
-S = "${WORKDIR}/mm-image-codec"
-
-inherit autotools
+S = "${WORKDIR}/camera-hal/mm-image-codec"
 
 # Need the kernel headers
 DEPENDS += "virtual/kernel"

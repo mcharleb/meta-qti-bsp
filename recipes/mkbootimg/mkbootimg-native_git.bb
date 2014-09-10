@@ -1,9 +1,5 @@
 inherit native
 
-PR = "r4"
-
-MY_PN = "mkbootimg"
-
 DESCRIPTION = "Boot image creation tool from Android"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
@@ -12,6 +8,10 @@ HOMEPAGE = "http://android.git.kernel.org/?p=platform/system/core.git"
 PROVIDES = "mkbootimg-native"
 
 DEPENDS = "libmincrypt-native"
+
+PR = "r5"
+
+MY_PN = "mkbootimg"
 
 # Handle do_fetch ourselves...  The automated tools don't work nicely with this...
 do_fetch () {

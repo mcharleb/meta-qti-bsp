@@ -3,10 +3,12 @@ require recipes-graphics/xorg-driver/xorg-driver-common.inc
 DESCRIPTION = "X.Org X server -- MSM display driver"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+#PV = "git-${GITSHA}"
 
-PR = "r8"
+PR = "r9"
 
-SRC_URI = "file://${WORKSPACE}/xf86-video-msm"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://xf86-video-msm"
 S = "${WORKDIR}/xf86-video-msm"
 
 EXTRA_OECONF_append += " --with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include \
@@ -16,7 +18,7 @@ EXTRA_OECONF_append += " --with-kernel-headers=${STAGING_KERNEL_DIR}/usr/include
 
 EXTRA_OECONF_append += " --enable-target=${BASEMACHINE}"
 
-RDEPENDS += "xserver-xorg"
+RDEPENDS_${PN} += "xserver-xorg"
 
 DEPENDS = "${RDEPENDS} \
            dri2proto \

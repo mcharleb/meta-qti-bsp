@@ -12,13 +12,18 @@ INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 
 do_install_append() {
-        install -m 0644 ${S}/profiles/network/network.conf ${D}/${sysconfdir}/bluetooth/
-        install -m 0644 ${S}/profiles/input/input.conf ${D}/${sysconfdir}/bluetooth/
+        install -d ${D}${sysconfdir}/bluetooth/
+
+        if [ -f ${S}/profiles/network/network.conf ]; then
+            install -m 0644 ${S}/profiles/network/network.conf ${D}/${sysconfdir}/bluetooth/
+        fi
+
+        if [ -f ${S}/profiles/input/input.conf ]; then
+            install -m 0644 ${S}/profiles/input/input.conf ${D}/${sysconfdir}/bluetooth/
+        fi
         # at_console doesn't really work with the current state of OE, so punch some more holes so people can actually use BT
         install -m 0644 ${WORKDIR}/bluetooth.conf ${D}/${sysconfdir}/dbus-1/system.d/
 }
-
-RDEPENDS_${PN}-dev = "bluez-hcidump"
 
 PACKAGES =+ "libasound-module-bluez"
 

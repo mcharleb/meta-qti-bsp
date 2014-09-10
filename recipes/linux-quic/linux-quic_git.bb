@@ -21,10 +21,10 @@ KERNEL_DEFCONFIG_mdmferrum     = "mdmferrum_defconfig"
 KERNEL_DEFCONFIG              ?= "msm9625_defconfig"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-KDIR = "/kernel"
+KDIR = "/usr/src/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r7"
+PR = "r8"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc dtbtool-native mkbootimg-native  dtbtool-native mkbootimg-native"
@@ -154,9 +154,25 @@ do_install () {
 	oe_runmake headers_install O=${D}${KDIR}
 	oe_runmake ${KERNEL_DEFCONFIG} O=${D}${KDIR}
 	uses_modules && oe_runmake modules_prepare O=${D}${KDIR}
-    	cp -rf ${D}/* ${STAGING_DIR_TARGET}
+	cp -rf ${D}/* ${STAGING_DIR_TARGET}
+	cp -rf ${D}/boot/* ${STAGING_KERNEL_DIR}
+        #
+        # Store the kernel version in sysroots for module-base.bbclass
+        #
+
+        echo "${KERNEL_VERSION}" > ${O}/kernel-abiversion
+
+        #
+        # Store kernel image name to allow use during image generation
+        #
+
+        echo "${KERNEL_IMAGE_BASE_NAME}" >${O}/kernel-image-name
+
 }
 
+do_bundle_initramfs() {
+        :
+}
 
 do_deploy () {
 # Make bootimage
@@ -193,3 +209,5 @@ do_deploy () {
 }
 
 addtask deploy before do_build after do_install
+do_bundle_initramfs[nostamp] = "1"
+addtask bundle_initramfs after do_compile

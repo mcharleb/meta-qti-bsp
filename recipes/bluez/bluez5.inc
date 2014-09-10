@@ -9,7 +9,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
                     file://src/main.c;beginline=1;endline=24;md5=9bc54b93cd7e17bf03f52513f39f926e"
 
 DEPENDS = "udev alsa-lib libusb dbus-glib glib-2.0 libical"
-RDEPENDS_${PN}-dev = "bluez-hcidump"
 
 ASNEEDED = ""
 
@@ -24,7 +23,6 @@ EXTRA_OECONF = "\
   --disable-cups \
   --enable-test \
   --enable-datafiles \
-  --with-systemdsystemunitdir=${STAGING_DIR_TARGET}/lib/systemd/system \
-  --with-systemduserunitdir=${STAGING_DIR_TARGET}/lib/systemd/system \
+  --disable-systemd \
   --with-sanitized-headers=${STAGING_KERNEL_HEADERS} \
 "

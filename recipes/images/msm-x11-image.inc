@@ -11,12 +11,12 @@ XSERVER = "xserver-xorg \
            xserver-xf86-config "
 
 IMAGE_INSTALL += "${XSERVER}"
-IMAGE_INSTALL += "${POKY_BASE_INSTALL}"
+IMAGE_INSTALL += "${CORE_IMAGE_BASE_INSTALL}"
 
 IMAGE_INSTALL += "xeyes"
 IMAGE_INSTALL += "xset"
 
-IMAGE_FEATURES += "x11-mini ssh-server-dropbear"
+IMAGE_FEATURES += "x11-base ssh-server-dropbear"
 
 IMAGE_LINGUAS = ""
 

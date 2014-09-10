@@ -4,9 +4,9 @@ require mdm-recovery-bootimg.inc
 DEPENDS += "bzip2 fsconfig-native"
 
 # The OE-Core minimal boot image files.
-IMAGE_INSTALL += task-core-boot
-IMAGE_INSTALL += ${ROOTFS_PKGMANAGE_BOOTSTRAP}
-IMAGE_INSTALL += ${POKY_EXTRA_INSTALL}
+IMAGE_INSTALL += "task-core-boot"
+IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
+IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "base-files"

@@ -5,13 +5,16 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-SRC_URI = "file://${WORKSPACE}/qcom-opensource/kernel/kernel-tests"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://qcom-opensource/kernel/kernel-tests/"
 
 DEPENDS = "virtual/kernel"
+# This DEPENDS is to serialize kernel module builds
+DEPENDS_append_mdm9635 = " qcacld-ll rtsp-alg"
 
-PR = "r2"
+PR = "r3"
 
-S = "${WORKDIR}/kernel-tests"
+S = "${WORKDIR}/qcom-opensource/kernel/kernel-tests"
 CFLAGS_pn-${PN} = ""
 CPPFLAGS_pn-${PN} = ""
 CXXFLAGS_pn-${PN} = ""

@@ -6,9 +6,10 @@ BUGTRACKER = "http://sourceforge.net/tracker/?group_id=243163&atid=1121516&sourc
 LICENSE = "GPLv2"
 PRIORITY = "optional"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0;md5=801f80980d171dd6425610833a22dbe6"
+DEPENDS = "readline"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r0"
+PR = "r1"
 
 SRC_URI = "\
     http://www.sqlite.org/${PN}-${PV}.tar.gz \
