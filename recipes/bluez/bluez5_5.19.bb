@@ -7,7 +7,8 @@ SRC_URI += "file://0001-bluetooth-Add-bluetooth-support-for-QCA6174-chip.patch \
             file://0002-bluetooth-Enable-3Mbps-baud-rate-support.patch \
             file://0003-bluetooth-Remove-unused-functions-in-the-firmware-do.patch \
             file://0004-bluetooth-Configure-BD-Address.patch \
-            file://0005-bluetooth-Fix-bug-in-firmware-parsing-mechanism.patch"
+            file://0005-bluetooth-Fix-bug-in-firmware-parsing-mechanism.patch \
+            file://0006-bluetooth-Enable-bluetooth-low-power-mode-functional.patch"
 
 SRC_URI[md5sum] = "2a575ec06aeaeadca9605b2f8173e00a"
 SRC_URI[sha256sum] = "92bf4ce87d58014794ef6b22dc0a13b0b19acdf9c96870391c935d1e01a43ffa"
