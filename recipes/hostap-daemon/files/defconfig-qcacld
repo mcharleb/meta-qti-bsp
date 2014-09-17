@@ -193,3 +193,6 @@ CONFIG_OS=unix
 #LIBS += -lbfd -liberty -lz
 #LIBS_p += -lbfd -liberty -lz
 #LIBS_c += -lbfd -liberty -lz
+
+# Enable ACS to make host driver be capable of advertising ACS offload feature
+CONFIG_ACS=y
