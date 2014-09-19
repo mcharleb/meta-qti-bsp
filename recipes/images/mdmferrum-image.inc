@@ -20,7 +20,7 @@ DEPENDS = " \
 IMAGE_FSTYPES = "tar.gz yaffs2 ${INITRAMFS_FSTYPES}"
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
-IMAGE_INSTALL += "${POKY_EXTRA_INSTALL}"
+IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "alsa-intf"
