@@ -75,10 +75,6 @@ do_install_append_msm8226 () {
 	install ${D}/usr/bin/fastboot ${DEPLOY_DIR}/host/linux/bin
 }
 
-INITSCRIPT_PACKAGES = "${PN}-adbd"
-INITSCRIPT_NAME_${PN}-adbd = "adbd"
-INITSCRIPT_PARAMS_${PN}-adbd = "start 38 S . stop 62 0 1 6 ."
-
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
 INITSCRIPT_NAME_${PN}-usb = "usb"
 INITSCRIPT_PARAMS_${PN}-usb = "start 37 S ."
