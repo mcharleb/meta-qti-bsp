@@ -4,7 +4,11 @@ require mdm-recovery-bootimg.inc
 DEPENDS += "bzip2 fsconfig-native"
 
 # Image output types
-IMAGE_FSTYPES += "yaffs2"
+IMAGE_FSTYPES += "ubi ext4"
+
+MKUBIFS_ARGS = "-m 4096 -e 253952 -c 83 -F"
+
+UBI_VOLNAME = "rootfs"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "task-core-boot"
@@ -23,3 +27,4 @@ IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "start-scripts-find-recovery-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "mtd-utils-ubifs"
