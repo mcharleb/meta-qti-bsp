@@ -1,5 +1,5 @@
 diff --git a/sample-etc_ddclient.conf b/sample-etc_ddclient.conf
-index 9ba474e..1397aca 100644
+index 9ba474e..49ecc5e 100644
 --- a/sample-etc_ddclient.conf
 +++ b/sample-etc_ddclient.conf
 @@ -19,12 +19,13 @@
@@ -22,15 +22,16 @@ index 9ba474e..1397aca 100644
  # postscript=script			# run script after updating.  The
  					# new IP is added as argument.
  #
-@@ -58,6 +59,7 @@ ssl=yes					# use ssl-support.  Works with
+@@ -58,6 +59,8 @@ ssl=yes					# use ssl-support.  Works with
  #
  #use=ip,                     ip=127.0.0.1	# via static IP's
  #use=if,                     if=eth0		# via interfaces
 +use=if, if=rmnet_data0
++usev6=if, if=rmnet_data0
  #use=web					# via web
  #
  #protocol=dyndns2				# default protocol
-@@ -66,7 +68,9 @@ ssl=yes					# use ssl-support.  Works with
+@@ -66,7 +69,9 @@ ssl=yes					# use ssl-support.  Works with
  #server=members.dyndns.org:8245			# default server (bypassing proxies)
  
  #login=your-login				# default login
@@ -40,7 +41,7 @@ index 9ba474e..1397aca 100644
  #mx=mx.for.your.host				# default MX
  #backupmx=yes|no				# host is primary MX?
  #wildcard=yes|no				# add wildcard CNAME?
-@@ -76,10 +80,9 @@ ssl=yes					# use ssl-support.  Works with
+@@ -76,10 +81,9 @@ ssl=yes					# use ssl-support.  Works with
  ##
  ## (supports variables: wildcard,mx,backupmx)
  ##
