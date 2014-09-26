@@ -3,7 +3,7 @@ require mdm-bootimg.inc
 require mdm-ramdisk.inc
 
 # Variables for switching to ubifs (for system partition)
-MKUBIFS_ARGS = "-m 2048 -e 126976 -c 300 -F"
+MKUBIFS_ARGS = "-m 4096 -e 253952 -c 300 -F"
 
 UBI_VOLNAME = "rootfs"
 
@@ -31,7 +31,6 @@ IMAGE_INSTALL += "data-ipa-cfg-mgr"
 IMAGE_INSTALL += "data-oss"
 IMAGE_INSTALL += "dhcpcd"
 IMAGE_INSTALL += "dnsmasq"
-#IMAGE_INSTALL += "dropbear"
 IMAGE_INSTALL += "ddclient"
 IMAGE_INSTALL += "ebtables"
 DEPENDS += "gdb-cross"
@@ -45,7 +44,7 @@ IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "initscripts-msm"
 #IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
-
+IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "jquery"
