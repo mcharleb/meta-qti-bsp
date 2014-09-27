@@ -1,6 +1,6 @@
-From 70e84be2036ac8fe9cd6bce50d107f30970540b0 Mon Sep 17 00:00:00 2001
+From 33a6458267c8061450858d563cf43356307d7a08 Mon Sep 17 00:00:00 2001
 From: Tyler Wear <twear@codeaurora.org>
-Date: Thu, 31 Jul 2014 11:16:11 -0700
+Date: Fri, 26 Sep 2014 09:00:50 -0700
 Subject: [PATCH 1/1] certification-fixes
 
 ---
@@ -240,7 +240,7 @@ index ee6e47b..b29c249
 diff --git a/miniupnpd.c b/miniupnpd.c
 old mode 100644
 new mode 100755
-index e22ba13..f630418
+index e22ba13..991011a
 --- a/miniupnpd.c
 +++ b/miniupnpd.c
 @@ -1347,7 +1347,11 @@ init(int argc, char * * argv, struct runtime_vars * v)
@@ -299,11 +299,18 @@ index e22ba13..f630418
  
  	if(GETFLAG(ENABLEUPNPMASK))
  	{
-@@ -2279,6 +2297,15 @@ main(int argc, char * * argv)
+@@ -2279,6 +2297,7 @@ main(int argc, char * * argv)
  
  shutdown:
  	syslog(LOG_NOTICE, "shutting down MiniUPnPd");
 +
+ 	/* send good-bye */
+ 	if (GETFLAG(ENABLEUPNPMASK))
+ 	{
+@@ -2294,6 +2313,14 @@ shutdown:
+ 	/* try to send pending packets */
+ 	finalize_sendto();
+ 
 +#ifdef QCMAP
 +        /* Tear Down QCMap Client */
 +	if(!tearDownQCMAPClient())
@@ -312,8 +319,8 @@ index e22ba13..f630418
 +	}
 +#endif
 +
- 	/* send good-bye */
- 	if (GETFLAG(ENABLEUPNPMASK))
+ 	/* close out open sockets */
+ 	while(upnphttphead.lh_first != NULL)
  	{
 diff --git a/miniupnpd.conf b/miniupnpd.conf
 old mode 100644
