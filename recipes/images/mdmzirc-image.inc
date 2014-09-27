@@ -5,6 +5,8 @@ require mdm-ramdisk.inc
 # Variables for switching to ubifs (for system partition)
 MKUBIFS_ARGS = "-m 2048 -e 126976 -c 300 -F"
 
+UBI_VOLNAME = "rootfs"
+
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES += "ubi ext4"
 
