@@ -25,7 +25,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/usr/src/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r8"
+PR = "r14"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc dtbtool-native mkbootimg-native  dtbtool-native mkbootimg-native"
@@ -193,13 +193,9 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     machine=`echo ${MACHINE}`
-     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3'
-    if [ "${machine}" == "mdm9635" ]; then
-       __cmdparams+=' msm_rtb.filter=0x37'
-    fi
+     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 earlyprintk'
 
     if [ "${machine}" == "mdmferrum" ]; then
-       __cmdparams+=' msm_rtb.filter=0x37'
        __cmdparams+=' maxcpus=1'
     fi
 
@@ -208,11 +204,13 @@ do_deploy () {
     fi
 
     cmdparams=`echo ${__cmdparams}`
+
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${STAGING_DIR_TARGET}/boot/zImage-${ver} \
         --dt ${STAGING_DIR_TARGET}/boot/masterDTB \
         --ramdisk /dev/null \
         --cmdline "${cmdparams}" \
+        --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
         --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET} \
         --ramdisk_offset 0x0 \

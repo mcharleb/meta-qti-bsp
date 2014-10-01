@@ -10,7 +10,7 @@ SRC_URI = "file://init_mss/"
 S = "${WORKDIR}/init_mss/"
 
 INITSCRIPT_NAME = "init_sys_mss"
-INITSCRIPT_PARAMS = "start 60 S ."
+INITSCRIPT_PARAMS = "start 38 S ."
 
 do_install() {
     install -m 0755 ${S}/init_mss -D ${D}/sbin/init_mss
