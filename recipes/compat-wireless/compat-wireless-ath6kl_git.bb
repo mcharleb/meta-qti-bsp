@@ -1,6 +1,7 @@
 include compat-wireless.inc
 
-PR = "${INC_PR}.4"
+do_unpack[deptask] = "do_populate_sysroot"
+PR = "${INC_PR}.5-${KERNEL_VERSION}"
 
 SRC_URI += "file://ath6kl_ctrl_wlan"
 

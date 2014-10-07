@@ -65,6 +65,16 @@ INSANE_SKIP_kernel-modbuild = "arch"
 PACKAGES =+ "kernel-modules"
 FILES_kernel-modules = "/lib/modules"
 
+RDEPENDS_kernel-base ?= "kernel-image"
+RPROVIDES_kernel-base += "kernel-${KERNEL_VERSION}"
+PKG_kernel-image = "kernel-image-${@legitimize_package_name('${KERNEL_VERSION}')}"
+PKG_kernel-base = "kernel-${@legitimize_package_name('${KERNEL_VERSION}')}"
+ALLOW_EMPTY_kernel = "1"
+ALLOW_EMPTY_kernel-base = "1"
+ALLOW_EMPTY_kernel-image = "1"
+ALLOW_EMPTY_kernel-modules = "1"
+DESCRIPTION_kernel-modules = "Kernel modules meta package"
+
 # The kernel makefiles do not like extra flags being given to make.
 EXTRA_OEMAKE_pn-${PN} = ""
 CFLAGS_pn-${PN} = ""
