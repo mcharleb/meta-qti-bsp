@@ -1,4 +1,4 @@
-inherit autotools linux-kernel-base module
+inherit autotools module
 
 DESCRIPTION = "Linux Wireless compatibility package"
 HOMEPAGE = "http://wireless.kernel.org/en/users/Download"
