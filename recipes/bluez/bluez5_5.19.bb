@@ -2,6 +2,7 @@ require bluez5.inc
 
 PR = "r0"
 
+DEPENDS += "readline"
 SRC_URI += "file://0001-bluetooth-Add-bluetooth-support-for-QCA6174-chip.patch \
             file://0002-bluetooth-Enable-3Mbps-baud-rate-support.patch \
             file://0003-bluetooth-Remove-unused-functions-in-the-firmware-do.patch \
