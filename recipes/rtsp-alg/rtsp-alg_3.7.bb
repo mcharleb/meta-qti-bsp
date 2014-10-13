@@ -4,7 +4,10 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;beginline=2;endline=30;md5=1d494e4d4253d1fcdcbfe334f8a4cd0a"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r4-${KERNEL_VERSION}"
+PR = "r5-${KERNEL_VERSION}"
+
+# This DEPENDS is to serialize kernel module builds
+DEPENDS_mdm9635 = "alx"
 
 FILES_${PN} += "\
     ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/netfilter/nf_nat_rtsp.ko \
