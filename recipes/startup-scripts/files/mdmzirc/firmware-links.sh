@@ -39,7 +39,7 @@ cd /firmware/image
 # Get the list of files in /firmware/image
 # for which sym links have to be created
 
-fwfiles=$(ls modem* adsp* *.bin mba*)
+fwfiles=$(ls modem* *.bin mba*)
 
 # Check if the links with similar names
 # have been created in /lib/firmware
@@ -85,18 +85,6 @@ case $linksNeeded in
             # trying to log here but nothing will be logged since it is
             # early in the boot process. Is there a way to log this message?
             echo "PIL no modem image found"
-            ;;
-      esac
-
-      case `ls adsp.mdt 2>/dev/null` in
-         adsp.mdt)
-            for imgfile in adsp*
-            do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-            ;;
-         *)
-            echo "PIL no adsp image found"
             ;;
       esac
 
