@@ -11,5 +11,5 @@ def get_git_latest_tag(path, d):
         if f.close() is None:
             rev = data.split(" ")[0]
             if len(rev) != 0:
-                return rev
+                return rev.rstrip("\n")
     return time.strftime('%Y%m%d%H%M')
