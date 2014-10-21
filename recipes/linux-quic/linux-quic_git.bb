@@ -25,7 +25,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/usr/src/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r10"
+PR = "r11"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc dtbtool-native mkbootimg-native  dtbtool-native mkbootimg-native"
@@ -136,7 +136,7 @@ __do_quic_deploy () {
 
     install -d ${STAGING_DIR_TARGET}/boot
 	for f in System.map Module.symvers vmlinux; do
-    	          install -m 0644 ${O}/${f} ${STAGING_DIR_TARGET}/boot/${f}-${KERNEL_VERSION}
+             install -m 0644 ${O}/${f} ${STAGING_DIR_TARGET}/boot/${f}-${KERNEL_VERSION}
 	done
 	install -m 0644 ${O}/arch/${TARGET_ARCH}/boot/${KERNEL_IMAGETYPE} ${STAGING_DIR_TARGET}/boot/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
 }
@@ -153,7 +153,8 @@ do_install () {
 
 	install -d ${D}/boot
 	for f in System.map Module.symvers vmlinux; do
-		install -m 0644 ${O}/${f} ${D}/boot/${f}-${KERNEL_VERSION}
+	         install -m 0644 ${O}/${f} ${D}/boot/${f}-${KERNEL_VERSION}
+	         ln -snf ${D}/boot/${f}-${KERNEL_VERSION} ${D}/boot/${f}
 	done
 	install -m 0644 ${O}/arch/${TARGET_ARCH}/boot/${KERNEL_IMAGETYPE} \
 		${D}/boot/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
