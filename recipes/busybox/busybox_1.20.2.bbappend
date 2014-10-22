@@ -13,6 +13,7 @@ SRC_URI += "\
             file://login.cfg \
             file://mdev.cfg \
             file://base.cfg \
+            file://busybox_klogd.patch;patchdir=.. \
 "
 
 prefix = ""
