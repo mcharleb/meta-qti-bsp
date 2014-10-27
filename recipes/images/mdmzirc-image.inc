@@ -1,6 +1,5 @@
 # Rootfs creation.
 require mdm-bootimg.inc
-require mdm-ramdisk.inc
 
 # Variables for switching to ubifs (for system partition)
 MKUBIFS_ARGS = "-m 4096 -e 253952 -c 300 -F"
@@ -88,7 +87,6 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 do_rootfs_append() {
-    do_ramdisk_create
 
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ubi
