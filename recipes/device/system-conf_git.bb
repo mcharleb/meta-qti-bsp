@@ -13,3 +13,5 @@ SRC_URI_mdmzirc = "file://mdm-init/"
 # Update for each machine
 S_mdm9635 = "${WORKDIR}/device/qcom/krypton/"
 S_mdmzirc = "${WORKDIR}/mdm-init/"
+
+FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
