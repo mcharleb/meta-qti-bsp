@@ -32,15 +32,21 @@
 FindAndMountUBI () {
    partition=$1
    dir=$2
+   ubi_device_number=1
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
    mkdir -p $dir
    ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
    mount -t ubifs /dev/ubi"$ubi_device_number"_0 $dir -o bulk_read
-   echo "MTD : Mounting of /dev/ubi"$ubi_device_number"_0 on $dir done"
+}
 
-   ubi_device_number=$((ubi_device_number+1))
+FindAndMountVolumeUBI () {
+   volume_name=$1
+   dir=$2
+
+   mkdir -p $dir
+   mount -t ubifs ubi0:$volume_name $dir -o bulk_read
 }
 
 FindAndMountEXT4 () {
@@ -51,7 +57,6 @@ FindAndMountEXT4 () {
    echo "EMMC : Detected block device : $dir for $partition"
    mkdir -p $dir
    mount -t ext4 /dev/$mmc_block_device $dir
-   echo "EMMC : Mounting of /dev/$mmc_block_device on $dir done"
 }
 
 mtd_file="/proc/mtd"
@@ -60,14 +65,16 @@ emmc_file="/proc/emmc"
 if [ -f "$mtd_file" ]
 then
     fstype="UBI"
-    ubi_device_number=1
+    eval FindAndMountVolume${fstype} usrfs /usr
+    eval FindAndMountVolume${fstype} cachefs /cache
+
 elif [ -f "$emmc_file" ]
 then
     fstype="EXT4"
+    eval FindAndMount${fstype} userdata /usr
+    eval FindAndMount${fstype} cache /cache
 fi
 
-eval FindAndMount${fstype} userdata /usr
-eval FindAndMount${fstype} cache /cache
 eval FindAndMount${fstype} modem /firmware
 
 exit 0
