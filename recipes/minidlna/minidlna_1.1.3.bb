@@ -15,6 +15,7 @@ SRC_URI = "\
     http://sourceforge.net/projects/minidlna/files/minidlna/${PV}/${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
     file://0001-M-DMS.patch \
+    file://0001-initial-notify.patch \
 "
 
 SRC_URI[md5sum] = "879027192c89e5376cdd2ae2d1aa33b4"
