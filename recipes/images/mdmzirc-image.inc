@@ -1,13 +1,8 @@
 # Rootfs creation.
 require mdm-bootimg.inc
 
-# Variables for switching to ubifs (for system partition)
-MKUBIFS_ARGS = "-m 4096 -e 253952 -c 300 -F"
-
-UBI_VOLNAME = "rootfs"
-
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES += "ubi ext4"
+IMAGE_FSTYPES += "ubifs ext4"
 
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -89,5 +84,4 @@ IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 do_rootfs_append() {
 
     cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ubi ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ubi
 }
