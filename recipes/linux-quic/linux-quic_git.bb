@@ -154,7 +154,7 @@ do_install () {
 	install -d ${D}/boot
 	for f in System.map Module.symvers vmlinux; do
 	         install -m 0644 ${O}/${f} ${D}/boot/${f}-${KERNEL_VERSION}
-	         ln -snf ${D}/boot/${f}-${KERNEL_VERSION} ${D}/boot/${f}
+	         cp  ${D}/boot/${f}-${KERNEL_VERSION} ${D}/boot/${f}
 	done
 	install -m 0644 ${O}/arch/${TARGET_ARCH}/boot/${KERNEL_IMAGETYPE} \
 		${D}/boot/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
