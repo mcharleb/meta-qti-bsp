@@ -9,7 +9,7 @@ PROVIDES = "virtual/bootloader"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI  = "file://bootable/bootloader/lk/"
 S        = "${WORKDIR}/bootable/bootloader/${PN}"
-PR       = "r12"
+PR       = "r13"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -23,8 +23,6 @@ LIBGCC_msm8226     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.8.1/libgcc.a"
 
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_9615-cdp = "mdm9615"
-
-MY_TARGET_mdmzirc = "msmzirc"
 
 BOOTLOADER_NAME         = "appsboot"
 BOOTLOADER_NAME_msm8960 = "emmc_appsboot"
@@ -46,7 +44,7 @@ do_install() {
         install build-${MY_TARGET}/${BOOTLOADER_NAME}.{mbn,raw} ${D}/boot
 }
 
-do_install_mdmzirc() {
+do_install_mdm9640() {
         install -d ${D}/boot
         install build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${D}/boot
 }
@@ -74,7 +72,7 @@ do_deploy() {
         install ${S}/build-${MY_TARGET}/${BOOTLOADER_NAME}.{mbn,raw} ${DEPLOYDIR}
 }
 
-do_deploy_mdmzirc() {
+do_deploy_mdm9640() {
         install ${S}/build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${DEPLOYDIR}
 }
 
