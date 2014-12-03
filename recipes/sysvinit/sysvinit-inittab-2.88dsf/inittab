@@ -11,6 +11,12 @@ si::sysinit:/etc/init.d/rcS
 # What to do in single-user mode.
 ~~:S:wait:/sbin/sulogin
 
+#Set the storage daemons to respawn
+# NOTE: These entries should be above the rc
+#       run level entries with wait below.
+rmts:2345:respawn:/sbin/rmt_storage
+tftp:2345:respawn:/sbin/tftp_server
+
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
 #
