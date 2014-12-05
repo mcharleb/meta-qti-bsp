@@ -18,6 +18,7 @@ KERNEL_DEFCONFIG_mdm9625-perf  = "msm9625-perf_defconfig"
 KERNEL_DEFCONFIG_mdm9635       = "mdm9630_defconfig"
 KERNEL_DEFCONFIG_mdm9635-perf  = "mdm9630-perf_defconfig"
 KERNEL_DEFCONFIG_mdm9640       = "mdm9640_defconfig"
+KERNEL_DEFCONFIG_mdm9640-perf  = "mdm9640-perf_defconfig"
 KERNEL_DEFCONFIG_mdmferrum     = "mdmferrum_defconfig"
 KERNEL_DEFCONFIG              ?= "msm9625_defconfig"
 
@@ -25,7 +26,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/usr/src/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r12"
+PR = "r13"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc dtbtool-native mkbootimg-native  dtbtool-native mkbootimg-native"
@@ -202,7 +203,7 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     machine=`echo ${MACHINE}`
-     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 earlyprintk'
+     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37'
 
     if [ "${machine}" == "mdmferrum" ]; then
        __cmdparams+=' maxcpus=1'
@@ -213,7 +214,7 @@ do_deploy () {
     fi
 
 
-    if [ "${machine}" == "mdm9640" ]; then
+    if [ "${BASEMACHINE}" == "mdm9640" ]; then
        __cmdparams+=' lpm_levels.sleep_disabled=1'
     fi
 
