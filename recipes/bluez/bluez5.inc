@@ -12,9 +12,10 @@ DEPENDS = "udev alsa-lib libusb dbus-glib glib-2.0 libical"
 
 ASNEEDED = ""
 
-SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.gz"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI = "file://external/bluetooth/bluez/"
 
-S = "${WORKDIR}/bluez-${PV}"
+S = "${WORKDIR}/external/bluetooth/bluez/"
 
 inherit autotools
 
