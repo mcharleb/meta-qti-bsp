@@ -32,13 +32,23 @@
 FindAndMountUBI () {
    partition=$1
    dir=$2
-   ubi_device_number=1
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
    mkdir -p $dir
-   ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
-   mount -t ubifs /dev/ubi"$ubi_device_number"_0 $dir -o bulk_read
+
+   ubiattach -m $mtd_block_number -d 1 /dev/ubi_ctrl
+   device=/dev/ubi1_0
+   while [ 1 ]
+    do
+        if [ -c $device ]
+        then
+            mount -t ubifs /dev/ubi1_0 $dir -o bulk_read
+            break
+        else
+            sleep 0.010
+        fi
+    done
 }
 
 FindAndMountVolumeUBI () {
