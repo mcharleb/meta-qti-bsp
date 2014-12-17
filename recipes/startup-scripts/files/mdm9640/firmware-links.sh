@@ -34,7 +34,23 @@ PATH=/sbin:/bin:/usr/sbin:/usr/bin
 export PATH
 
 # Check for images and set up symlinks
-cd /firmware/image
+if [ -f /etc/init.d/fw ]
+then
+   chmod 777 /etc/init.d/fw
+   swconfig=`cat /etc/init.d/fw`
+   fwpath="/firmware/image/${swconfig}"
+   if [ -d $fwpath -a "$(ls $fwpath)" ]
+   then
+      echo "fwpath exists"
+   else
+      fwpath="/firmware/image"
+   fi
+else
+   fwpath="/firmware/image"
+fi
+
+echo $fwpath
+cd $fwpath
 
 # Get the list of files in /firmware/image
 # for which sym links have to be created
@@ -72,13 +88,13 @@ done
 
 case $linksNeeded in
    1)
-      cd /firmware/image
+      cd $fwpath
 
       case `ls modem.mdt 2>/dev/null` in
          modem.mdt)
             for imgfile in modem*
             do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+               ln -s $fwpath/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
             ;;
         *)
@@ -92,7 +108,7 @@ case $linksNeeded in
          *.bin)
             for imgfile in *.bin
             do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+               ln -s $fwpath/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
             ;;
          *)
@@ -104,7 +120,7 @@ case $linksNeeded in
          *.tlv)
             for imgfile in *.tlv
             do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+               ln -s $fwpath/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
             ;;
          *)
@@ -116,7 +132,7 @@ case $linksNeeded in
          mba.mdt)
             for imgfile in mba*
             do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+               ln -s $fwpath/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
             ;;
          *)
