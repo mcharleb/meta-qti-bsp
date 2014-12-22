@@ -4,3 +4,7 @@ FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI += "file://fstab"
+
+do_install_append(){
+    ln -s /media/card ${D}/sdcard
+}
