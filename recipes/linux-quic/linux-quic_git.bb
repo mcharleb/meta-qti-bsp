@@ -213,11 +213,6 @@ do_deploy () {
         __cmdparams+=' rootfstype=yaffs2'
     fi
 
-
-    if [ "${BASEMACHINE}" == "mdm9640" ]; then
-       __cmdparams+=' lpm_levels.sleep_disabled=1'
-    fi
-
     cmdparams=`echo ${__cmdparams}`
 
     # Updated base address according to new memory map.
