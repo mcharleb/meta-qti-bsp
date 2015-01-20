@@ -1,4 +1,4 @@
-inherit module
+inherit module autotools
 
 DESCRIPTION = "Qualcomm Atheros Gigabit Ethernet Driver"
 LICENSE = "ISC"
@@ -11,6 +11,8 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/compat-wireless/drivers/net/ethernet/atheros/alx/ \
            file://start_alx_le"
 S = "${WORKDIR}/external/compat-wireless/drivers/net/ethernet/atheros/alx/"
+
+FILES_${PN}="/etc/init.d/start_alx_le"
 
 do_install() {
     module_do_install
