@@ -9,12 +9,6 @@ PR = "r5-${KERNEL_VERSION}"
 # This DEPENDS is to serialize kernel module builds
 DEPENDS_mdm9635 = "alx"
 
-FILES_${PN} += "\
-    ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/netfilter/nf_nat_rtsp.ko \
-    "
-FILES_${PN} += "\
-    ${D}${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/netfilter/nf_conntrack_rtsp.ko \
-    "
 
 SRC_URI = "http://github.com/maru-sama/rtsp-linux/archive/${PV}.tar.gz \
 		file://Makefile.patch \
