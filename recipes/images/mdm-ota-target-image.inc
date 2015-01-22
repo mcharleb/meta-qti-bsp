@@ -49,9 +49,6 @@ echo /system   yaffs2  system >> ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/recovery.fs
 
 #Copy contents of userdata rootfs
 cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS}/DATA/.
-#Remove fota dir and ipth_dme binary from userdata. We dont want to update them
-rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/fota
-rm -rf ${OTA_TARGET_IMAGE_ROOTFS}/DATA/bin/ipth_dme
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin
@@ -59,7 +56,6 @@ cp   ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/usr/bin/applypatch ${OTA_TARGET_IMAGE_R
 
 cp   ${OTA_TARGET_IMAGE_ROOTFS}/RECOVERY/usr/bin/updater ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
 
-cp ${WORKSPACE}/Innopath/FOTA/ipth_dua/ipth_dua ${OTA_TARGET_IMAGE_ROOTFS}/OTA/bin/.
 
 # copy contents of META folder
 #recovery_api_version is from recovery module
