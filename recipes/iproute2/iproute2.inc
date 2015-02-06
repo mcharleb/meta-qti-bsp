@@ -9,11 +9,11 @@ LICENSE = "GPLv2+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
                     file://ip/ip.c;beginline=3;endline=8;md5=689d691d0410a4b64d3899f8d6e31817"
 
-DEPENDS = "flex-native bison-native"
+DEPENDS = "flex-native bison-native iptables"
 
 inherit update-alternatives
 
-EXTRA_OEMAKE = "CC='${CC}' KERNEL_INCLUDE=${STAGING_KERNEL_DIR}/include DOCDIR=${docdir}/iproute2 SUBDIRS='lib tc ip bridge' SBINDIR=/sbin"
+EXTRA_OEMAKE = "CC='${CC}' KERNEL_INCLUDE=${STAGING_INCDIR} DOCDIR=${docdir}/iproute2 SUBDIRS='lib tc ip bridge' SBINDIR='${base_sbindir}' LIBDIR='${libdir}'"
 
 do_install () {
     oe_runmake DESTDIR=${D} install
@@ -26,12 +26,12 @@ do_install () {
 # There are only .so files in iproute2
 INSANE_SKIP_${PN} = "dev-so"
 
-FILES_${PN} += "${base_libdir}/tc/*"
-FILES_${PN}-dbg += "${base_libdir}/tc/.debug"
+FILES_${PN} += "${libdir}/tc"
+FILES_${PN}-dbg += "${libdir}/tc/.debug"
 
-ALTERNATIVE_NAME = "ip"
-ALTERNATIVE_PATH = "${base_sbindir}/ip.iproute2"
-ALTERNATIVE_LINK = "${base_bindir}/ip"
+ALTERNATIVE_${PN} = "ip"
+ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"
+ALTERNATIVE_LINK_NAME[ip] = "${base_bindir}/ip"
 ALTERNATIVE_PRIORITY = "100"
 
 PARALLEL_MAKE = ""
