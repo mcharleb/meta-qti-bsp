@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -29,35 +29,62 @@
 # find_recovery_partitions        init.d script to dynamically find partitions used in recovery
 #
 
+emmc_dir=/dev/block/bootdevice/by-name
+mtd_file=/proc/mtd
+fstab_file=/res/recovery_volume_detected
+
+
+ubi_device_number=1
+
 UpdateRecoveryVolume () {
    partition=$1
    dir=$2
-   fstype=$3
+   fs_type=$3
    device=$4
-   echo /dev/$device       $dir     $fstype     defaults    0   0 >> /res/recovery_volume_config
+   echo "$device       $dir     $fs_type     defaults    0   0" >> $fstab_file
+}
+
+FindAndAttachUBI() {
+   partition=$1
+
+   mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
+   if [ -z "$mtd_block_number" ]; then
+      echo "MTD : Partition $partition not found"
+   else
+      echo "MTD : Attaching UBI device /dev/mtdblock$mtd_bloc_number for $partition @$ubi_device_number"
+
+      ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
+      while [ 1 ]; do
+         if [ -c /dev/ubi$ubi_device_number ]; then
+            break
+         else
+            sleep 0.010
+         fi
+      done
+      ubi_device_number=$(($ubi_device_number + 1))
+   fi
 }
 
 FindAndMountUBI () {
-   partition=$1
+   volume=$1
    dir=$2
-   ubi_device_number=1
+   fstab_only="$3"
 
-   mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
-   echo "MTD : Detected block device : $dir for $partition"
+   echo "MTD : Looking for UBI volume : $dir for $volume"
    mkdir -p $dir
-   ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
-   mount -t ubifs /dev/ubi"$ubi_device_number"_0 $dir -o bulk_read
-   echo "MTD : Mounting of /dev/ubi"$ubi_device_number"_0 on $dir done"
 
-   mtd_block_device=mtdblock"$mtd_block_number"
-   UpdateRecoveryVolume $1 $2 "ubifs" $mtd_block_device
-}
-
-FindAndMountVolumeUBI () {
-   volume_name=$1
-   dir=$2
-   mkdir -p $dir
-   mount -t ubifs ubi0:$volume_name $dir -o bulk_read
+   # Skip ubi0 for recoveryfs
+   for ubidev in /dev/ubi[1-99]_*; do
+      volname=`ubinfo $ubidev | grep Name\: | awk '{print $2}'`
+      if [ "$volname" == "$volume" ]; then
+         if [ "$fstab_only" != "1" ]; then
+            mount -t ubifs $ubidev $dir -o bulk_read
+            echo "MTD : Mounting of $ubidev on $dir done"
+         fi
+         UpdateRecoveryVolume $volume $dir "ubifs" $ubidev
+         break
+      fi
+   done
 }
 
 FindAndMountEXT4 () {
@@ -70,7 +97,7 @@ FindAndMountEXT4 () {
    mount -t ext4 /dev/$mmc_block_device $dir
    echo "EMMC : Mounting of /dev/$mmc_block_device on $dir done"
 
-   UpdateRecoveryVolume $1 $2 "ext4" $mmc_block_device
+   UpdateRecoveryVolume $1 $2 "ext4" /dev/$mmc_block_device
 }
 
 FindAndMountMTD () {
@@ -83,11 +110,10 @@ FindAndMountMTD () {
    mount -t mtd /dev/$mtd_block_device $dir
    echo "Mounting of /dev/$mmc_block_device on $dir done"
 
-   UpdateRecoveryVolume $1 $2 "mtd" $mtd_block_device
+   UpdateRecoveryVolume $1 $2 "mtd" /dev/$mtd_block_device
 }
 
-emmc_dir=/dev/block/bootdevice/by-name
-mtd_file="/proc/mtd"
+echo -n > $fstab_file
 
 if [ -d $emmc_dir ]
 then
@@ -95,7 +121,11 @@ then
     eval FindAndMount${fstype} cache /cache
 else
     fstype="UBI"
-    eval FindAndMountVolume${fstype} cachefs /cache
+    eval FindAndAttachUBI modem
+    eval FindAndAttachUBI system
+    eval FindAndMountUBI rootfs  /system  1
+    eval FindAndMountUBI usrfs   /data    1
+    eval FindAndMountUBI cachefs /cache
 fi
 
 FindAndMountMTD misc /misc
