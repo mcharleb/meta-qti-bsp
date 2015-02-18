@@ -40,6 +40,7 @@ UpdateRecoveryVolume () {
 FindAndMountUBI () {
    partition=$1
    dir=$2
+   ubi_device_number=1
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
@@ -47,17 +48,23 @@ FindAndMountUBI () {
    ubiattach -m $mtd_block_number -d $ubi_device_number /dev/ubi_ctrl
    mount -t ubifs /dev/ubi"$ubi_device_number"_0 $dir -o bulk_read
    echo "MTD : Mounting of /dev/ubi"$ubi_device_number"_0 on $dir done"
-   ubi_device_number=$((ubi_device_number+1))
 
    mtd_block_device=mtdblock"$mtd_block_number"
    UpdateRecoveryVolume $1 $2 "ubifs" $mtd_block_device
+}
+
+FindAndMountVolumeUBI () {
+   volume_name=$1
+   dir=$2
+   mkdir -p $dir
+   mount -t ubifs ubi0:$volume_name $dir -o bulk_read
 }
 
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
 
-   mmc_block_device=`cat $emmc_file | grep -i $partition | awk -F ':' '{print $1}'`
+   mmc_block_device=/dev/block/bootdevice/by-name/$partition
    echo "EMMC : Detected block device : $dir for $partition"
    mkdir -p $dir
    mount -t ext4 /dev/$mmc_block_device $dir
@@ -79,20 +86,19 @@ FindAndMountMTD () {
    UpdateRecoveryVolume $1 $2 "mtd" $mtd_block_device
 }
 
+emmc_dir=/dev/block/bootdevice/by-name
 mtd_file="/proc/mtd"
-emmc_file="/proc/emmc"
 
-if [ -f "$mtd_file" ]
+if [ -d $emmc_dir ]
 then
-    fstype_var="UBI"
-    ubi_device_number=1
-elif [ -f "$emmc_file" ]
-then
-    fstype_var="EXT4"
+    fstype="EXT4"
+    eval FindAndMount${fstype} cache /cache
+else
+    fstype="UBI"
+    eval FindAndMountVolume${fstype} cachefs /cache
 fi
 
-eval FindAndMount${fstype_var} cache /cache
 FindAndMountMTD misc /misc
-eval FindAndMount${fstype_var} /firmware
+eval FindAndMount${fstype} modem /firmware
 
 exit
