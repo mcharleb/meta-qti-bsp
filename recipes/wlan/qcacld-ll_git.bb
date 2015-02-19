@@ -12,7 +12,7 @@ do_unpack[deptask] = "do_populate_sysroot"
 PR = "r6-${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
-DEPENDS_mdm9635 = "rtsp-alg"
+DEPENDS = "rtsp-alg"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://wlan/qcacld-2.0/"
