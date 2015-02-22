@@ -7,7 +7,7 @@ do_unpack[deptask] = "do_populate_sysroot"
 PR = "r5-${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
-DEPENDS_mdm9635 = "alx"
+DEPENDS = "alx"
 
 
 SRC_URI = "http://github.com/maru-sama/rtsp-linux/archive/${PV}.tar.gz \

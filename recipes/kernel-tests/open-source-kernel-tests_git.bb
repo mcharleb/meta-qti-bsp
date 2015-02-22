@@ -11,6 +11,7 @@ SRC_URI = "file://qcom-opensource/kernel/kernel-tests/"
 DEPENDS = "virtual/kernel"
 # This DEPENDS is to serialize kernel module builds
 DEPENDS_append_mdm9635 = " qcacld-ll rtsp-alg"
+DEPENDS_append_mdm9640 = " qcacld-ll rtsp-alg"
 
 PR = "r3"
 
