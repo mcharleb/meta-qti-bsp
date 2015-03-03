@@ -64,7 +64,7 @@ FindAndMountEXT4 () {
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
    echo "EMMC : Detected block device : $dir for $partition"
    mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir
+   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
    echo "EMMC : Mounting of $mmc_block_device on $dir done"
 }
 

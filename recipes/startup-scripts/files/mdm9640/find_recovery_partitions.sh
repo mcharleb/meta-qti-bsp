@@ -90,14 +90,17 @@ FindAndMountUBI () {
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
+   fstab_only="$3"
 
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   echo "EMMC : Detected block device : $dir for $partition"
-   mkdir -p $dir
-   mount -t ext4 /dev/$mmc_block_device $dir
-   echo "EMMC : Mounting of /dev/$mmc_block_device on $dir done"
 
-   UpdateRecoveryVolume $1 $2 "ext4" /dev/$mmc_block_device
+   echo "EMMC : Looking for EXT4 block device : $dir for $partition"
+   mkdir -p $dir
+   if [ "$fstab_only" != "1" ]; then
+      mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+      echo "EMMC : Mounting of $mmc_block_device on $dir done"
+   fi
+   UpdateRecoveryVolume $1 $2 "ext4" $mmc_block_device
 }
 
 FindAndMountMTD () {
@@ -118,7 +121,9 @@ echo -n > $fstab_file
 if [ -d $emmc_dir ]
 then
     fstype="EXT4"
-    eval FindAndMount${fstype} cache /cache
+    eval FindAndMountEXT4 system   /system   1
+    eval FindAndMountEXT4 userdata /data     1
+    eval FindAndMountEXT4 cache    /cache
 else
     fstype="UBI"
     eval FindAndAttachUBI modem
