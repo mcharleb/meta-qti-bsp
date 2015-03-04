@@ -2,7 +2,7 @@
 require mdm-bootimg.inc
 
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES += "ubifs ext4"
+IMAGE_FSTYPES += "ubifs"
 
 IMAGE_INSTALL += "task-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -90,7 +90,9 @@ IMAGE_INSTALL += "wireless-tools"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
-do_rootfs_append() {
+# Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
-    cp ${DEPLOY_DIR_IMAGE}/${IMAGE_LINK_NAME}.ext4 ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4
+do_makesystem() {
+
+    make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
