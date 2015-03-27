@@ -90,7 +90,7 @@ FILES_${PN}-adbd-dbg = "/sbin/.debug/adbd"
 FILES_${PN}-adbd     = "/sbin/adbd ${sysconfdir}/init.d/adbd"
 
 PACKAGES =+ "${PN}-usb"
-FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${base_sbindir}/usb_composition_switch ${base_sbindir}/usb/compositions/* ${base_sbindir}/usb/*  ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
+FILES_${PN}-usb     = "${sysconfdir}/init.d/usb ${base_sbindir}/usb_composition ${bindir}/usb_composition_switch ${base_sbindir}/usb/compositions/* ${base_sbindir}/usb/*  ${base_sbindir}/usb_debug ${base_sbindir}/usb/debuger/*"
 
 PACKAGES =+ "${PN}-liblog-dbg ${PN}-liblog ${PN}-liblog-dev ${PN}-liblog-static"
 FILES_${PN}-liblog-dbg    = "${libdir}/.debug/liblog.* ${bindir}/.debug/logcat"
