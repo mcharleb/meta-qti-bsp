@@ -103,9 +103,9 @@ CONFFILES_avahi-daemon = "${sysconfdir}/avahi/avahi-daemon.conf"
 
 INITSCRIPT_PACKAGES = "avahi-daemon avahi-dnsconfd"
 INITSCRIPT_NAME_avahi-daemon = "avahi-daemon"
-INITSCRIPT_PARAMS_avahi-daemon = "defaults 21 19"
+INITSCRIPT_PARAMS_avahi-daemon = "defaults 99 01"
 INITSCRIPT_NAME_avahi-dnsconfd = "avahi-dnsconfd"
-INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 22 19"
+INITSCRIPT_PARAMS_avahi-dnsconfd = "defaults 99 01"
 
 do_install() {
         bbnote install -d ${D}${bindir}
