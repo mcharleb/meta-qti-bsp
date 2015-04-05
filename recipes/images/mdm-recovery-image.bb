@@ -18,3 +18,6 @@ inherit core-image
 
 do_rootfs[nostamp] = "1"
 do_build[nostamp]  = "1"
+
+# Call function makesystem to generate sparse ext4 image
+addtask makesystem after do_rootfs before do_build

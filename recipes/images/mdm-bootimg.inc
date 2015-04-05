@@ -10,6 +10,7 @@ DEPENDS = " \
              yaffs2-utils-native \
              genext2fs-native \
              e2fsprogs-native \
+             ext4-utils-native \
              kernel-tests \
 "
 # Image output types
