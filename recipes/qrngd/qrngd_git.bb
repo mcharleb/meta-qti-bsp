@@ -13,7 +13,7 @@ S = "${WORKDIR}/external/qrngd/"
 EXTRA_OECONF += "--with-glib --with-common-includes=${STAGING_INCDIR}"
 
 INITSCRIPT_NAME = "qrngd"
-INITSCRIPT_PARAMS = "start 27 2 3 4 5 . stop 80 0 1 6 ."
+INITSCRIPT_PARAMS = "start 97 2 3 4 5 . stop 03 0 1 6 ."
 
 do_install_append() {
         install -m 0755 ${S}/start_qrngd -D ${D}${sysconfdir}/init.d/qrngd
