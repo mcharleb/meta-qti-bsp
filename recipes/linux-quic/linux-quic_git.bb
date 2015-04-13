@@ -3,7 +3,7 @@ inherit linux-kernel-base localgit
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(9615-cdp|mdm9625|mdm9625-perf|mdm9635|mdm9635-perf|mdm9640|mdmferrum)"
+COMPATIBLE_MACHINE = "(9615-cdp|mdm9625|mdm9625-perf|mdm9635|mdm9635-perf|mdm9640)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 # Moved to here from the distro.conf file because it really kind of belongs
@@ -19,7 +19,6 @@ KERNEL_DEFCONFIG_mdm9635       = "mdm9630_defconfig"
 KERNEL_DEFCONFIG_mdm9635-perf  = "mdm9630-perf_defconfig"
 KERNEL_DEFCONFIG_mdm9640       = "mdm9640_defconfig"
 KERNEL_DEFCONFIG_mdm9640-perf  = "mdm9640-perf_defconfig"
-KERNEL_DEFCONFIG_mdmferrum     = "mdmferrum_defconfig"
 KERNEL_DEFCONFIG              ?= "msm9625_defconfig"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -204,10 +203,6 @@ do_deploy () {
     mkdir -p ${DEPLOY_DIR_IMAGE}
     machine=`echo ${MACHINE}`
      __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37'
-
-    if [ "${machine}" == "mdmferrum" ]; then
-       __cmdparams+=' maxcpus=1'
-    fi
 
     if [ "${BASEMACHINE}" != "mdm9640" ]; then
         __cmdparams+=' rootfstype=yaffs2'
