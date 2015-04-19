@@ -8,12 +8,13 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://qcom-opensource/kernel/kernel-tests/"
 
-DEPENDS = "virtual/kernel"
+DEPENDS = "virtual/kernel libxml2"
+
 # This DEPENDS is to serialize kernel module builds
 DEPENDS_append_mdm9635 = " qcacld-ll rtsp-alg"
 DEPENDS_append_mdm9640 = " qcacld-ll rtsp-alg"
 
-PR = "r3"
+PR = "r4"
 
 S = "${WORKDIR}/qcom-opensource/kernel/kernel-tests"
 CFLAGS_pn-${PN} = ""
