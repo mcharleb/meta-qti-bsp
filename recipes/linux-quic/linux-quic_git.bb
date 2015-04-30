@@ -25,7 +25,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 KDIR = "/usr/src/kernel"
 SRC_DIR = "${WORKSPACE}/kernel"
 PV = "git-${GITSHA}"
-PR = "r13"
+PR = "r14"
 
 PROVIDES += "virtual/kernel"
 DEPENDS = "virtual/${TARGET_PREFIX}gcc dtbtool-native mkbootimg-native  dtbtool-native mkbootimg-native"
@@ -46,8 +46,6 @@ PACKAGES = "kernel kernel-base kernel-module-bridge \
   kernel-module-nf-conntrack-ipv4 \
   kernel-module-nf-nat"
 
-PACKAGES =+ "kernel-image"
-FILES_kernel-image = "/boot/${KERNEL_IMAGETYPE}*"
 
 PACKAGES =+ "kernel-dev"
 FILES_kernel-dev = "/boot/System.map* /boot/Module.symvers* /boot/config*"
@@ -65,7 +63,6 @@ INSANE_SKIP_kernel-modbuild = "arch"
 PACKAGES =+ "kernel-modules"
 FILES_kernel-modules = "/lib/modules"
 
-RDEPENDS_kernel-base ?= "kernel-image"
 RPROVIDES_kernel-base += "kernel-${KERNEL_VERSION}"
 PKG_kernel-image = "kernel-image-${@legitimize_package_name('${KERNEL_VERSION}')}"
 PKG_kernel-base = "kernel-${@legitimize_package_name('${KERNEL_VERSION}')}"
