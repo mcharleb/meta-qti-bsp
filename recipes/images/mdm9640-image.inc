@@ -62,7 +62,6 @@ IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
 #IMAGE_INSTALL += "loc-api"
 IMAGE_INSTALL += "minidlna"
-IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "open-source-kernel-tests"
@@ -73,7 +72,6 @@ IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "qcacld-ll"
-IMAGE_INSTALL += "qcacld-tools"
 IMAGE_INSTALL += "qrngd"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "rtsp-alg"
@@ -87,8 +85,18 @@ IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
-IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
+
+# Below packages are open source packages that depend on proprietary packages
+
+DIAG_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/diag')}"
+IMAGE_INSTALL += "${@base_conditional('DIAG_DIR_PRESENT', 'True', 'qcacld-tools', '', d)}"
+
+QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
+IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
+
+DATA_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/data')}"
+IMAGE_INSTALL += "${@base_conditional('DATA_DIR_PRESENT', 'True', 'miniupnpd', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 

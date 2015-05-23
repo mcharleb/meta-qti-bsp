@@ -11,8 +11,8 @@ DEPENDS = " \
              genext2fs-native \
              e2fsprogs-native \
              ext4-utils-native \
-             kernel-tests \
 "
+
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
 
