@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|apq8009)"
+COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|mdmcalifornium|apq8009)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 # Default image type is zImage, change here if needed.
@@ -25,7 +25,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git-${GITVER}"
-PR = "r1"
+PR = "r2"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 KERNEL_PRIORITY = "9001"
@@ -48,6 +48,13 @@ do_install_prepend () {
 
 do_install_append() {
     oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} headers_install
+    install -d ${STAGING_KERNEL_DIR}/usr
+    for f in ${B}/usr/*; do
+        install -m 0777 ${f} ${STAGING_KERNEL_DIR}/${f#${B}}
+    done
+    install -m 0777 ${B}/vmlinux ${STAGING_KERNEL_DIR}/vmlinux
+    install -m 0777 ${B}/arch/arm/boot/Image ${STAGING_KERNEL_DIR}/arch/arm/boot/Image
+    install -m 0777 ${B}/arch/arm/boot/dts/${BASEMACHINE}-rumi.dtb ${STAGING_KERNEL_DIR}/arch/arm/boot/dts/${BASEMACHINE}-rumi.dtb
 }
 
 do_deploy () {

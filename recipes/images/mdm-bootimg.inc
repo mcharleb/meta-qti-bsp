@@ -3,7 +3,6 @@
 # our images...
 DEPENDS = " \
              virtual/kernel \
-             virtual/bootloader \
              pkgconfig-native \
              gtk-doc-native \
              gettext-native \
@@ -11,6 +10,8 @@ DEPENDS = " \
              e2fsprogs-native \
              ext4-utils-native \
 "
+
+DEPENDS_append_mdm9640 += "virtual/bootloader"
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"

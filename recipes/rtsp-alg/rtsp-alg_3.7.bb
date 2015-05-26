@@ -7,7 +7,7 @@ do_unpack[deptask] = "do_populate_sysroot"
 PR = "r6-${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
-DEPENDS = "alx"
+DEPENDS = "alx virtual/kernel"
 
 
 SRC_URI = "http://github.com/maru-sama/rtsp-linux/archive/${PV}.tar.gz \
