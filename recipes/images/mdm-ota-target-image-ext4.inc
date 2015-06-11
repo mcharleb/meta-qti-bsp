@@ -44,7 +44,9 @@ echo /recovery emmc  /dev/block/bootdevice/by-name/recovery >> ${OTA_TARGET_IMAG
 echo /system   ext4  system >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RECOVERY/recovery.fstab
 
 #Copy contents of userdata rootfs
-cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
+if [ -d ${TMPDIR}/rootfs/${MACHINE}-usrfs/ ]; then
+   cp -r ${TMPDIR}/rootfs/${MACHINE}-usrfs/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/DATA/.
+fi
 
 #Getting content for OTA folder
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/OTA/bin
