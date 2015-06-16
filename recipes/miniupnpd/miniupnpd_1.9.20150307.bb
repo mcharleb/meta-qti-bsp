@@ -10,7 +10,7 @@ DEPENDS = "data"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r5"
+PR = "r6"
 
 SRC_URI = "\
     https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
@@ -19,8 +19,8 @@ SRC_URI = "\
     file://0001-port-desc.patch \
 "
 
-SRC_URI[md5sum] = "fcac89e11da091b1cc61f43d83c9e4f5"
-SRC_URI[sha256sum] = "e72cd1e515aa9e6281e519e1814fe74e7689f5da71ce463a996a17e787ffe490"
+SRC_URI[md5sum] = "f91dc5647b1d2c13a82082a481a53e3d"
+SRC_URI[sha256sum] = "7d8c9b1f7ed73e288b4e7e52e0af67de73ba07994a6984008a1a688568153409"
 
 do_compile () {
     cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR} INCDIR=${STAGING_INCDIR}

@@ -1,17 +1,15 @@
-From 54ef0d53b83c394b1627581fe963c602f969b194 Mon Sep 17 00:00:00 2001
-From: Tyler Wear <twear@codeaurora.org>
-Date: Thu, 31 Jul 2014 11:13:30 -0700
-Subject: [PATCH 1/1] presentation-page
+From b972220492f72d79d00b29d30cdae95256463f37 Mon Sep 17 00:00:00 2001
+From: Ravinder Konka <rkonka@codeaurora.org>
+Date: Mon, 23 Mar 2015 21:53:46 +0530
+Subject: [PATCH] presentation-page
 
+Change-Id: I75997749a17a10ac765bc63dc34d401a0e81d06d
 ---
  upnphttp.c | 27 +++++++++++++++++++++++++++
  1 file changed, 27 insertions(+)
- mode change 100644 => 100755 upnphttp.c
 
 diff --git a/upnphttp.c b/upnphttp.c
-old mode 100644
-new mode 100755
-index f869fe5..dcbfb13
+index a6dd865..4742090 100755
 --- a/upnphttp.c
 +++ b/upnphttp.c
 @@ -28,6 +28,7 @@
@@ -22,7 +20,52 @@ index f869fe5..dcbfb13
  
  #ifdef ENABLE_HTTPS
  #include <openssl/err.h>
-@@ -690,6 +691,26 @@ ProcessHTTPUnSubscribe_upnphttp(struct upnphttp * h, const char * path)
+@@ -524,11 +525,13 @@ ProcessHTTPPOST_upnphttp(struct upnphttp
+ static int
+ checkCallbackURL(struct upnphttp * h)
+ {
+-	char addrstr[48];
++	char addrstr[48], addrstr1[48];
+ 	int ipv6;
+-	const char * p;
++	const char * p,*t;
+ 	unsigned int i;
+-
++/*
++'<http://[fe80::6c4f:b721:4e2d:ea6%13]:49240/urn:upnp-org:serviceId:WANIPv6FC1
++/143598522>'*/
+ start_again:
+ 	if(h->req_CallbackOff <= 0 || h->req_CallbackLen < 10)
+ 		return 0;
+@@ -542,10 +545,15 @@ start_again:
+ 	if(*p == '[') {
+ 		p++;
+ 		ipv6 = 1;
+-		while(*p != ']' && *p != '>' && i < (sizeof(addrstr)-1)
++		while(*p != ']' && *p != '>' && *p!='%' && i < (sizeof(addrstr)-1)
+ 		      && p < (h->req_buf + h->req_CallbackOff + h->req_CallbackLen))
+ 			addrstr[i++] = *(p++);
+-	} else {
++		while(*p != ']' && *p != '>' && i < (sizeof(addrstr)-1)
++		      && p < (h->req_buf + h->req_CallbackOff + h->req_CallbackLen))
++			p++;
++	}
++    else 
++       {
+ 		ipv6 = 0;
+ 		while(*p != '/' && *p != ':' && *p != '>' && i < (sizeof(addrstr)-1)
+ 		      && p < (h->req_buf + h->req_CallbackOff + h->req_CallbackLen))
+@@ -556,6 +564,9 @@ start_again:
+ 	if(ipv6) {
+ #ifdef ENABLE_IPV6
+ 		struct in6_addr addr;
++
++        inet_ntop(AF_INET6,&(h->clientaddr_v6), addrstr1, 48);
++        syslog(LOG_INFO, "ADDR1= %s ADDR2%s\n",addrstr,addrstr1);
+ 		if(inet_pton(AF_INET6, addrstr, &addr) <= 0)
+ 			goto invalid;
+ 		if(!h->ipv6
+@@ -701,6 +712,26 @@ ProcessHTTPUnSubscribe_upnphttp(struct u
  }
  #endif
  
@@ -49,7 +92,7 @@ index f869fe5..dcbfb13
  /* Parse and process Http Query
   * called once all the HTTP headers have been received,
   * so it is guaranteed that h->req_buf contains the \r\n\r\n
-@@ -783,6 +804,12 @@ ProcessHttpQuery_upnphttp(struct upnphttp * h)
+@@ -823,6 +854,12 @@ ProcessHttpQuery_upnphttp(struct upnphtt
  			return;
  		}
  #endif
