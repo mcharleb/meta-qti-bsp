@@ -90,9 +90,6 @@ IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
 
-DIAG_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/diag')}"
-IMAGE_INSTALL += "${@base_conditional('DIAG_DIR_PRESENT', 'True', 'qcacld-tools', '', d)}"
-
 QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
 IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
 
