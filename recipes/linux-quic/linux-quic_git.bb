@@ -14,11 +14,7 @@ BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 # Provide a config baseline for things so the kernel will build...
-KERNEL_DEFCONFIG_mdm9640         = "mdm9640_defconfig"
-KERNEL_DEFCONFIG_mdm9640-perf    = "mdm9640-perf_defconfig"
-KERNEL_DEFCONFIG_mdmfermium      = "mdmfermium_defconfig"
-KERNEL_DEFCONFIG_mdmfermium-perf = "mdmfermium-perf_defconfig"
-KERNEL_DEFCONFIG                ?= "${KERNEL_DEFCONFIG_mdm9640}"
+KERNEL_DEFCONFIG                = "mdm_defconfig"
 
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
@@ -28,7 +24,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git-${GITVER}"
-PR = "r0"
+PR = "r1"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 KERNEL_PRIORITY = "9001"
@@ -68,14 +64,7 @@ do_deploy () {
     ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-    machine=`echo ${MACHINE}`
-     __cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37'
-
-    if [ "${BASEMACHINE}" != "mdm9640" || "${BASEMACHINE}" != "mdmfermium" ]; then
-        __cmdparams+=' rootfstype=yaffs2'
-    fi
-
-    cmdparams=`echo ${__cmdparams}`
+    cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1'
 
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \

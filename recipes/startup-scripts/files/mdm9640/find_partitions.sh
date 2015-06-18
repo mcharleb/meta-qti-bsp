@@ -82,5 +82,4 @@ else
 fi
 
 eval FindAndMount${fstype} modem /firmware
-
 exit 0
