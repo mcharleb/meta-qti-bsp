@@ -1,4 +1,4 @@
-inherit autotools linux-kernel-base
+inherit autotools-brokensep linux-kernel-base
 
 DESCRIPTION = "Hostap Daemon"
 LICENSE = "BSD"
@@ -8,7 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 FILES_${PN} += "\
         /usr/bin \
         "
-INC_PR = "r3"
+INC_PR = "r4"
 
 DEPENDS = "openssl libnl"
 

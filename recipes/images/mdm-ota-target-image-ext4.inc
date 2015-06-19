@@ -1,12 +1,19 @@
 DEPENDS += "mdm-image"
 
-OTA_TARGET_BASENAME_EXT4 = "${MACHINE}-ota-target-image-ext4"
+OTA_TARGET_BASENAME_EXT4     = "${MACHINE}-ota-target-image-ext4"
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_EXT4}"
-OUTPUT_FILE_EXT4 = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}.zip"
-BASE_IMAGE_ROOTFS_EXT4 = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
+OUTPUT_FILE_EXT4             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_EXT4}.zip"
+BASE_IMAGE_ROOTFS_EXT4       = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
 #OUTPUT_FILE_EXT4 = "${OTA_TARGET_BASENAME_EXT4}.zip"
 
-do_rootfs_append(){
+python do_rootfs_append(){
+    bb.build.exec_func('recovery_ext4', d)
+}
+
+recovery_ext4[cleandirs] = "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
+recovery_ext4[dirs]      = "${OTA_TARGET_IMAGE_ROOTFS_EXT4}"
+
+recovery_ext4() {
 rm -rf ${OTA_TARGET_IMAGE_ROOTFS_EXT4}
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}
 

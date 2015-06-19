@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools-brokensep
 
 DESCRIPTION = "hardware libhardware headers"
 HOMEPAGE = "http://codeaurora.org/"
@@ -11,7 +11,7 @@ SRC_URI   = "file://hardware/libhardware/"
 SRC_URI  += "file://autotools.patch"
 S = "${WORKDIR}/hardware/${PN}"
 
-PR = "r4"
+PR = "r5"
 
 DEPENDS = "system-core"
 

@@ -26,4 +26,4 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/usb.sh ${D}${sysconfdir}/mdev/
 }
 
-FILES_${PN}-mdev += "${sysconfdir}/mdev/* "
+#FILES_${PN}-mdev += "${sysconfdir}/mdev/* "

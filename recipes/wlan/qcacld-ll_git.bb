@@ -1,4 +1,4 @@
-inherit autotools module
+inherit autotools-brokensep module
 
 DESCRIPTION = "Qualcomm Atheros WLAN CLD driver"
 LICENSE = "ISC"
@@ -9,7 +9,7 @@ FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
 RPROVIDES_${PN} += "kernel-module-wlan"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r6-${KERNEL_VERSION}"
+PR = "r7-${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
 DEPENDS = "rtsp-alg"

@@ -8,7 +8,9 @@ BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI +="file://${BASEMACHINE}/find_partitions.sh"
 
-PR = "r3"
+S = "${WORKDIR}/${BASEMACHINE}"
+
+PR = "r4"
 
 inherit update-rc.d
 

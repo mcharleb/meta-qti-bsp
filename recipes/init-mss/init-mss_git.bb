@@ -1,8 +1,8 @@
-inherit autotools update-rc.d
+inherit autotools-brokensep update-rc.d
 DESCRIPTION = "Modem init"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
-PR = "r5"
+PR = "r6"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://init_mss/"

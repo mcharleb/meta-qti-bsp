@@ -1,10 +1,10 @@
-inherit autotools module
+inherit autotools-brokensep module
 DESCRIPTION = "RSTP ALG"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;beginline=2;endline=30;md5=1d494e4d4253d1fcdcbfe334f8a4cd0a"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r5-${KERNEL_VERSION}"
+PR = "r6-${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
 DEPENDS = "alx"

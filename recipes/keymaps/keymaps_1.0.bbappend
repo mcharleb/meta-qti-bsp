@@ -1,9 +1,1 @@
-INITSCRIPT_NAME=""
-INITSCRIPT_PARAMS =""
-
-
-
-
-
-
-
+INITSCRIPT_PARAMS ="remove"

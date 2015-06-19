@@ -8,7 +8,6 @@ DEPENDS = " \
              gtk-doc-native \
              gettext-native \
              yaffs2-utils-native \
-             genext2fs-native \
              e2fsprogs-native \
              ext4-utils-native \
 "
@@ -16,5 +15,14 @@ DEPENDS = " \
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
 
-IMAGE_PREPROCESS_COMMAND += "mkdir -p ${IMAGE_ROOTFS}/cache;"
-IMAGE_PREPROCESS_COMMAND += "echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop;"
+IMAGE_PREPROCESS_COMMAND_prepend = " gen_buildprop;"
+IMAGE_PREPROCESS_COMMAND_mdm9640 += "gen_target;"
+
+gen_buildprop() {
+   mkdir -p ${IMAGE_ROOTFS}/cache
+   echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
+}
+
+gen_target() {
+   echo ${MACHINE} >> ${IMAGE_ROOTFS}/target
+}

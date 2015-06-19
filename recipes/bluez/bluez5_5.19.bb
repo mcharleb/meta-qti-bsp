@@ -1,6 +1,6 @@
 require bluez5.inc
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS += "readline"
 
@@ -40,4 +40,10 @@ FILES_${PN} += "\
 FILES_${PN}-dev += "\
   ${libdir}/alsa-lib/libasound_module_ctl_bluetooth.la \
   ${libdir}/alsa-lib/libasound_module_pcm_bluetooth.la \
+"
+
+PACKAGES =+ "${PN}-test"
+RDEPENDS_${PN}-test = "python"
+FILES_${PN}-test += "\
+  ${libdir}/bluez/ \
 "

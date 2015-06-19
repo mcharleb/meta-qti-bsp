@@ -11,7 +11,7 @@ MKUBIFS_ARGS = "-m 4096 -e 253952 -c 83 -F"
 UBI_VOLNAME = "rootfs"
 
 # The OE-Core minimal boot image files.
-IMAGE_INSTALL += "task-core-boot"
+IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 

@@ -1,6 +1,6 @@
-PRINC = "1"
+PR = "r157"
 
-FILESEXTRAPATHS := "${THISDIR}/${PN}-${PV}"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"

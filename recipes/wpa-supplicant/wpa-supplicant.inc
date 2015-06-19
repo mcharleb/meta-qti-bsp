@@ -1,4 +1,4 @@
-inherit autotools linux-kernel-base
+inherit autotools-brokensep linux-kernel-base
 
 DESCRIPTION = "Wi-Fi Protected Access(WPA) Supplicant"
 LICENSE = "BSD"

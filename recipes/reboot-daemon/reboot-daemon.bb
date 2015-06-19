@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools-brokensep
 
 DESCRIPTION = "Rebooter daemon"
 LICENSE = "BSD"

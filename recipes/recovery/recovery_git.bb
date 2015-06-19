@@ -1,5 +1,5 @@
-inherit autotools
-PR = "r6"
+inherit autotools-brokensep pkgconfig update-rc.d
+PR = "r7"
 
 DESCRIPTION = "Recovery bootloader"
 LICENSE = "Apache-2.0"
@@ -17,9 +17,9 @@ S = "${WORKDIR}/bootable/${PN}/"
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR_NATIVE}"
 
+PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
 INITSCRIPT_PARAMS = "start 27 5 . stop 80 0 1 6 ."
-inherit update-rc.d
 
 FILES_${PN} += "/cache"
 FILES_${PN} += "/system"
@@ -36,10 +36,3 @@ do_install_append() {
         install -m 0755 ${WORKSPACE}/oe-core/meta-msm/recipes/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 }
-
-oe_runmake() {
-        if [ x"$MAKE" = x ]; then MAKE=make; fi
-        bbnote make -j 1 "$@"
-        make -j 1 "$@" || die "oe_runmake failed"
-}
-

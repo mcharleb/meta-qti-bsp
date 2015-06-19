@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools-brokensep
 SUMMARY = "nl80211 based CLI configuration utility for wireless devices"
 DESCRIPTION = "iw is a new nl80211 based CLI configuration utility for \
                wireless devices. It supports almost all new drivers that have been added \
@@ -8,7 +8,7 @@ SECTION = "base"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=878618a5c4af25e9b93ef0be1a93f774"
 
-PR = "r0"
+PR = "r1"
 
 DEPENDS = "libnl pkgconfig"
 

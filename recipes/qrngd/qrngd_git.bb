@@ -1,16 +1,14 @@
-inherit update-rc.d autotools
+inherit update-rc.d autotools-brokensep
 
 DESCRIPTION = "Daemon to start QRNG"
 LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 BSD;md5=3775480a712fc46a69647678acb234cb"
-PR = "r2"
+PR = "r3"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/qrngd/"
 S = "${WORKDIR}/external/qrngd/"
-
-EXTRA_OECONF += "--with-glib --with-common-includes=${STAGING_INCDIR}"
 
 INITSCRIPT_NAME = "qrngd"
 INITSCRIPT_PARAMS = "start 97 2 3 4 5 . stop 03 0 1 6 ."

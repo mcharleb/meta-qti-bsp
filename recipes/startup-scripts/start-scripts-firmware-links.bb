@@ -8,7 +8,9 @@ BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI +="file://${BASEMACHINE}/firmware-links.sh"
 
-PR = "r4"
+S = "${WORKDIR}/${BASEMACHINE}"
+
+PR = "r5"
 
 inherit update-rc.d
 

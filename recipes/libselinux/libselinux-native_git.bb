@@ -1,4 +1,4 @@
-inherit native autotools
+inherit native autotools-brokensep pkgconfig
 
 DESCRIPTION = "Libselinux"
 LICENSE = "PD"

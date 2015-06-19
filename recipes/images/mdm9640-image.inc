@@ -2,16 +2,15 @@
 require mdm-bootimg.inc
 
 # The OE-Core minimal boot image files.
-IMAGE_FSTYPES += "ubifs"
+IMAGE_FSTYPES += "ubifs ubi"
 
-IMAGE_INSTALL += "task-core-boot"
+IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "alsa-intf"
 IMAGE_INSTALL += "alx"
-IMAGE_INSTALL += "avahi-systemd"
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
 IMAGE_INSTALL += "avahi-autoipd"
@@ -32,7 +31,7 @@ IMAGE_INSTALL += "e2fsprogs-e2fsck"
 IMAGE_INSTALL += "e2fsprogs-mke2fs"
 IMAGE_INSTALL += "ebtables"
 IMAGE_INSTALL += "ethtool"
-DEPENDS += "gdb-cross"
+DEPENDS += "gdb-cross-arm"
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "gdb"
 IMAGE_INSTALL += "glib-2.0"
@@ -86,7 +85,6 @@ IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
-IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
 

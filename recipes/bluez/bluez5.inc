@@ -17,7 +17,7 @@ SRC_URI = "file://external/bluetooth/bluez/"
 
 S = "${WORKDIR}/external/bluetooth/bluez/"
 
-inherit autotools
+inherit autotools-brokensep pkgconfig
 
 EXTRA_OECONF = "\
   --enable-tools \
@@ -25,5 +25,6 @@ EXTRA_OECONF = "\
   --enable-test \
   --enable-datafiles \
   --disable-systemd \
-  --with-sanitized-headers=${STAGING_KERNEL_HEADERS} \
 "
+#  unused param
+#  --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include \

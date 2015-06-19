@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools-brokensep
 SUMMARY = "Lightweight implementation of a UPnP IGD daemon."
 DESCRIPTION = "MiniUPnPd is a low memory daemon which acts as a\
 UPnP device, enabling seamless detection of other UPnP devices/control points."
@@ -23,9 +23,9 @@ SRC_URI[md5sum] = "f91dc5647b1d2c13a82082a481a53e3d"
 SRC_URI[sha256sum] = "7d8c9b1f7ed73e288b4e7e52e0af67de73ba07994a6984008a1a688568153409"
 
 do_compile () {
-    cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR} INCDIR=${STAGING_INCDIR}
+    cd ${S} && make -f Makefile.linux LIBDIR=${STAGING_LIBDIR} INCDIR=${STAGING_INCDIR} STRIP=echo
 }
 
 do_install () {
-    make -f Makefile.linux DESTDIR=${D} LIBDIR=${STAGING_LIBDIR} install
+    make -f Makefile.linux DESTDIR=${D} LIBDIR=${STAGING_LIBDIR} STRIP=echo install
 }

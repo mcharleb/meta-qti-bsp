@@ -1,14 +1,21 @@
 DEPENDS += "mdm-image"
 
-OTA_TARGET_BASENAME_UBI = "${MACHINE}-ota-target-image-ubi"
+OTA_TARGET_BASENAME_UBI     = "${MACHINE}-ota-target-image-ubi"
 OTA_TARGET_IMAGE_ROOTFS_UBI = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_UBI}"
-OUTPUT_FILE_UBI = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}.zip"
-BASE_IMAGE_ROOTFS_UBI = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
+OUTPUT_FILE_UBI             = "${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}.zip"
+BASE_IMAGE_ROOTFS_UBI       = "$(echo ${IMAGE_ROOTFS} | sed 's#-recovery##')"
 #OUTPUT_FILE_UBI = "${OTA_TARGET_BASENAME_UBI}.zip"
 
-do_rootfs_append(){
-rm -rf ${OTA_TARGET_IMAGE_ROOTFS_UBI}
-mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}
+python do_rootfs_append(){
+    bb.build.exec_func('recovery_ubi', d)
+}
+
+recovery_ubi[cleandirs] = "${OTA_TARGET_IMAGE_ROOTFS_UBI}"
+recovery_ubi[dirs]      = "${OTA_TARGET_IMAGE_ROOTFS_UBI}"
+
+recovery_ubi() {
+#rm -rf ${OTA_TARGET_IMAGE_ROOTFS_UBI}
+#mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}
 
 #Create directory structure for targetfiles.zip
 mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES

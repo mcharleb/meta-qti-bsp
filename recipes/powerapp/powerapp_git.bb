@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools-brokensep
 
 DESCRIPTION = "Powerapp tools"
 HOMEPAGE = "http://codeaurora.org/"
@@ -18,7 +18,7 @@ FILES_${PN}-powerconfig = "${sysconfdir}/init.d/power_config"
 # TODO - add depedency on virtual/sh
 PROVIDES =+ "${PN}-reboot ${PN}-shutdown ${PN}-powerconfig"
 
-PR = "r8"
+PR = "r9"
 
 do_install() {
         install -m 0755 ${S}/powerapp -D ${D}/sbin/powerapp

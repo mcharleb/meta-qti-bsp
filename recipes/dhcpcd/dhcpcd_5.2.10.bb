@@ -9,12 +9,11 @@ and other information from the DHCP server, automatically \
 configures the network interface, and tries to renew the \
 lease time according to RFC2131 or RFC1541."
 
-PR = "r1"
+PR = "r2"
 
-inherit autotools
+inherit autotools-brokensep
 
 SRC_URI = "http://roy.aydogan.net/dhcpcd/dhcpcd-${PV}.tar.bz2"
-
 
 do_configure() {
         ./configure --includedir=${STAGING_INCDIR} --bindir=${prefix}/sbin \

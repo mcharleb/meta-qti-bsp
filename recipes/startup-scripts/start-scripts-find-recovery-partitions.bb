@@ -7,8 +7,9 @@ LICENSE = "BSD"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI +="file://${BASEMACHINE}/find_recovery_partitions.sh"
+S = "${WORKDIR}/${BASEMACHINE}"
 
-PR = "r2"
+PR = "r3"
 
 inherit update-rc.d
 
