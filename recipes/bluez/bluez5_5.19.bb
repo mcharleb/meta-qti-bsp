@@ -10,6 +10,8 @@ SRC_URI[sha256sum] = "92bf4ce87d58014794ef6b22dc0a13b0b19acdf9c96870391c935d1e01
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
 
+CFLAGS_append = " -D_PLATFORM_MDM_"
+
 do_install_append() {
         install -d ${D}${sysconfdir}/bluetooth/
 
