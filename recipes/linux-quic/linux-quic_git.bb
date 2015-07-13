@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium)"
+COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|apq8009)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 # Default image type is zImage, change here if needed.
@@ -15,6 +15,7 @@ KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG                = "mdm_defconfig"
+KERNEL_DEFCONFIG_apq8009         = "msm8909_defconfig"
 
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
@@ -30,7 +31,6 @@ DEPENDS += "dtbtool-native mkbootimg-native"
 KERNEL_PRIORITY = "9001"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
-
 
 do_configure () {
 	oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_DEFCONFIG} O=${B}
@@ -65,6 +65,10 @@ do_deploy () {
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1'
+
+    if [ "${BASEMACHINE}" == "apq8009" ]; then
+        __cmdparams+=' root=${MACHINE_ROOTDEV} rootfstype=ext4 earlyprintk'
+    fi
 
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \

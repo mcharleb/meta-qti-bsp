@@ -17,14 +17,18 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 MY_TARGET          = "${BASEMACHINE}"
+MY_TARGET_apq8009  = "msm8909"
 
 LIBGCC_mdm9640     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
+LIBGCC_apq8009     = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
 
 BOOTLOADER_NAME         = "appsboot"
 #BOOTLOADER_NAME_msm8960 = "emmc_appsboot"
+BOOTLOADER_NAME_apq8009 = "emmc_appsboot"
 
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET}"
 EXTRA_OEMAKE_append_mdm9640  = " LIBGCC='${LIBGCC}'"
+EXTRA_OEMAKE_append_apq8009  = " LIBGCC='${LIBGCC}'"
 
 do_install() {
         install -d ${D}/boot
@@ -32,6 +36,11 @@ do_install() {
 }
 
 do_install_mdm9640() {
+        install -d ${D}/boot
+        install build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${D}/boot
+}
+
+do_install_apq8009() {
         install -d ${D}/boot
         install build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${D}/boot
 }
@@ -45,6 +54,10 @@ do_deploy() {
 }
 
 do_deploy_mdm9640() {
+        install ${S}/build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${DEPLOYDIR}
+}
+
+do_deploy_apq8009() {
         install ${S}/build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${DEPLOYDIR}
 }
 
