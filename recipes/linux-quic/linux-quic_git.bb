@@ -54,7 +54,7 @@ do_install_append() {
     done
     install -m 0777 ${B}/vmlinux ${STAGING_KERNEL_DIR}/vmlinux
     install -m 0777 ${B}/arch/arm/boot/Image ${STAGING_KERNEL_DIR}/arch/arm/boot/Image
-    install -m 0777 ${B}/arch/arm/boot/dts/${BASEMACHINE}-rumi.dtb ${STAGING_KERNEL_DIR}/arch/arm/boot/dts/${BASEMACHINE}-rumi.dtb
+    install -m 0777 ${B}/arch/arm/boot/dts/${MACHINE_DTS_NAME}*.dtb ${STAGING_KERNEL_DIR}/arch/arm/boot/dts/
 }
 
 do_deploy () {
@@ -71,11 +71,7 @@ do_deploy () {
     ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-    cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1'
-
-    if [ "${BASEMACHINE}" == "apq8009" ]; then
-        __cmdparams+=' root=${MACHINE_ROOTDEV} rootfstype=ext4 earlyprintk'
-    fi
+    cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
 
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
