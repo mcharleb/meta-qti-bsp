@@ -13,6 +13,7 @@ PR = "r1"
 SRC_URI = " \
 	http://netfilter.org/projects/conntrack-tools/files/conntrack-tools-${PV}.tar.bz2 \
         file://conntrack-tools-NULL.patch \
+        file://conntrack-tools-ipv6.patch \
 "
 
 SRC_URI[md5sum] = "8a60f02a177fc31fe40cc992c4de90e2"
