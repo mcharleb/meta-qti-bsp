@@ -13,6 +13,7 @@ DEPENDS = " \
 
 DEPENDS_append_mdm9640 += "virtual/bootloader"
 DEPENDS_append_apq8009 += "virtual/bootloader"
+DEPENDS_append_mdmfermium += "virtual/bootloader"
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
