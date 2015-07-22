@@ -19,6 +19,8 @@ SRC_URI += "\
 
 prefix = ""
 
+BUSYBOX_SPLIT_SUID = "0"
+
 do_install_append() {
     install -d ${D}${sysconfdir}/mdev
     install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
