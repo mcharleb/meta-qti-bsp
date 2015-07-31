@@ -21,13 +21,11 @@ MY_TARGET_apq8009  = "msm8909"
 
 LIBGCC             = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
 
-BOOTLOADER_NAME         = "appsboot"
-
 EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET} LIBGCC='${LIBGCC}'"
 
 do_install() {
         install -d ${D}/boot
-        install build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${D}/boot
+        install build-${MY_TARGET}/*.mbn ${D}/boot
 }
 
 
@@ -35,7 +33,7 @@ FILES_${PN} = "/boot"
 FILES_${PN}-dbg = "/boot/.debug"
 
 do_deploy() {
-        install ${S}/build-${MY_TARGET}/${BOOTLOADER_NAME}.mbn ${DEPLOYDIR}
+        install ${S}/build-${MY_TARGET}/*.mbn ${DEPLOYDIR}
 }
 
 do_deploy[dirs] = "${S} ${DEPLOYDIR}"
