@@ -9,7 +9,7 @@ IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
-#IMAGE_INSTALL += "alsa-intf"
+IMAGE_INSTALL += "alsa-intf"
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
 #IMAGE_INSTALL += "avahi-daemon"
@@ -41,9 +41,9 @@ IMAGE_INSTALL += "glib-2.0"
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
-#IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "init-audio"
 #IMAGE_INSTALL += "iproute2"
-#IMAGE_INSTALL += "init-mss"
+IMAGE_INSTALL += "init-mss"
 #IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "iw"
 #IMAGE_INSTALL += "jquery"
@@ -74,7 +74,7 @@ IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "perl"
 #IMAGE_INSTALL += "qcacld-ll"
 #IMAGE_INSTALL += "qrngd"
-#IMAGE_INSTALL += "reboot-daemon"
+IMAGE_INSTALL += "reboot-daemon"
 #IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
@@ -89,9 +89,6 @@ IMAGE_INSTALL += "system-core-libcutils"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
-
-#DIAG_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/diag')}"
-#IMAGE_INSTALL += "${@base_conditional('DIAG_DIR_PRESENT', 'True', 'qcacld-tools', '', d)}"
 
 #QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
 #IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
