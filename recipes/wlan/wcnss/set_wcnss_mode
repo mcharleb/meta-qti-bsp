@@ -35,7 +35,7 @@ echo -n "Setting WNCSS platform : "
 
 serialno=
 
-wcnssnode=`ls /dev/wcnss*`
+wcnssnode=`ls /dev/wcnss_wlan*`
     case "$wcnssnode" in
         *wcnss*)
             # Before triggering wcnss, let it know that
