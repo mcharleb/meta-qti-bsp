@@ -25,7 +25,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git-${GITVER}"
-PR = "r2"
+PR = "r3"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 KERNEL_PRIORITY = "9001"
@@ -54,7 +54,6 @@ do_install_append() {
     done
     install -m 0777 ${B}/vmlinux ${STAGING_KERNEL_DIR}/vmlinux
     install -m 0777 ${B}/arch/arm/boot/Image ${STAGING_KERNEL_DIR}/arch/arm/boot/Image
-    install -m 0777 ${B}/arch/arm/boot/dts/${MACHINE_DTS_NAME}*.dtb ${STAGING_KERNEL_DIR}/arch/arm/boot/dts/
 }
 
 do_deploy () {
@@ -64,11 +63,18 @@ do_deploy () {
 
     # Create separate images with dtb appended to zImage for all targets.
     for d in ${dtb_files}; do
-       targets=`echo ${d#${MACHINE_DTS_NAME}-}`
-       cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/arm/boot/dts/${d}.dtb > ${B}/arch/arm/boot/dts/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
+	 #Strip qcom from the result if its present.
+       targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
+	 #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
+       qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
+	   if [ ${qcom_check} == "qcom" ]; then
+		cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/arm/boot/dts/${d}.dtb > ${B}/arch/arm/boot/dts/qcom/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
+	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+	   else
+        cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/arm/boot/dts/${d}.dtb > ${B}/arch/arm/boot/dts/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
+	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+	   fi
     done
-
-    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
