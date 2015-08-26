@@ -35,6 +35,7 @@ do_ramdisk_create() {
         cp ${IMAGE_ROOTFS}/lib/libdl.so.2 lib/libdl.so.2
         cp ${IMAGE_ROOTFS}/lib/libresolv.so.2 lib/libresolv.so.2
         cp ${IMAGE_ROOTFS}/lib/libcrypto.so.1.0.0 lib/libcrypto.so.1.0.0
+        cp ${STAGING_LIBDIR}/libstdc++.so.6 lib/libstdc++.so.6
         cp ${IMAGE_ROOTFS}/etc/init.d/mdev etc/init.d/
         cp ${IMAGE_ROOTFS}/etc/mdev.conf etc/
         cp -r ${IMAGE_ROOTFS}/etc/mdev etc/
@@ -52,9 +53,9 @@ do_ramdisk_create() {
         ln -s busybox bin/mdev
 
         #gen_initramfs_list.sh expects to be run from kernel directory
-        cd ${STAGING_KERNEL_DIR}
+        cd ${STAGING_KERNEL_BUILDDIR}
 
-        bash ${WORKSPACE}/kernel/scripts/gen_initramfs_list.sh -o ${DEPLOY_DIR_IMAGE}/${PN}-initrd.gz -u 0 -g 0 ${TMPDIR}/ramdisk
+        bash ./scripts/gen_initramfs_list.sh -o ${DEPLOY_DIR_IMAGE}/${PN}-initrd.gz -u 0 -g 0 ${TMPDIR}/ramdisk
 
         cd ${CURRENT_DIR}
 }

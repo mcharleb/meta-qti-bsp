@@ -9,7 +9,7 @@ PR = "r4"
 
 DEPENDS += "virtual/kernel glib-2.0"
 
-EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include --with-glib"
+EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include --with-glib"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://data-oss"

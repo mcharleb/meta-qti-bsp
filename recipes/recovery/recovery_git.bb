@@ -14,7 +14,7 @@ SRC_URI = "file://bootable/recovery/"
 
 S = "${WORKDIR}/bootable/${PN}/"
 
-EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include \
+EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR_NATIVE}"
 
 PARALLEL_MAKE = ""
