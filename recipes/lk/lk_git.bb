@@ -9,19 +9,20 @@ PROVIDES = "virtual/bootloader"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI  = "file://bootable/bootloader/lk/"
 S        = "${WORKDIR}/bootable/bootloader/${PN}"
-PR       = "r14"
+PR       = "r15"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-#re-use non-perf settings
-BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+#LK requires BASEMACHINE to be mdm9640  to support one source multiple targets.
+BASEMACHINE        = "mdm9640"
 
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_apq8009  = "msm8909"
+MY_TARGET_mdmfermium  = "mdmfermium"
 
 LIBGCC             = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
 
-EXTRA_OEMAKE = "TOOLCHAIN_PREFIX='${TARGET_PREFIX}' ${MY_TARGET} LIBGCC='${LIBGCC}'"
+EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}'"
 
 do_install() {
         install -d ${D}/boot
