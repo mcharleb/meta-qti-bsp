@@ -14,13 +14,15 @@ BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 # Provide a config baseline for things so the kernel will build...
-KERNEL_DEFCONFIG                = "mdm_defconfig"
-KERNEL_DEFCONFIG_apq8009         = "msm8909_defconfig"
+KERNEL_DEFCONFIG          = "mdm_defconfig"
+KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
+KERNEL_PRIORITY           = "9001"
+# Add V=1 to KERNEL_EXTRA_ARGS for verbose
+KERNEL_EXTRA_ARGS        += "O=${B}"
 
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
-SRC_URI   =+ "file://kernel/arch/${ARCH}/configs/${KERNEL_DEFCONFIG}"
 SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
@@ -28,32 +30,96 @@ PV = "git-${GITVER}"
 PR = "r3"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
-KERNEL_PRIORITY = "9001"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
+# Put the zImage in the kernel-dev pkg
+FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
+
 do_configure () {
-	oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_DEFCONFIG} O=${B}
+	oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_DEFCONFIG}
 }
 
-# Make vmlinux available as soon as possible
-do_install_prepend () {
 
-    install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-    for f in System.map Module.symvers vmlinux; do
-        install -m 0644 ${B}/${f} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${f}-${KERNEL_VERSION}
-    done
-    install -m 0644 ${B}/${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+do_shared_workdir () {
+        cd ${B}
+
+        kerneldir=${STAGING_KERNEL_BUILDDIR}
+        install -d $kerneldir
+
+        #
+        # Store the kernel version in sysroots for module-base.bbclass
+        #
+
+        echo "${KERNEL_VERSION}" > $kerneldir/kernel-abiversion
+
+        # Copy files required for module builds
+        cp System.map $kerneldir/System.map-${KERNEL_VERSION}
+        cp Module.symvers $kerneldir/Module.symvers
+        cp Makefile $kerneldir/
+        cp .config $kerneldir/
+        cp -fR usr $kerneldir/
+
+        # Signing keys may not be present
+        [ -f signing_key.priv ] && cp signing_key.priv $kerneldir/
+        [ -f signing_key.x509 ] && cp signing_key.x509 $kerneldir/
+
+        # include/config
+        mkdir -p $kerneldir/include/config
+        cp include/config/kernel.release $kerneldir/include/config/kernel.release
+        cp include/config/auto.conf $kerneldir/include/config/auto.conf
+
+        # We can also copy over all the generated files and avoid special cases
+        # like version.h, but we've opted to keep this small until file creep starts
+        # to happen
+        if [ -e include/linux/version.h ]; then
+                mkdir -p $kerneldir/include/linux
+                cp include/linux/version.h $kerneldir/include/linux/version.h
+        fi
+
+        mkdir -p $kerneldir/include/generated/
+        cp -fR include/generated/* $kerneldir/include/generated/
+
+        if [ -d arch/${ARCH}/include ]; then
+                mkdir -p $kerneldir/arch/${ARCH}/include/
+                cp -fR arch/${ARCH}/include/* $kerneldir/arch/${ARCH}/include/
+        fi
+
+        if [ -d arch/${ARCH}/boot ]; then
+                mkdir -p $kerneldir/arch/${ARCH}/boot/
+                cp -fR arch/${ARCH}/boot/* $kerneldir/arch/${ARCH}/boot/
+        fi
+
+        if [ -d scripts ]; then
+            for i in \
+                scripts/basic/bin2c \
+                scripts/basic/fixdep \
+                scripts/conmakehash \
+                scripts/dtc/dtc \
+                scripts/kallsyms \
+                scripts/kconfig/conf \
+                scripts/mod/mk_elfconfig \
+                scripts/mod/modpost \
+                scripts/sign-file \
+                scripts/sortextable;
+            do
+                if [ -e $i ]; then
+                    mkdir -p $kerneldir/`dirname $i`
+                    cp $i $kerneldir/$i
+                fi
+            done
+        fi
+
+        cp ${STAGING_KERNEL_DIR}/scripts/gen_initramfs_list.sh $kerneldir/scripts/
+
+        # Make vmlinux available as soon as possible
+        install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
+        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
+        install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
 }
 
 do_install_append() {
-    oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" ${KERNEL_EXTRA_ARGS} headers_install
-    install -d ${STAGING_KERNEL_DIR}/usr
-    for f in ${B}/usr/*; do
-        install -m 0777 ${f} ${STAGING_KERNEL_DIR}/${f#${B}}
-    done
-    install -m 0777 ${B}/vmlinux ${STAGING_KERNEL_DIR}/vmlinux
-    install -m 0777 ${B}/arch/arm/boot/Image ${STAGING_KERNEL_DIR}/arch/arm/boot/Image
+    oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
 do_deploy () {

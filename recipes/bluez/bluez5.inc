@@ -27,4 +27,4 @@ EXTRA_OECONF = "\
   --disable-systemd \
 "
 #  unused param
-#  --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include \
+#  --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \

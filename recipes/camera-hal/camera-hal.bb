@@ -34,8 +34,8 @@ ARM_INSTRUCTION_SET = "arm"
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/jpeg/inc"
 CFLAGS += "-I${STAGING_INCDIR}/cameracommon"
-CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include"
-CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include/media"
+CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include"
+CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/media"
 
 EXTRA_OECONF_append = " --enable-debug=no --with-dlog"
 
@@ -46,7 +46,7 @@ EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8226', ' --enable-target=msm8226', '', d)}"
 EXTRA_OECONF_append = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/hardware/libhardware/include -I${WORKSPACE}/base/include -I${WORKSPACE}/system/core/include -I${WORKSPACE}/mm-video-oss/libstagefrighthw""
 
-EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
+EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append_msm8960 = " --with-additional-include-directives="-I${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/mm-still/omx/inc/""
 EXTRA_OECONF_append_msm8974 = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ ""
 EXTRA_OECONF_append_msm8610 = " --with-additional-include-directives="${WORKSPACE}/mm-video-oss/mm-core/inc/ -I${WORKSPACE}/hardware/libhardware/include -I${WORKSPACE}/base/include -I${WORKSPACE}/system/core/include -I${WORKSPACE}/mm-video-oss/libstagefrighthw""

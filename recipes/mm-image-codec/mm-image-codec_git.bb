@@ -22,7 +22,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 EXTRA_OECONF_append = " --enable-debug=no --with-dlog"
-EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_DIR}/usr/include"
+EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append = " --with-omx-includes=${WORKSPACE}/mm-video-oss/mm-core/inc"
 
 EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target=msm8974', '', d)}"
