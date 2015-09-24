@@ -36,7 +36,7 @@ SRC_URI[md5sum] = "b08a1195ec2c1ebeaf072db3c55fdf43"
 SRC_URI[sha256sum] = "77e6581f21f15946a814fa311236e5f3f7c6593180f9d695cea06aa95e464aba"
 
 
-CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include/linux/netfilter_ipv4"
+CFLAGS += "-I${STAGING_KERNEL_BUILDDIR}/usr/include/linux/netfilter_ipv4"
 
 inherit autotools pkgconfig
 
