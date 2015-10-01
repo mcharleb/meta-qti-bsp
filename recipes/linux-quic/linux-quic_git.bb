@@ -5,6 +5,7 @@ LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|mdmcalifornium|apq8009)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+EXTRA_KERNEL_CMD_PARAMS ?= ""
 
 # Default image type is zImage, change here if needed.
 #KERNEL_IMAGETYPE = "zImage"
