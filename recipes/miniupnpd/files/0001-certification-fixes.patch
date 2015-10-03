@@ -5,6 +5,8 @@ Subject: [PATCH] certification-fixes
 
 Change-Id: I7efdf811a168302d651345695af9c31506c41dcd
 ---
+ getifaddr.c                   |   4 ++--
+ minissdp.c                    |   8 ++++----
  config.h                      | 140 ++++++
  getifstats.h                  |   6 +
  linux/getroute.c              |   1 +
@@ -17,11 +19,67 @@ Change-Id: I7efdf811a168302d651345695af9c31506c41dcd
  upnpredirect.c                |  81 ++-
  upnpredirect.h                |  17 +-
  upnpsoap.c                    | 140 +++++-
- upnpdescgen.c                 | 6 +++---
+ upnpdescgen.c                 |  27 +++---
  13 files changed, 1079 insertions(+), 63 deletions(-)
  create mode 100755 config.h
  create mode 100755 upnppinhole.c
 
+diff --git a/getifaddr.c b/getifaddr.c
+index 6bbbe78..0bdc16a 100644
+--- a/getifaddr.c
++++ b/getifaddr.c
+@@ -241,8 +241,7 @@ find_ipv6_addr(const char * ifname,
+ 		if(ife->ifa_addr->sa_family == AF_INET6)
+ 		{
+ 			addr = (const struct sockaddr_in6 *)ife->ifa_addr;
+-			if(!IN6_IS_ADDR_LOOPBACK(&addr->sin6_addr)
+-			   && !IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr))
++			if(IN6_IS_ADDR_LINKLOCAL(&addr->sin6_addr))
+ 			{
+ 				inet_ntop(ife->ifa_addr->sa_family,
+ 				          &addr->sin6_addr,
+@@ -250,6 +249,7 @@ find_ipv6_addr(const char * ifname,
+ 				/* add brackets */
+ 				snprintf(dst, n, "[%s]", buf);
+ 				r = 1;
++				break;
+ 			}
+ 		}
+ 	}
+
+diff --git a/minissdp.c b/minissdp.c
+index 9fff6d9..cc83861 100644
+--- a/minissdp.c
++++ b/minissdp.c
+@@ -201,7 +201,7 @@ OpenAndConfSSDPNotifySocket(in_addr_t addr)
+ 	int s;
+ 	unsigned char loopchar = 0;
+ 	int bcast = 1;
+-	unsigned char ttl = 2; /* UDA v1.1 says :
++	unsigned char ttl = 4; /* UDA v1.1 says :
+ 		The TTL for the IP packet SHOULD default to 2 and
+ 		SHOULD be configurable. */
+ 	/* TODO: Make TTL be configurable */
+@@ -485,8 +485,8 @@ static struct {
+ {
+ 	{"upnp:rootdevice", 0, uuidvalue_igd},
+ 	{"urn:schemas-upnp-org:device:InternetGatewayDevice:", IGD_VER, uuidvalue_igd},
+-	{"urn:schemas-upnp-org:device:WANConnectionDevice:", 1, uuidvalue_wcd},
+-	{"urn:schemas-upnp-org:device:WANDevice:", 1, uuidvalue_wan},
++	{"urn:schemas-upnp-org:device:WANConnectionDevice:", IGD_VER, uuidvalue_wcd},
++	{"urn:schemas-upnp-org:device:WANDevice:", IGD_VER, uuidvalue_wan},
+ 	{"urn:schemas-upnp-org:service:WANCommonInterfaceConfig:", 1, uuidvalue_wan},
+ 	{"urn:schemas-upnp-org:service:WANIPConnection:", WANIPC_VER, uuidvalue_wcd},
+ #ifndef UPNP_STRICT
+@@ -499,7 +499,7 @@ static struct {
+ 	{"urn:schemas-upnp-org:service:Layer3Forwarding:", 1, uuidvalue_igd},
+ #endif
+ #ifdef ENABLE_6FC_SERVICE
+-	{"url:schemas-upnp-org:service:WANIPv6FirewallControl:", 1, uuidvalue_wcd},
++	{"urn:schemas-upnp-org:service:WANIPv6FirewallControl:", 1, uuidvalue_wcd},
+ #endif
+ /* we might want to support urn:schemas-wifialliance-org:device:WFADevice:1
+  * urn:schemas-wifialliance-org:device:WFADevice:1
 diff --git a/config.h b/config.h
 new file mode 100755
 index 0000000..25ff292
@@ -247,7 +305,7 @@ diff --git a/miniupnpd.c b/miniupnpd.c
 index f785b01..4875de3 100755
 --- a/miniupnpd.c
 +++ b/miniupnpd.c
-@@ -77,6 +77,10 @@
+@@ -77,6 +77,16 @@
  #ifdef USE_IFACEWATCHER
  #include "ifacewatcher.h"
  #endif
@@ -255,10 +313,16 @@ index f785b01..4875de3 100755
 +#include "netfilter/iptpinhole.c"
 +#endif
 +
++#ifndef QCMAP
++#if defined(USE_NETFILTER)
++#include "netfilter/iptpinhole.c"
++#endif
++#endif
++
  #ifdef ENABLE_UPNPPINHOLE
  #ifdef USE_NETFILTER
  void init_iptpinhole(void);
-@@ -155,15 +159,17 @@ OpenAndConfHTTPSocket(unsigned short * p
+@@ -155,15 +165,17 @@ OpenAndConfHTTPSocket(unsigned short * p
  	{
  		syslog(LOG_WARNING, "setsockopt(http, SO_REUSEADDR): %m");
  	}
@@ -278,7 +342,7 @@ index f785b01..4875de3 100755
  	if(!set_non_blocking(s))
  	{
  		syslog(LOG_WARNING, "set_non_blocking(http): %m");
-@@ -1371,7 +1377,11 @@ init(int argc, char * * argv, struct run
+@@ -1371,7 +1383,11 @@ init(int argc, char * * argv, struct run
  			fprintf(stderr, "Unknown option: %s\n", argv[i]);
  		}
  	}
@@ -291,7 +355,7 @@ index f785b01..4875de3 100755
  	{
  		/* bad configuration */
  		goto print_usage;
-@@ -1457,9 +1467,15 @@ init(int argc, char * * argv, struct run
+@@ -1457,9 +1473,15 @@ init(int argc, char * * argv, struct run
  	srandom((unsigned int)time(NULL));
  
  	/* initialize redirection engine (and pinholes) */
@@ -307,7 +371,7 @@ index f785b01..4875de3 100755
  		return 1;
  	}
  #ifdef ENABLE_UPNPPINHOLE
-@@ -1648,7 +1664,11 @@ main(int argc, char * * argv)
+@@ -1648,7 +1670,11 @@ main(int argc, char * * argv)
  		return 0;
  	}
  
@@ -319,7 +383,7 @@ index f785b01..4875de3 100755
  #ifdef ENABLE_NATPMP
  #ifdef ENABLE_PCP
  	       GETFLAG(ENABLENATPMPMASK) ? " NAT-PMP/PCP " : " ",
-@@ -1658,8 +1678,12 @@ main(int argc, char * * argv)
+@@ -1658,8 +1684,12 @@ main(int argc, char * * argv)
  #else
  	       " ",
  #endif
@@ -334,7 +398,7 @@ index f785b01..4875de3 100755
  
  	if(GETFLAG(ENABLEUPNPMASK))
  	{
-@@ -2334,6 +2358,7 @@ main(int argc, char * * argv)
+@@ -2334,6 +2364,7 @@ main(int argc, char * * argv)
  
  shutdown:
  	syslog(LOG_NOTICE, "shutting down MiniUPnPd");
@@ -342,7 +406,7 @@ index f785b01..4875de3 100755
  	/* send good-bye */
  	if (GETFLAG(ENABLEUPNPMASK))
  	{
-@@ -2349,6 +2374,14 @@ shutdown:
+@@ -2349,6 +2380,14 @@ shutdown:
  	/* try to send pending packets */
  	finalize_sendto();
  
@@ -530,7 +594,7 @@ index 0000000..2c4b661
  #include <stdio.h>
  #include <ctype.h>
  #include <unistd.h>
-@@ -41,6 +41,10 @@
+@@ -41,6 +41,15 @@
  #endif
  #if defined(USE_IPFW)
  #endif
@@ -538,10 +602,15 @@ index 0000000..2c4b661
 +#include "netfilter/iptpinhole.c"
 +#endif
 +
++#ifndef QCMAP
++#if defined(USE_NETFILTER)
++#include "netfilter/iptpinhole.c"
++#endif
++#endif
  
  #ifdef ENABLE_UPNPPINHOLE
  
-@@ -108,7 +112,11 @@ upnp_add_inboundpinhole(const char * rad
+@@ -108,7 +117,11 @@ upnp_add_inboundpinhole(const char * rad
  	time_t current;
  	unsigned int timestamp;
  	struct in6_addr address;
@@ -554,7 +623,7 @@ index 0000000..2c4b661
  	r = inet_pton(AF_INET6, iaddr, &address);
  	if(r <= 0) {
  		syslog(LOG_ERR, "inet_pton(%d, %s, %p) FAILED",
-@@ -119,6 +127,10 @@ upnp_add_inboundpinhole(const char * rad
+@@ -119,6 +132,10 @@ upnp_add_inboundpinhole(const char * rad
  	timestamp = current + leasetime;
  	r = 0;
  
@@ -565,7 +634,7 @@ index 0000000..2c4b661
  #if 0
  	if(r == 1 && strcmp(iaddr, iaddr_old)==0 && iport==iport_old)
  	{
-@@ -129,6 +141,8 @@ upnp_add_inboundpinhole(const char * rad
+@@ -129,6 +146,8 @@ upnp_add_inboundpinhole(const char * rad
  	}
  	else
  #endif
@@ -574,7 +643,7 @@ index 0000000..2c4b661
  #if defined(USE_PF) || defined(USE_NETFILTER)
  	*uid = add_pinhole (0/*ext_if_name*/, raddr, rport,
  	                    iaddr, iport, proto, desc, timestamp);
-@@ -136,8 +150,39 @@ upnp_add_inboundpinhole(const char * rad
+@@ -136,8 +155,39 @@ upnp_add_inboundpinhole(const char * rad
  #else
  	return -42;	/* not implemented */
  #endif
@@ -607,15 +676,15 @@ index 0000000..2c4b661
 +     }
 +  syslog(LOG_INFO, "p uid: %d",*uid);
 +  return *uid >= 0 ? 1 : -1;
-+
+ 
 +#endif
 +
- 
++
 +}
  #if 0
  int
  upnp_add_inboundpinhole_internal(const char * raddr, unsigned short rport,
-@@ -226,6 +271,7 @@ upnp_get_pinhole_info(unsigned short uid
+@@ -226,6 +276,7 @@ upnp_get_pinhole_info(unsigned short uid
                        unsigned int * packets)
  {
  	/* Call Firewall specific code to get IPv6 pinhole infos */
@@ -623,7 +692,7 @@ index 0000000..2c4b661
  #if defined(USE_PF) || defined(USE_NETFILTER)
  	int r;
  	unsigned int timestamp;
-@@ -259,6 +305,54 @@ upnp_get_pinhole_info(unsigned short uid
+@@ -259,6 +310,54 @@ upnp_get_pinhole_info(unsigned short uid
  	UNUSED(leasetime); UNUSED(packets);
  	return -42;	/* not implemented */
  #endif
@@ -678,7 +747,7 @@ index 0000000..2c4b661
  }
  
  int
-@@ -290,6 +384,7 @@ upnp_update_inboundpinhole(unsigned shor
+@@ -290,6 +389,7 @@ upnp_update_inboundpinhole(unsigned shor
  int
  upnp_delete_inboundpinhole(unsigned short uid)
  {
@@ -686,7 +755,7 @@ index 0000000..2c4b661
  #if defined(USE_PF) || defined(USE_NETFILTER)
  	return delete_pinhole(uid);
  #else
-@@ -297,6 +392,18 @@ upnp_delete_inboundpinhole(unsigned shor
+@@ -297,6 +397,18 @@ upnp_delete_inboundpinhole(unsigned shor
  
  	return -1;
  #endif
@@ -917,27 +986,27 @@ index 28560ab..fc29e92 100755
  		tmp = list;
  		list = tmp->next;
  		free(tmp);
-@@ -604,8 +674,11 @@ remove_unused_rules(struct rule_state *
+@@ -604,16 +674,22 @@ remove_unused_rules(struct rule_state *
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
 -upnp_get_portmappings_in_range(unsigned short startport,
 +upnp_get_portmappings_in_range(
-+#ifndef QCMAP
 +                               unsigned short startport,
                                 unsigned short endport,
-+#endif
                                 const char * protocol,
-                                unsigned int * number)
+-                               unsigned int * number)
++                               unsigned int *number)
  {
-@@ -613,7 +686,11 @@ upnp_get_portmappings_in_range(unsigned
++      unsigned int * entries;
+ 	int proto;
  	proto = proto_atoi(protocol);
  	if(!number)
  		return NULL;
 +#ifndef QCMAP
  	return get_portmappings_in_range(startport, endport, proto, number);
 +#else
-+	return NULL;
++	return getPortMappingsWrapper(startport,endport,proto, number);
 +#endif
  }
  
@@ -972,16 +1041,14 @@ index b549824..311abba 100755
                         const char * iaddr, unsigned short iport,
                         int proto, const char * desc,
                         unsigned int timestamp);
-@@ -103,8 +111,11 @@ remove_unused_rules(struct rule_state *
+@@ -103,7 +111,8 @@ remove_unused_rules(struct rule_state *
   * return a list of all "external" ports for which a port
   * mapping exists */
  unsigned short *
 -upnp_get_portmappings_in_range(unsigned short startport,
 +upnp_get_portmappings_in_range(
-+#ifndef QCMAP
 +                               unsigned short startport,
                                 unsigned short endport,
-+#endif
                                 const char * protocol,
                                 unsigned int * number);
  
@@ -1099,7 +1166,39 @@ index e8db166..23cc09a 100755
  		strncpy(ext_ip_addr, "0.0.0.0", INET_ADDRSTRLEN);
  	}
  #else
-@@ -423,7 +458,11 @@ AddPortMapping(struct upnphttp * h, cons
+@@ -314,7 +349,7 @@ AddPortMapping(struct upnphttp * h, cons
+ 	struct NameValueParserData data;
+ 	char * int_ip, * int_port, * ext_port, * protocol, * desc;
+ 	char * leaseduration_str;
+-	unsigned int leaseduration;
++	unsigned int leaseduration,proto;
+ 	char * r_host;
+ 	unsigned short iport, eport;
+ 
+@@ -386,14 +421,20 @@ AddPortMapping(struct upnphttp * h, cons
+ 	protocol = GetValueFromNameValueList(&data, "NewProtocol");
+ 	desc = GetValueFromNameValueList(&data, "NewPortMappingDescription");
+ 	leaseduration_str = GetValueFromNameValueList(&data, "NewLeaseDuration");
+-
+-	if (!int_port || !ext_port || !protocol)
++	if (!int_port || !ext_port || !protocol )
+ 	{
+ 		ClearNameValueList(&data);
+ 		SoapError(h, 402, "Invalid Args");
+ 		return;
+ 	}
+ 
++	if  ((strcmp(protocol, "UDP") != 0) && (strcmp(protocol, "TCP") != 0))
++	{
++		ClearNameValueList(&data);
++		SoapError(h, 601, "Arguments out of range");
++		return;
++	}
++
+ 	eport = (unsigned short)atoi(ext_port);
+ 	iport = (unsigned short)atoi(int_port);
+ 
+@@ -423,7 +464,11 @@ AddPortMapping(struct upnphttp * h, cons
  	PortMappingDescription, PortMappingEnabled and PortMappingLeaseDuration are
  	overwritten.
  	*/
@@ -1112,7 +1211,37 @@ index e8db166..23cc09a 100755
  
  	ClearNameValueList(&data);
  
-@@ -559,7 +598,11 @@ AddAnyPortMapping(struct upnphttp * h, c
+@@ -478,7 +523,7 @@ AddAnyPortMapping(struct upnphttp * h, c
+ 	struct NameValueParserData data;
+ 	const char * int_ip, * int_port, * ext_port, * protocol, * desc;
+ 	const char * r_host;
+-	unsigned short iport, eport;
++	unsigned short iport, eport,proto;
+ 	const char * leaseduration_str;
+ 	unsigned int leaseduration;
+ 
+@@ -499,13 +544,18 @@ AddAnyPortMapping(struct upnphttp * h, c
+ 	leaseduration = leaseduration_str ? atoi(leaseduration_str) : 0;
+ 	if(leaseduration == 0)
+ 		leaseduration = 604800;
+-
+-	if (!int_ip || !ext_port || !int_port)
++	if (!int_ip || !ext_port || !int_port || !protocol )
+ 	{
+ 		ClearNameValueList(&data);
+ 		SoapError(h, 402, "Invalid Args");
+ 		return;
+ 	}
++	if  ((strcmp(protocol, "UDP") != 0) && (strcmp(protocol, "TCP") != 0))
++	{
++		ClearNameValueList(&data);
++		SoapError(h, 601, "Arguments out of range");
++		return;
++	}
+ 
+ 	eport = (unsigned short)atoi(ext_port);
+ 	iport = (unsigned short)atoi(int_port);
+@@ -559,7 +609,11 @@ AddAnyPortMapping(struct upnphttp * h, c
  	/* TODO : accept a different external port
  	 * have some smart strategy to choose the port */
  	for(;;) {
@@ -1125,31 +1254,115 @@ index e8db166..23cc09a 100755
  		if(r==-2 && eport < 65535) {
  			eport++;
  		} else {
-@@ -809,7 +852,10 @@ DeletePortMappingRange(struct upnphttp *
- 	syslog(LOG_INFO, "%s: deleting external ports: %hu-%hu, protocol: %s",
+@@ -704,6 +758,12 @@ DeletePortMapping(struct upnphttp * h, c
+ 		SoapError(h, 402, "Invalid Args");
+ 		return;
+ 	}
++	if  ((strcmp(protocol, "UDP") != 0) && (strcmp(protocol, "TCP") != 0))
++	{
++		ClearNameValueList(&data);
++		SoapError(h, 601, "Arguments out of range");
++		return;
++	}
+ #ifndef SUPPORT_REMOTEHOST
+ #ifdef UPNP_STRICT
+ 	if (r_host && (strlen(r_host) > 0) && (0 != strcmp(r_host, "*")))
+@@ -777,6 +837,7 @@ DeletePortMappingRange(struct upnphttp *
+ 	const char * startport_s, * endport_s;
+ 	unsigned short startport, endport;
+ 	/*int manage;*/
++	int proto;
+ 	unsigned short * port_list;
+ 	unsigned int i, number = 0;
+ 	UNUSED(action);
+@@ -786,7 +847,7 @@ DeletePortMappingRange(struct upnphttp *
+ 	endport_s = GetValueFromNameValueList(&data, "NewEndPort");
+ 	protocol = GetValueFromNameValueList(&data, "NewProtocol");
+ 	/*manage = atoi(GetValueFromNameValueList(&data, "NewManage"));*/
+-	if(startport_s == NULL || endport_s == NULL || protocol == NULL) {
++	if(startport_s == NULL || endport_s == NULL || protocol == NULL ) {
+ 		SoapError(h, 402, "Invalid Args");
+ 		ClearNameValueList(&data);
+ 		return;
+@@ -806,10 +867,19 @@ DeletePortMappingRange(struct upnphttp *
+ 		return;
+ 	}
+ 
+-	syslog(LOG_INFO, "%s: deleting external ports: %hu-%hu, protocol: %s",
++	if  ((strcmp(protocol, "UDP") != 0) && (strcmp(protocol, "TCP") != 0))
++	{
++		ClearNameValueList(&data);
++		SoapError(h, 601, "Arguments out of range");
++		return;
++	}
++
++	syslog(LOG_INFO, "%s: deleting external ports: %hu-%hu, protocol: %s\n",
  	       action, startport, endport, protocol);
  
 -	port_list = upnp_get_portmappings_in_range(startport, endport,
 +	port_list = upnp_get_portmappings_in_range(
-+#ifndef QCMAP
++
 +                                                   startport, endport,
-+#endif
  	                                           protocol, &number);
  	if(number == 0)
  	{
-@@ -1027,7 +1073,10 @@ http://www.upnp.org/schemas/gw/WANIPConn
+@@ -820,7 +890,7 @@ DeletePortMappingRange(struct upnphttp *
+ 
+ 	for(i = 0; i < number; i++)
+ 	{
+-		r = upnp_delete_redirection(port_list[i], protocol);
++	    r = upnp_delete_redirection(port_list[i], protocol);
+ 		syslog(LOG_INFO, "%s: deleting external port: %hu, protocol: %s: %s",
+ 		       action, port_list[i], protocol, r < 0 ? "failed" : "ok");
+ 	}
+@@ -960,8 +1030,8 @@ GetListOfPortMappings(struct upnphttp *
+ 	const char * protocol;
+ 	/*int manage;*/
+ 	const char * number_s;
+-	int number;
+-	unsigned short * port_list;
++	int number,proto;
++	unsigned short *port_list;
+ 	unsigned int i, list_size = 0;
+ 
+ 	ParseNameValue(h->req_buf + h->req_contentoff, h->req_contentlen, &data);
+@@ -981,8 +1051,12 @@ GetListOfPortMappings(struct upnphttp *
+ 	endport = (unsigned short)atoi(endport_s);
+ 	/*manage = atoi(manage_s);*/
+ 	number = atoi(number_s);
++	if(!startport && !endport) {
++		SoapError(h, 402, "Invalid Args");
++		ClearNameValueList(&data);
++		return;
++	}
+ 	if(number == 0) number = 1000;	/* return up to 1000 mappings by default */
+-
+ 	if(startport > endport)
+ 	{
+ 		SoapError(h, 733, "InconsistentParameter");
+@@ -1027,10 +1101,11 @@ http://www.upnp.org/schemas/gw/WANIPConn
  	memcpy(body+bodylen, list_start, sizeof(list_start));
  	bodylen += (sizeof(list_start) - 1);
  
 -	port_list = upnp_get_portmappings_in_range(startport, endport,
 +	port_list = upnp_get_portmappings_in_range(
-+#ifndef QCMAP
 +                                                   startport, endport,
-+#endif
  	                                           protocol, &list_size);
  	/* loop through port mappings */
- 	for(i = 0; number > 0 && i < list_size; i++)
-@@ -1175,16 +1224,63 @@ SetConnectionType(struct upnphttp * h, c
+-	for(i = 0; number > 0 && i < list_size; i++)
++		for(i = 0; number > 0 && i < list_size; i++)
+ 	{
+ 		/* have a margin of 1024 bytes to store the new entry */
+ 		if((unsigned int)bodylen + 1024 > bodyalloc)
+@@ -1139,7 +1214,6 @@ GetDefaultConnectionService(struct upnph
+ 	 * urn:upnp-org:serviceId:WANPPPConn1 */
+ 	char body[1024];
+ 	int bodylen;
+-
+ 	bodylen = snprintf(body, sizeof(body), resp,
+ 	                   action, uuidvalue_wcd, action);
+ 	BuildSendAndCloseSoapResp(h, body, bodylen);
+@@ -1175,16 +1249,63 @@ SetConnectionType(struct upnphttp * h, c
  static void
  RequestConnection(struct upnphttp * h, const char * action)
  {
@@ -1213,7 +1426,7 @@ index e8db166..23cc09a 100755
  }
  
  /*
-@@ -1223,8 +1319,11 @@ QueryStateVariable(struct upnphttp * h,
+@@ -1223,8 +1344,11 @@ QueryStateVariable(struct upnphttp * h,
  	else if(strcmp(var_name, "ConnectionStatus") == 0)
  	{
  		const char * status;
@@ -1226,7 +1439,7 @@ index e8db166..23cc09a 100755
  		bodylen = snprintf(body, sizeof(body), resp,
                             action, "urn:schemas-upnp-org:control-1-0",
  		                   status, action);
-@@ -1279,12 +1378,22 @@ GetFirewallStatus(struct upnphttp * h, c
+@@ -1279,12 +1403,22 @@ GetFirewallStatus(struct upnphttp * h, c
  
  	char body[512];
  	int bodylen;
@@ -1253,7 +1466,7 @@ index e8db166..23cc09a 100755
  	BuildSendAndCloseSoapResp(h, body, bodylen);
  }
  
-@@ -1404,12 +1513,14 @@ PinholeVerification(struct upnphttp * h,
+@@ -1404,12 +1538,14 @@ PinholeVerification(struct upnphttp * h,
  #ifdef DEBUG
  	printf("\tPinholeVerification:\n\t\tCompare sender @: %s\n\t\t  to intClient @: %s\n", senderAddr, int_ip);
  #endif
@@ -1270,7 +1483,7 @@ index e8db166..23cc09a 100755
  		return 0;
  	}
  
-@@ -1418,7 +1529,7 @@ PinholeVerification(struct upnphttp * h,
+@@ -1418,7 +1554,7 @@ PinholeVerification(struct upnphttp * h,
  	{
  		syslog(LOG_INFO, "Client %s tried to access pinhole with port < 1024 and is not authorized to do it",
  		       senderAddr);
@@ -1279,7 +1492,7 @@ index e8db166..23cc09a 100755
  		return 0;
  	}
  	return 1;
-@@ -1570,8 +1681,11 @@ AddPinhole(struct upnphttp * h, const ch
+@@ -1570,8 +1706,11 @@ AddPinhole(struct upnphttp * h, const ch
  		case -1: 	/* not permitted */
  			SoapError(h, 701, "PinholeSpaceExhausted");
  			break;
@@ -1292,7 +1505,7 @@ index e8db166..23cc09a 100755
  			break;
  	}
  	/* 606 Action not authorized
-@@ -1616,7 +1730,7 @@ UpdatePinhole(struct upnphttp * h, const
+@@ -1616,7 +1755,7 @@ UpdatePinhole(struct upnphttp * h, const
  		SoapError(h, 402, "Invalid Args");
  		return;
  	}
@@ -1301,7 +1514,7 @@ index e8db166..23cc09a 100755
  	/* Check that client is not updating an pinhole
  	 * it doesn't have access to, because of its public access */
  	n = upnp_get_pinhole_info(uid, NULL, 0, NULL,
-@@ -1870,6 +1984,7 @@ GetPinholePackets(struct upnphttp * h, c
+@@ -1870,6 +2009,7 @@ GetPinholePackets(struct upnphttp * h, c
  		SoapError(h, 402, "Invalid Args");
  		return;
  	}
@@ -1309,7 +1522,7 @@ index e8db166..23cc09a 100755
  
  	/* Check that client is not getting infos of a pinhole
  	 * it doesn't have access to, because of its public access */
-@@ -1883,6 +1998,10 @@ GetPinholePackets(struct upnphttp * h, c
+@@ -1883,6 +2023,10 @@ GetPinholePackets(struct upnphttp * h, c
  		if(PinholeVerification(h, iaddr, iport)<=0)
  			return ;
  	}
@@ -1320,7 +1533,7 @@ index e8db166..23cc09a 100755
  #if 0
  	else if(r == -4 || r == -1)
  	{
-@@ -2048,7 +2167,7 @@ soapMethods[] =
+@@ -2048,7 +2192,7 @@ soapMethods[] =
  	{ "GetFirewallStatus", GetFirewallStatus},	/* Required */
  	{ "AddPinhole", AddPinhole},				/* Required */
  	{ "UpdatePinhole", UpdatePinhole},			/* Required */
@@ -1329,12 +1542,55 @@ index e8db166..23cc09a 100755
  	{ "DeletePinhole", DeletePinhole},			/* Required */
  	{ "CheckPinholeWorking", CheckPinholeWorking},	/* Optional */
  	{ "GetPinholePackets", GetPinholePackets},	/* Required */
-
 diff --git a/upnpdescgen.c b/upnpdescgen.c
 index 4f45fbf..bf3f384 100755
 --- a/upnpdescgen.c
 +++ b/upnpdescgen.c
-@@ -655,7 +655,7 @@ static const struct argument GetFirewallStatusArgs[] =
+@@ -8,7 +8,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+-
++#include <syslog.h>
+ #include "config.h"
+ #ifdef ENABLE_EVENTS
+ #include "getifaddr.h"
+@@ -76,16 +76,15 @@ static const char * const upnpallowedvalues[] =
+ 	"Disconnected",
+ 	0,
+ 	"ERROR_NONE",	/* 25 */
+-/* Optionals values :
+- * ERROR_COMMAND_ABORTED
+- * ERROR_NOT_ENABLED_FOR_INTERNET
+- * ERROR_USER_DISCONNECT
+- * ERROR_ISP_DISCONNECT
+- * ERROR_IDLE_DISCONNECT
+- * ERROR_FORCED_DISCONNECT
+- * ERROR_NO_CARRIER
+- * ERROR_IP_CONFIGURATION
+- * ERROR_UNKNOWN */
++	"ERROR_COMMAND_ABORTED",
++	"ERROR_NOT_ENABLED_FOR_INTERNET",
++	"ERROR_USER_DISCONNECT",
++	"ERROR_ISP_DISCONNECT",
++	"ERROR_IDLE_DISCONNECT",
++	"ERROR_FORCED_DISCONNECT",
++	"ERROR_NO_CARRIER",
++	"ERROR_IP_CONFIGURATION",
++	"ERROR_UNKNOWN",
+ 	0,
+ 	"",		/* 27 */
+ 	0
+@@ -261,7 +260,7 @@ static const struct XMLElt rootDesc[] =
+ #ifdef ENABLE_6FC_SERVICE
+ /* 58 */
+ 	{"/serviceType", "urn:schemas-upnp-org:service:WANIPv6FirewallControl:1"},
+-	{"/serviceId", "urn:upnp-org:serviceId:WANIPv6FC1"},
++	{"/serviceId", "urn:upnp-org:serviceId:WANIPv6Firewall1"},
+ 	{"/controlURL", WANIP6FC_CONTROLURL},
+ 	{"/eventSubURL", WANIP6FC_EVENTURL},
+ 	{"/SCPDURL", WANIP6FC_PATH},
+@@ -655,7 +655,7 @@ static const struct argument GetFirewall
  	{2|0x80, 6}, /* OUT : InboundPinholeAllowed */
  	{0, 0}
  };
@@ -1343,7 +1599,7 @@ index 4f45fbf..bf3f384 100755
  static const struct argument GetOutboundPinholeTimeoutArgs[] =
  {
  	{1|0x80|(3<<2), 1}, /* RemoteHost IN A_ARG_TYPE_IPv6Address */
-@@ -666,7 +666,7 @@ static const struct argument GetOutboundPinholeTimeoutArgs[] =
+@@ -666,7 +666,7 @@ static const struct argument GetOutbound
  	{2|0x80, 7}, /* OutboundPinholeTimeout OUT A_ARG_TYPE_OutboundPinholeTimeout */
  	{0, 0}
  };
@@ -1352,7 +1608,7 @@ index 4f45fbf..bf3f384 100755
  static const struct argument AddPinholeArgs[] =
  {
  	{1|0x80|(3<<2), 1}, /* RemoteHost IN A_ARG_TYPE_IPv6Address */
-@@ -709,7 +709,7 @@ static const struct argument CheckPinholeWorkingArgs[] =
+@@ -709,7 +709,7 @@ static const struct argument CheckPinhol
  static const struct action IPv6FCActions[] =
  {
  	{"GetFirewallStatus", GetFirewallStatusArgs}, /* Req */

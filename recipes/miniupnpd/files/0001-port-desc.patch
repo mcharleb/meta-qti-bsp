@@ -180,6 +180,24 @@ index e96a7d3..1df62cc 100755
  static struct ip6t_entry_match *
  new_match(int proto, unsigned short sport, unsigned short dport)
  {
+@@ -194,7 +218,7 @@ miniupnpd_forward_chain, line_number, pr
+ ip6tables -t raw -I PREROUTING %d -p %s -i %s -s %s --sport %hu -d %s --dport %hu -j TRACE
+ ip6tables -t raw -I PREROUTING %d -p %s -i %s --sport %hu -d %s --dport %hu -j TRACE
+ */
+-int add_pinhole(const char * ifname,
++static int add_pinhole(const char * ifname,
+                 const char * rem_host, unsigned short rem_port,
+                 const char * int_client, unsigned short int_port,
+                 int proto, const char * desc, unsigned int timestamp)
+@@ -262,7 +286,7 @@ int add_pinhole(const char * ifname,
+ 	return uid;
+ }
+ 
+-int
++static int
+ delete_pinhole(unsigned short uid)
+ {
+ 	struct pinhole_t * p;
 @@ -320,8 +344,9 @@ error:
  	ip6tc_free(h);
  	return -1;
@@ -191,15 +209,17 @@ index e96a7d3..1df62cc 100755
  update_pinhole(unsigned short uid, unsigned int timestamp)
  {
  	struct pinhole_t * p;
-@@ -334,7 +359,7 @@ update_pinhole(unsigned short uid, unsig
+@@ -334,8 +359,8 @@ update_pinhole(unsigned short uid, unsig
  		return -2;	/* Not found */
  	}
  }
 -
+-int
 +#ifndef QCMAP
- int
++static int
  get_pinhole_info(unsigned short uid,
                   char * rem_host, int rem_hostlen,
+                  unsigned short * rem_port,
 @@ -400,8 +425,8 @@ get_pinhole_info(unsigned short uid,
  	}
  	return 0;
@@ -251,17 +271,18 @@ diff --git a/netfilter/iptpinhole.h b/netfilter/iptpinhole.h
 index a858ead..31c81db 100755
 --- a/netfilter/iptpinhole.h
 +++ b/netfilter/iptpinhole.h
-@@ -10,12 +10,18 @@
+@@ -10,16 +10,22 @@
  #ifdef ENABLE_UPNPPINHOLE
  #include <sys/types.h>
 
+-int add_pinhole(const char * ifname,
 +
 +static void init_iptpinhole(void);
 +
 +static void shutdown_iptpinhole(void);
 +
 +
- int add_pinhole(const char * ifname,
++static int add_pinhole(const char * ifname,
                  const char * rem_host, unsigned short rem_port,
                  const char * int_client, unsigned short int_port,
                  int proto, const char *desc, unsigned int timestamp);
@@ -269,8 +290,14 @@ index a858ead..31c81db 100755
 -int update_pinhole(unsigned short uid, unsigned int timestamp);
 +static int update_pinhole(unsigned short uid, unsigned int timestamp);
 
- int delete_pinhole(unsigned short uid);
+-int delete_pinhole(unsigned short uid);
++static int delete_pinhole(unsigned short uid);
 
+-int
++static int
+ get_pinhole_info(unsigned short uid,
+                  char * rem_host, int rem_hostlen, unsigned short * rem_port,
+                  char * int_client, int int_clientlen,
 @@ -28,9 +34,9 @@ get_pinhole_info(unsigned short uid,
                   unsigned int * timestamp,
                   u_int64_t * packets, u_int64_t * bytes);
