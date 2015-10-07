@@ -11,6 +11,33 @@ diff --git a/upnpsoap.c b/upnpsoap.c
 index 0b6ec56..229f80f 100644
 --- a/upnpsoap.c
 +++ b/upnpsoap.c
+@@ -165,11 +165,21 @@ RegisterDevice(struct upnphttp * h, cons
+ 
+ 	char body[512];
+ 	int bodylen;
+-
+-	bodylen = snprintf(body, sizeof(body), resp,
+-		action, "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1",
+-		uuidvalue, action);
+-	BuildSendAndCloseSoapResp(h, body, bodylen);
++struct NameValueParserData data;
++	const char * id;
++      ParseNameValue(h->req_buf + h->req_contentoff, h->req_contentlen, &data, XML_STORE_EMPTY_FL);
++      id = GetValueFromNameValueList(&data, "DeviceID");
++      if(id)
++      {
++         int bodylen;
++         bodylen = snprintf(body, sizeof(body), resp,
++                   action, "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1",
++                   uuidvalue, action);
++         BuildSendAndCloseSoapResp(h, body, bodylen);
++      }
++        else
++            SoapError(h, 402, "Invalid Args");
++        ClearNameValueList(&data);
+ }
+ 
+ static void
 @@ -1712,17 +1712,35 @@ SearchContentDirectory(struct upnphttp * h, const char * action)
  		goto search_error;
  	}
