@@ -8,24 +8,17 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://qcom-opensource/wlan/prima/firmware_bin \
            file://set_wcnss_mode"
 
-S = "${WORKDIR}/qcom-opensource/wlan/prima/firmware_bin"
+S = "${WORKDIR}/qcom-opensource/wlan/firmware_bin"
 
 inherit update-rc.d
 
 do_install() {
     install -d ${D}/etc
     install -d ${D}/etc/init.d
-    install set_wcnss_mode ${D}/etc/init.d
-}
+    install "${WORKDIR}"/set_wcnss_mode ${D}/etc/init.d
 
-do_install_append_msm8610() {
-   mkdir -p ${D}/lib/firmware/wlan/prima
-   cp -pPr ${S}/* ${D}/lib/firmware/wlan/prima
-}
-
-do_install_append_msm8226() {
-   mkdir -p ${D}/lib/firmware/wlan/prima
-   cp -pPr ${S}/firmware_bin/* ${D}/lib/firmware/wlan/prima
+    mkdir -p ${D}/lib/firmware/wlan/prima
+    cp -pPr ${S}/* ${D}/lib/firmware/wlan/prima
 }
 
 INITSCRIPT_NAME = "set_wcnss_mode"

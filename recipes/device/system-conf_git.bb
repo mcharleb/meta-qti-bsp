@@ -7,11 +7,9 @@ PR = "r3"
 
 FILESPATH =+ "${WORKSPACE}:"
 # Provide a baseline
-SRC_URI_mdm9635 = "file://device/qcom/krypton/"
-SRC_URI_mdm9640 = "file://mdm-init/"
+SRC_URI = "file://mdm-init/"
 
 # Update for each machine
-S_mdm9635 = "${WORKDIR}/device/qcom/krypton/"
-S_mdm9640 = "${WORKDIR}/mdm-init/"
+S = "${WORKDIR}/mdm-init/"
 
 FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
