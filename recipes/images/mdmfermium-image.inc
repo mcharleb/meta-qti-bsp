@@ -36,7 +36,7 @@ DEPENDS += "gdb-cross-arm"
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "gdb"
 IMAGE_INSTALL += "glib-2.0"
-#IMAGE_INSTALL += "hostap-daemon-qcacld"
+IMAGE_INSTALL += "hostap-daemon-qcacld"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
@@ -72,7 +72,7 @@ IMAGE_INSTALL += "powerapp-reboot"
 IMAGE_INSTALL += "powerapp-shutdown"
 IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
-#IMAGE_INSTALL += "qcacld-ll"
+IMAGE_INSTALL += "qcacld-ll"
 IMAGE_INSTALL += "qrngd"
 IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "rtsp-alg"
@@ -82,16 +82,16 @@ IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-core-liblog"
 IMAGE_INSTALL += "system-core-libcutils"
-#IMAGE_INSTALL += "system-conf"
+IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
-#IMAGE_INSTALL += "wireless-tools"
+IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
 IMAGE_INSTALL += "sfe"
 
 # Below packages are open source packages that depend on proprietary packages
 
-#QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
-#IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
+QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
+IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
 
 #DATA_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/data')}"
 #IMAGE_INSTALL += "${@base_conditional('DATA_DIR_PRESENT', 'True', 'miniupnpd', '', d)}"
