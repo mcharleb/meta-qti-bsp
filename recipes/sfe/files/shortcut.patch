@@ -1,0 +1,665 @@
+diff -aruN shortcut-fe/Makefile shortcut-fe_new/Makefile
+--- shortcut-fe/Makefile	2015-09-03 12:06:02.074343400 +0530
++++ shortcut-fe_new/Makefile	2015-09-03 14:15:28.976212346 +0530
+@@ -13,7 +13,8 @@
+ #
+ # Makefile for Shortcut FE.
+ #
+-
++SFE_SUPPORT_IPV6 = IPV6
++KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
+ obj-m += shortcut-fe.o
+ 
+ ifdef SFE_SUPPORT_IPV6
+@@ -33,3 +34,17 @@
+ shortcut-fe-cm-objs := \
+ 	sfe_cm.o
+ 
++	ccflags-y += -D__CHECK_ENDIAN__
++
++CDEFINES += -D__CHECK_ENDIAN__
++
++KBUILD_CPPFLAGS += $(CDEFINES)
++
++all:
++	$(MAKE) -C $(KERNEL_SRC) M=$(shell pwd) modules
++modules_install:
++	$(MAKE) INSTALL_MOD_STRIP=1 -C $(KERNEL_SRC) M=$(shell pwd) modules_install
++
++clean:
++	$(MAKE) -C $(KERNEL_SRC) M=$(PWD) clean
++
+diff -aruN shortcut-fe/sfe.h shortcut-fe_new/sfe.h
+--- shortcut-fe/sfe.h	2015-09-03 12:06:02.074343400 +0530
++++ shortcut-fe_new/sfe.h	2015-09-03 22:43:03.715524701 +0530
+@@ -25,8 +25,13 @@
+  * of any packets is actually correct too.  Right now we're relying on
+  * the bridge layer to do this sort of thing for us.
+  */
+-#define SFE_HOOK_ABOVE_BRIDGE 1
++#define SFE_HOOK_ABOVE_BRIDGE 0
++#define MAX_INTF_LEN 50
+ 
++
++#ifndef SFE_SUPPORT_IPV6
++#define SFE_SUPPORT_IPV6
++#endif
+ /*
+  * Debug output verbosity level.
+  */
+diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
+--- shortcut-fe/sfe_cm.c	2015-09-03 12:06:02.074343400 +0530
++++ shortcut-fe_new/sfe_cm.c	2015-09-28 22:06:08.064606948 +0530
+@@ -106,6 +106,7 @@
+  * Expose the hook for the receive processing.
+  */
+ extern int (*athrs_fast_nat_recv)(struct sk_buff *skb);
++extern void (*delete_sfe_entry)(struct nf_conn *ct);
+ 
+ /*
+  * Expose what should be a static flag in the TCP connection tracker.
+@@ -204,6 +205,61 @@
+ }
+ 
+ /*
++ * sfe_cm_delete_conntrack()
++ *	Handle SFE entry deletion based on conntrack deletion.
++ * Returns void
++ */
++
++static void sfe_cm_delete_conntrack (struct nf_conn *ct)
++{
++	struct sfe_connection_destroy sid;
++	struct nf_conntrack_tuple orig_tuple;
++
++	if (unlikely(!ct)) {
++		DEBUG_WARN("no ct in conntrack event callback\n");
++		return;
++	}
++
++	orig_tuple = ct->tuplehash[IP_CT_DIR_ORIGINAL].tuple;
++	sid.protocol = (int32_t)orig_tuple.dst.protonum;
++
++	/*
++	 * Extract information from the conntrack connection.  We're only interested
++	 * in nominal connection information (i.e. we're ignoring any NAT information).
++	 */
++
++	switch (sid.protocol) {
++	case IPPROTO_TCP:
++		sid.src_port = orig_tuple.src.u.tcp.port;
++		sid.dest_port = orig_tuple.dst.u.tcp.port;
++		break;
++
++	case IPPROTO_UDP:
++		sid.src_port = orig_tuple.src.u.udp.port;
++		sid.dest_port = orig_tuple.dst.u.udp.port;
++		break;
++
++	default:
++		DEBUG_TRACE("unhandled protocol: %d\n", sid.protocol);
++		return;
++	}
++
++	if (likely(nf_ct_l3num(ct) == AF_INET)) {
++		sid.src_ip.ip = (__be32)orig_tuple.src.u3.ip;
++		sid.dest_ip.ip = (__be32)orig_tuple.dst.u3.ip;
++
++	sfe_ipv4_destroy_rule(&sid);
++	} else if (likely(nf_ct_l3num(ct) == AF_INET6)) {
++		sid.src_ip.ip6[0] = *((struct sfe_ipv6_addr *)&orig_tuple.src.u3.in6);
++		sid.dest_ip.ip6[0] = *((struct sfe_ipv6_addr *)&orig_tuple.dst.u3.in6);
++
++		sfe_ipv6_destroy_rule(&sid);
++	} else {
++		DEBUG_TRACE("ignoring non-IPv4 and non-IPv6 connection\n");
++	}
++}
++
++/*
+  * sfe_cm_find_dev_and_mac_addr()
+  *	Find the device and MAC address for a given IPv4/IPv6 address.
+  *
+@@ -607,9 +663,13 @@
+ 	sic.dest_mtu = dest_dev->mtu;
+ 
+ 	if (likely(is_v4)) {
+-		sfe_ipv4_create_rule(&sic);
++		if (sfe_ipv4_create_rule(&sic) == 0) {
++				ct->sfe_entry = (void *)(&sic);
++			}
+ 	} else {
+-		sfe_ipv6_create_rule(&sic);
++		if (sfe_ipv6_create_rule(&sic) == 0) {
++				ct->sfe_entry = (void *)(&sic);
++			}
+ 	}
+ 
+ 	/*
+@@ -990,17 +1050,6 @@
+ 		goto exit3;
+ 	}
+ 
+-#ifdef CONFIG_NF_CONNTRACK_EVENTS
+-	/*
+-	 * Register a notifier hook to get fast notifications of expired connections.
+-	 */
+-	result = nf_conntrack_register_notifier(&init_net, &sfe_cm_conntrack_notifier);
+-	if (result < 0) {
+-		DEBUG_ERROR("can't register nf notifier hook: %d\n", result);
+-		goto exit4;
+-	}
+-#endif
+-
+ 	spin_lock_init(&sc->lock);
+ 
+ 	/*
+@@ -1010,6 +1059,12 @@
+ 	RCU_INIT_POINTER(athrs_fast_nat_recv, sfe_cm_recv);
+ 
+ 	/*
++	 * Register the delete conntrack callback.
++	 */
++	BUG_ON(delete_sfe_entry != NULL);
++	RCU_INIT_POINTER(delete_sfe_entry, sfe_cm_delete_conntrack);
++
++	/*
+ 	 * Hook the shortcut sync callback.
+ 	 */
+ 	sfe_ipv4_register_sync_rule_callback(sfe_cm_sync_rule);
+diff -aruN shortcut-fe/sfe_cm.h shortcut-fe_new/sfe_cm.h
+--- shortcut-fe/sfe_cm.h	2015-09-03 12:06:02.074343400 +0530
++++ shortcut-fe_new/sfe_cm.h	2015-09-03 14:49:58.973347087 +0530
+@@ -20,6 +20,11 @@
+  */
+ #define SFE_CREATE_FLAG_NO_SEQ_CHECK 0x1
+ 					/* Indicates that we should not check sequence numbers */
++/*
++*/
++#ifndef SFE_SUPPORT_IPV6
++#define SFE_SUPPORT_IPV6
++#endif
+ 
+ /*
+  * IPv6 address structure
+diff -aruN shortcut-fe/sfe_ipv4.c shortcut-fe_new/sfe_ipv4.c
+--- shortcut-fe/sfe_ipv4.c	2015-09-03 12:06:02.078343400 +0530
++++ shortcut-fe_new/sfe_ipv4.c	2015-09-28 22:27:13.481818387 +0530
+@@ -248,6 +248,7 @@
+ 	 */
+ 	uint64_t rx_packet_count64;	/* Number of packets RX'd */
+ 	uint64_t rx_byte_count64;	/* Number of bytes RX'd */
++	bool addEthMAC;	/*Add ethernet header if set*/
+ };
+ 
+ /*
+@@ -281,6 +282,7 @@
+ 					/* Pointer to the previous entry in the list of all connections */
+ 	uint32_t mark;			/* mark for outgoing packet */
+ 	uint32_t debug_read_seq;	/* sequence number for debug dump */
++	bool use_destMac;		/*Add ethernet header if set*/
+ };
+ 
+ /*
+@@ -454,6 +456,12 @@
+ 	struct kobject *sys_sfe_ipv4;	/* sysfs linkage */
+ 	int debug_dev;			/* Major number of the debug char device */
+ 	uint32_t debug_read_seq;	/* sequence number for debug dump */
++
++	/*
++	* Proc entry for Interface name
++	*/
++	char ipv4_iface[MAX_INTF_LEN];
++	int iface_length;
+ };
+ 
+ /*
+@@ -1372,28 +1380,30 @@
+ 	xmit_dev = cm->xmit_dev;
+ 	skb->dev = xmit_dev;
+ 
+-	/*
+-	 * Check to see if we need to write a header.
+-	 */
+-	if (likely(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
+-		if (unlikely(!(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
+-			dev_hard_header(skb, xmit_dev, ETH_P_IP,
+-					cm->xmit_dest_mac, cm->xmit_src_mac, len);
+-		} else {
+-			/*
+-			 * For the simple case we write this really fast.
+-			 */
+-			struct sfe_ipv4_eth_hdr *eth = (struct sfe_ipv4_eth_hdr *)__skb_push(skb, ETH_HLEN);
+-			eth->h_proto = htons(ETH_P_IP);
+-			eth->h_dest[0] = cm->xmit_dest_mac[0];
+-			eth->h_dest[1] = cm->xmit_dest_mac[1];
+-			eth->h_dest[2] = cm->xmit_dest_mac[2];
+-			eth->h_source[0] = cm->xmit_src_mac[0];
+-			eth->h_source[1] = cm->xmit_src_mac[1];
+-			eth->h_source[2] = cm->xmit_src_mac[2];
++	struct sfe_ipv4_connection *c = cm->connection;
++	if (likely(c->use_destMac || cm->addEthMAC)) {
++		/*
++		 * Check to see if we need to write a header.
++		 */
++		if (likely(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
++			if (unlikely(!(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
++				dev_hard_header(skb, xmit_dev, ETH_P_IP,
++						cm->xmit_dest_mac, cm->xmit_src_mac, len);
++			} else {
++				/*
++				 * For the simple case we write this really fast.
++				 */
++				struct sfe_ipv4_eth_hdr *eth = (struct sfe_ipv4_eth_hdr *)__skb_push(skb, ETH_HLEN);
++				eth->h_proto = htons(ETH_P_IP);
++				eth->h_dest[0] = cm->xmit_dest_mac[0];
++				eth->h_dest[1] = cm->xmit_dest_mac[1];
++				eth->h_dest[2] = cm->xmit_dest_mac[2];
++				eth->h_source[0] = cm->xmit_src_mac[0];
++				eth->h_source[1] = cm->xmit_src_mac[1];
++				eth->h_source[2] = cm->xmit_src_mac[2];
++			}
+ 		}
+ 	}
+-
+ 	/*
+ 	 * Mark outgoing packet.
+ 	 */
+@@ -1910,28 +1920,30 @@
+ 	xmit_dev = cm->xmit_dev;
+ 	skb->dev = xmit_dev;
+ 
+-	/*
+-	 * Check to see if we need to write a header.
+-	 */
+-	if (likely(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
+-		if (unlikely(!(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
+-			dev_hard_header(skb, xmit_dev, ETH_P_IP,
+-					cm->xmit_dest_mac, cm->xmit_src_mac, len);
+-		} else {
+-			/*
+-			 * For the simple case we write this really fast.
+-			 */
+-			struct sfe_ipv4_eth_hdr *eth = (struct sfe_ipv4_eth_hdr *)__skb_push(skb, ETH_HLEN);
+-			eth->h_proto = htons(ETH_P_IP);
+-			eth->h_dest[0] = cm->xmit_dest_mac[0];
+-			eth->h_dest[1] = cm->xmit_dest_mac[1];
+-			eth->h_dest[2] = cm->xmit_dest_mac[2];
+-			eth->h_source[0] = cm->xmit_src_mac[0];
+-			eth->h_source[1] = cm->xmit_src_mac[1];
+-			eth->h_source[2] = cm->xmit_src_mac[2];
++	struct sfe_ipv4_connection *c = cm->connection;
++	if (likely(c->use_destMac || cm->addEthMAC)) {
++		/*
++		 * Check to see if we need to write a header.
++		 */
++		if (likely(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
++			if (unlikely(!(cm->flags & SFE_IPV4_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
++				dev_hard_header(skb, xmit_dev, ETH_P_IP,
++						cm->xmit_dest_mac, cm->xmit_src_mac, len);
++			} else {
++				/*
++				 * For the simple case we write this really fast.
++				 */
++				struct sfe_ipv4_eth_hdr *eth = (struct sfe_ipv4_eth_hdr *)__skb_push(skb, ETH_HLEN);
++				eth->h_proto = htons(ETH_P_IP);
++				eth->h_dest[0] = cm->xmit_dest_mac[0];
++				eth->h_dest[1] = cm->xmit_dest_mac[1];
++				eth->h_dest[2] = cm->xmit_dest_mac[2];
++				eth->h_source[0] = cm->xmit_src_mac[0];
++				eth->h_source[1] = cm->xmit_src_mac[1];
++				eth->h_source[2] = cm->xmit_src_mac[2];
++			}
+ 		}
+ 	}
+-
+ 	/*
+ 	 * Mark outgoing packet
+ 	 */
+@@ -2551,7 +2563,6 @@
+ 		}
+ 	}
+ 
+-
+ 	if (sic->dest_ip.ip != sic->dest_ip_xlate.ip || sic->dest_port != sic->dest_port_xlate) {
+ 		original_cm->flags |= SFE_IPV4_CONNECTION_MATCH_FLAG_XLATE_DEST;
+ 		reply_cm->flags |= SFE_IPV4_CONNECTION_MATCH_FLAG_XLATE_SRC;
+@@ -2579,6 +2590,21 @@
+ 	c->debug_read_seq = 0;
+ 	c->last_sync_jiffies = get_jiffies_64();
+ 
++	if (strncmp(dest_dev->name, si->ipv4_iface, strlen(si->ipv4_iface) - 1)== 0) {
++		c->use_destMac = false;
++		original_cm->addEthMAC = false;
++		reply_cm->addEthMAC = true;
++	}
++	else if (strncmp(src_dev->name, si->ipv4_iface, strlen(si->ipv4_iface) - 1)== 0) {
++		c->use_destMac = false;
++		reply_cm->addEthMAC = false;
++		original_cm->addEthMAC = true;
++	}
++	else {
++		c->use_destMac = true;
++		reply_cm->addEthMAC = false;
++		original_cm->addEthMAC = false;
++	}
+ 	/*
+ 	 * Take hold of our source and dest devices for the duration of the connection.
+ 	 */
+@@ -2703,7 +2729,7 @@
+  * sysfs attributes.
+  */
+ static const struct device_attribute sfe_ipv4_debug_dev_attr =
+-	__ATTR(debug_dev, S_IWUGO | S_IRUGO, sfe_ipv4_get_debug_dev, NULL);
++	__ATTR(debug_dev, 0664, sfe_ipv4_get_debug_dev, NULL);
+ 
+ /*
+  * sfe_ipv4_destroy_all_rules_for_dev()
+@@ -3300,6 +3326,57 @@
+ 	.release = sfe_ipv4_debug_dev_release
+ };
+ 
++static int read_from_v4_iface_proc_entry(struct file *filp,char *buf,size_t count,loff_t *offp ) 
++{
++	struct sfe_ipv4 *si = &__si;
++
++	if ( count < si->iface_length )
++		return -EINVAL;
++
++	if (*offp != 0)
++		return 0;
++
++	if (copy_to_user(buf, si->ipv4_iface, si->iface_length))
++		return -EINVAL;
++
++	*offp = si->iface_length;
++
++	return si->iface_length;
++}
++
++static int write_to_v4_iface_proc_entry(struct file *file,const char *buf,int count,void *data )
++{
++	struct sfe_ipv4 *si = &__si;
++
++	if (count == 0) {
++		DEBUG_ERROR("Iface_length zero \n");
++		return 0;
++	}
++	else if(count > MAX_INTF_LEN)
++	{
++		DEBUG_ERROR("Iface_length too big \n");
++		return 0;
++	}
++
++	memset(si->ipv4_iface, 0, MAX_INTF_LEN);
++
++	if(copy_from_user(si->ipv4_iface, buf, count-1))
++		return -EFAULT;
++
++	si->iface_length = strlen(si->ipv4_iface);
++	DEBUG_INFO( "Iface length = %d , iface_name = %s \n", si->iface_length, si->ipv4_iface);
++
++	return count;
++}
++
++
++static struct file_operations ipv4_iface_proc_fops = {
++.owner = THIS_MODULE,
++.read = read_from_v4_iface_proc_entry,
++.write = write_to_v4_iface_proc_entry,
++};
++
++
+ #ifdef CONFIG_NF_FLOW_COOKIE
+ /*
+  * sfe_register_flow_cookie_cb
+@@ -3377,6 +3454,10 @@
+ 
+ 	si->debug_dev = result;
+ 
++	proc_create("ipv4_iface_name",0,NULL,&ipv4_iface_proc_fops);
++	memset(si->ipv4_iface,0,MAX_INTF_LEN);
++	si->iface_length=strlen(si->ipv4_iface);
++		
+ 	/*
+ 	 * Create a timer to handle periodic statistics.
+ 	 */
+@@ -3415,6 +3496,8 @@
+ 
+ 	unregister_chrdev(si->debug_dev, "sfe_ipv4");
+ 
++	remove_proc_entry("ipv4_iface_name",NULL);
++
+ 	sysfs_remove_file(si->sys_sfe_ipv4, &sfe_ipv4_debug_dev_attr.attr);
+ 
+ 	kobject_put(si->sys_sfe_ipv4);
+diff -aruN shortcut-fe/sfe_ipv6.c shortcut-fe_new/sfe_ipv6.c
+--- shortcut-fe/sfe_ipv6.c	2015-09-03 12:06:02.078343400 +0530
++++ shortcut-fe_new/sfe_ipv6.c	2015-09-28 22:29:09.888526147 +0530
+@@ -273,6 +273,7 @@
+ 	 */
+ 	uint64_t rx_packet_count64;	/* Number of packets RX'd */
+ 	uint64_t rx_byte_count64;	/* Number of bytes RX'd */
++	bool addEthMAC;	/*Add ethernet header if set*/
+ };
+ 
+ /*
+@@ -306,6 +307,7 @@
+ 					/* Pointer to the previous entry in the list of all connections */
+ 	uint32_t mark;			/* mark for outgoing packet */
+ 	uint32_t debug_read_seq;	/* sequence number for debug dump */
++	bool use_destMac;		/*Add ethernet header if set*/
+ };
+ 
+ /*
+@@ -481,6 +483,12 @@
+ 	struct kobject *sys_sfe_ipv6;	/* sysfs linkage */
+ 	int debug_dev;			/* Major number of the debug char device */
+ 	uint32_t debug_read_seq;	/* sequence number for debug dump */
++
++	/*
++	*  Proc entry for Interface name
++	*/
++	char ipv6_iface[MAX_INTF_LEN];
++	int iface_length;
+ };
+ 
+ /*
+@@ -522,7 +530,7 @@
+  * sysfs attributes.
+  */
+ static const struct device_attribute sfe_ipv6_debug_dev_attr =
+-	__ATTR(debug_dev, S_IWUGO | S_IRUGO, sfe_ipv6_get_debug_dev, NULL);
++	__ATTR(debug_dev, 0664, sfe_ipv6_get_debug_dev, NULL);
+ 
+ /*
+  * sfe_ipv6_addr_equal()
+@@ -1420,22 +1428,25 @@
+ 	/*
+ 	 * Check to see if we need to write a header.
+ 	 */
+-	if (likely(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
+-		if (unlikely(!(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
+-			dev_hard_header(skb, xmit_dev, ETH_P_IPV6,
+-					cm->xmit_dest_mac, cm->xmit_src_mac, len);
+-		} else {
+-			/*
+-			 * For the simple case we write this really fast.
+-			 */
+-			struct sfe_ipv6_eth_hdr *eth = (struct sfe_ipv6_eth_hdr *)__skb_push(skb, ETH_HLEN);
+-			eth->h_proto = htons(ETH_P_IPV6);
+-			eth->h_dest[0] = cm->xmit_dest_mac[0];
+-			eth->h_dest[1] = cm->xmit_dest_mac[1];
+-			eth->h_dest[2] = cm->xmit_dest_mac[2];
+-			eth->h_source[0] = cm->xmit_src_mac[0];
+-			eth->h_source[1] = cm->xmit_src_mac[1];
+-			eth->h_source[2] = cm->xmit_src_mac[2];
++	struct sfe_ipv6_connection *c = cm->connection;
++	if (likely(c->use_destMac || cm->addEthMAC)) {
++		if (likely(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
++			if (unlikely(!(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
++				dev_hard_header(skb, xmit_dev, ETH_P_IPV6,
++						cm->xmit_dest_mac, cm->xmit_src_mac, len);
++			} else {
++				/*
++				 * For the simple case we write this really fast.
++				 */
++				struct sfe_ipv6_eth_hdr *eth = (struct sfe_ipv6_eth_hdr *)__skb_push(skb, ETH_HLEN);
++				eth->h_proto = htons(ETH_P_IPV6);
++				eth->h_dest[0] = cm->xmit_dest_mac[0];
++				eth->h_dest[1] = cm->xmit_dest_mac[1];
++				eth->h_dest[2] = cm->xmit_dest_mac[2];
++				eth->h_source[0] = cm->xmit_src_mac[0];
++				eth->h_source[1] = cm->xmit_src_mac[1];
++				eth->h_source[2] = cm->xmit_src_mac[2];
++			}
+ 		}
+ 	}
+ 
+@@ -1942,25 +1953,27 @@
+ 	/*
+ 	 * Check to see if we need to write a header.
+ 	 */
+-	if (likely(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
+-		if (unlikely(!(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
+-			dev_hard_header(skb, xmit_dev, ETH_P_IPV6,
+-					cm->xmit_dest_mac, cm->xmit_src_mac, len);
+-		} else {
+-			/*
+-			 * For the simple case we write this really fast.
+-			 */
+-			struct sfe_ipv6_eth_hdr *eth = (struct sfe_ipv6_eth_hdr *)__skb_push(skb, ETH_HLEN);
+-			eth->h_proto = htons(ETH_P_IPV6);
+-			eth->h_dest[0] = cm->xmit_dest_mac[0];
+-			eth->h_dest[1] = cm->xmit_dest_mac[1];
+-			eth->h_dest[2] = cm->xmit_dest_mac[2];
+-			eth->h_source[0] = cm->xmit_src_mac[0];
+-			eth->h_source[1] = cm->xmit_src_mac[1];
+-			eth->h_source[2] = cm->xmit_src_mac[2];
++	struct sfe_ipv6_connection *c = cm->connection;
++	if (likely(c->use_destMac || cm->addEthMAC)) {
++		if (likely(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_L2_HDR)) {
++			if (unlikely(!(cm->flags & SFE_IPV6_CONNECTION_MATCH_FLAG_WRITE_FAST_ETH_HDR))) {
++				dev_hard_header(skb, xmit_dev, ETH_P_IPV6,
++						cm->xmit_dest_mac, cm->xmit_src_mac, len);
++			} else {
++				/*
++				 * For the simple case we write this really fast.
++				 */
++				struct sfe_ipv6_eth_hdr *eth = (struct sfe_ipv6_eth_hdr *)__skb_push(skb, ETH_HLEN);
++				eth->h_proto = htons(ETH_P_IPV6);
++				eth->h_dest[0] = cm->xmit_dest_mac[0];
++				eth->h_dest[1] = cm->xmit_dest_mac[1];
++				eth->h_dest[2] = cm->xmit_dest_mac[2];
++				eth->h_source[0] = cm->xmit_src_mac[0];
++				eth->h_source[1] = cm->xmit_src_mac[1];
++				eth->h_source[2] = cm->xmit_src_mac[2];
++			}
+ 		}
+ 	}
+-
+ 	/*
+ 	 * Mark outgoing packet
+ 	 */
+@@ -2599,6 +2612,23 @@
+ 	c->debug_read_seq = 0;
+ 	c->last_sync_jiffies = get_jiffies_64();
+ 
++	if (strncmp(dest_dev->name, si->ipv6_iface, strlen(si->ipv6_iface) - 1)== 0) {
++		c->use_destMac = false;
++		original_cm->addEthMAC = false;
++		reply_cm->addEthMAC = true;
++	}
++	else if (strncmp(src_dev->name, si->ipv6_iface, strlen(si->ipv6_iface) - 1)== 0) {
++		c->use_destMac = false;
++		reply_cm->addEthMAC = false;
++		original_cm->addEthMAC = true;
++	}
++	else {
++		c->use_destMac = true;
++		reply_cm->addEthMAC = false;
++		original_cm->addEthMAC = false;
++	}
++
++
+ 	/*
+ 	 * Take hold of our source and dest devices for the duration of the connection.
+ 	 */
+@@ -3314,6 +3344,57 @@
+ 	.release = sfe_ipv6_debug_dev_release
+ };
+ 
++static int read_from_v6_iface_proc_entry(struct file *filp,char *buf,size_t count,loff_t *offp ) 
++{
++	struct sfe_ipv6 *si = &__si6;
++
++	if ( count < si->iface_length )
++		return -EINVAL;
++
++	if (*offp != 0)
++		return 0;
++
++	if (copy_to_user(buf, si->ipv6_iface, si->iface_length))
++		return -EINVAL;
++
++	*offp = si->iface_length;
++
++	return si->iface_length;
++}
++
++static int write_to_v6_iface_proc_entry(struct file *file,const char *buf,int count,void *data )
++{
++	struct sfe_ipv6 *si = &__si6;
++
++	if (count == 0) {
++		DEBUG_ERROR("Iface_length zero \n");
++		return 0;
++	}
++	else if(count > MAX_INTF_LEN)
++	{
++		DEBUG_ERROR("Iface_length too big \n");
++		return 0;
++	}
++
++	memset(si->ipv6_iface, 0, MAX_INTF_LEN);
++
++	if(copy_from_user(si->ipv6_iface, buf, count-1))
++		return -EFAULT;
++
++	si->iface_length = strlen(si->ipv6_iface);
++		DEBUG_INFO( "Iface length = %d , iface_name = %s \n", si->iface_length, si->ipv6_iface);
++
++	return count;
++}
++
++
++static struct file_operations ipv6_iface_proc_fops = {
++.owner = THIS_MODULE,
++.read = read_from_v6_iface_proc_entry,
++.write = write_to_v6_iface_proc_entry,
++};
++
++
+ #ifdef CONFIG_NF_FLOW_COOKIE
+ /*
+  * sfe_ipv6_register_flow_cookie_cb
+@@ -3391,6 +3472,10 @@
+ 
+ 	si->debug_dev = result;
+ 
++	proc_create("ipv6_iface_name",0,NULL,&ipv6_iface_proc_fops);
++	memset(si->ipv6_iface,0,MAX_INTF_LEN);
++	si->iface_length=strlen(si->ipv6_iface);
++
+ 	/*
+ 	 * Create a timer to handle periodic statistics.
+ 	 */
+@@ -3429,6 +3514,8 @@
+ 
+ 	unregister_chrdev(si->debug_dev, "sfe_ipv6");
+ 
++	remove_proc_entry("ipv6_iface_name",NULL);
++
+ 	sysfs_remove_file(si->sys_sfe_ipv6, &sfe_ipv6_debug_dev_attr.attr);
+ 
+ 	kobject_put(si->sys_sfe_ipv6);
