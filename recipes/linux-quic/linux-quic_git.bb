@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|mdmcalifornium|apq8009)"
+COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdmfermium|mdmfermium-perf|mdmcalifornium|apq8009)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
@@ -17,6 +17,8 @@ KERNEL_IMAGETYPE_FOR_MAKE = ""
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG          = "mdm_defconfig"
 KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
+KERNEL_DEFCONFIG_mdmfermium  = "mdmfermium_defconfig"
+KERNEL_DEFCONFIG_mdmfermium-perf  = "mdmfermium-perf_defconfig"
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
