@@ -1,6 +1,5 @@
 # Rootfs creation.
 require mdm-bootimg.inc
-require mdm-ramdisk.inc
 
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES += "ubifs ubi"
@@ -92,7 +91,6 @@ DATA_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/data')}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
-fakeroot do_makesystem() {
-    do_ramdisk_create
-    #make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
+do_makesystem() {
+    make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
