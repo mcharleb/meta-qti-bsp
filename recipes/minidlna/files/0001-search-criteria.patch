@@ -4,9 +4,25 @@ Date: Wed, 1 Apr 2015 17:42:33 -0700
 Subject: [PATCH 1/1] search-criteria
 
 ---
+ metadata.c | 10 ++++++++++++------
  upnpsoap.c | 40 +++++++++++++++++++++++++++++-----------
  1 file changed, 29 insertions(+), 11 deletions(-)
-
+diff --git a/metadata.c b/metadata.c
+index 0b6ec56..229f80f 100644
+--- a/metadata.c
++++ b/metadata.c
+@@ -814,7 +814,10 @@
+ 			min = (int)(duration / 60 % 60);
+ 			sec = (int)(duration % 60);
+ 			ms = (int)(ctx->duration / (AV_TIME_BASE/1000) % 1000);
+-			xasprintf(&m.duration, "%d:%02d:%02d.%03d", hours, min, sec, ms);
++			if (sec ==0 && ms ==0)
++			    xasprintf(&m.duration, "%d:%02d:%02d", hours, min, sec);
++			else
++			    xasprintf(&m.duration, "%d:%02d:%02d.%03d", hours, min, sec, ms);
+ 		}
+ 
+ 		/* NOTE: The DLNA spec only provides for ASF (WMV), TS, PS, and MP4 containers.
 diff --git a/upnpsoap.c b/upnpsoap.c
 index 0b6ec56..229f80f 100644
 --- a/upnpsoap.c
