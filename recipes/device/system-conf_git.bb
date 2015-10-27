@@ -13,3 +13,8 @@ SRC_URI = "file://mdm-init/"
 S = "${WORKDIR}/mdm-init/"
 
 FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
+
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmfermium', '--enable-target-mdmfermium=yes', '', d)}"
