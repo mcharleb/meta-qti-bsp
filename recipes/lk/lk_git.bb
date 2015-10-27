@@ -19,6 +19,7 @@ BASEMACHINE        = "mdm9640"
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_apq8009  = "msm8909"
 MY_TARGET_mdmfermium  = "mdmfermium"
+MY_TARGET_mdmfermium-perf  = "mdmfermium"
 
 LIBGCC             = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
 
