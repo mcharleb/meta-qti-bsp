@@ -55,6 +55,7 @@ IMAGE_INSTALL += "libxml2"
 IMAGE_INSTALL += "lighttpd"
 #IMAGE_INSTALL += "loc-api"
 IMAGE_INSTALL += "minidlna"
+IMAGE_INSTALL += "miniupnpd"
 IMAGE_INSTALL += "mtd-utils-ubifs"
 IMAGE_INSTALL += "openssl"
 IMAGE_INSTALL += "open-source-kernel-tests"
@@ -85,9 +86,6 @@ IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
 #IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
-
-DATA_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/data')}"
-#IMAGE_INSTALL += "${@base_conditional('DATA_DIR_PRESENT', 'True', 'miniupnpd', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 

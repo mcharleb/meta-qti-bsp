@@ -6,7 +6,7 @@ HOMEPAGE = "http://miniupnp.free.fr/"
 BUGTRACKER = "http://miniupnp.tuxfamily.org/forum/viewforum.php?f=2"
 LICENSE = "BSD"
 PRIORITY = "optional"
-DEPENDS = "data"
+DEPENDS = "conntrack-tools"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
