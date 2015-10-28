@@ -1,6 +1,6 @@
 diff -aruN shortcut-fe/Makefile shortcut-fe_new/Makefile
 --- shortcut-fe/Makefile	2015-09-03 12:06:02.074343400 +0530
-+++ shortcut-fe_new/Makefile	2015-09-03 14:15:28.976212346 +0530
++++ shortcut-fe_new/Makefile	2015-10-28 12:14:12.278246568 +0530
 @@ -13,7 +13,8 @@
  #
  # Makefile for Shortcut FE.
@@ -31,7 +31,7 @@ diff -aruN shortcut-fe/Makefile shortcut-fe_new/Makefile
 +
 diff -aruN shortcut-fe/sfe.h shortcut-fe_new/sfe.h
 --- shortcut-fe/sfe.h	2015-09-03 12:06:02.074343400 +0530
-+++ shortcut-fe_new/sfe.h	2015-09-03 22:43:03.715524701 +0530
++++ shortcut-fe_new/sfe.h	2015-10-28 12:14:12.278246568 +0530
 @@ -25,8 +25,13 @@
   * of any packets is actually correct too.  Right now we're relying on
   * the bridge layer to do this sort of thing for us.
@@ -49,7 +49,7 @@ diff -aruN shortcut-fe/sfe.h shortcut-fe_new/sfe.h
   */
 diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
 --- shortcut-fe/sfe_cm.c	2015-09-03 12:06:02.074343400 +0530
-+++ shortcut-fe_new/sfe_cm.c	2015-09-28 22:06:08.064606948 +0530
++++ shortcut-fe_new/sfe_cm.c	2015-10-28 12:28:28.324020342 +0530
 @@ -106,6 +106,7 @@
   * Expose the hook for the receive processing.
   */
@@ -120,8 +120,79 @@ diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
   * sfe_cm_find_dev_and_mac_addr()
   *	Find the device and MAC address for a given IPv4/IPv6 address.
   *
-@@ -607,9 +663,13 @@
- 	sic.dest_mtu = dest_dev->mtu;
+@@ -299,6 +355,8 @@
+ 	struct net_device *dev;
+ 	struct net_device *src_dev;
+ 	struct net_device *dest_dev;
++	struct net_device *src_dev_use;
++	struct net_device *dest_dev_use;
+ 	struct net_device *src_br_dev = NULL;
+ 	struct net_device *dest_br_dev = NULL;
+ 	struct nf_conntrack_tuple orig_tuple;
+@@ -526,6 +584,7 @@
+ 		sfe_cm_incr_exceptions(SFE_CM_EXCEPTION_NO_SRC_DEV);
+ 		return NF_ACCEPT;
+ 	}
++	src_dev_use = src_dev;
+ 
+ 	if (!sfe_cm_find_dev_and_mac_addr(&sic.src_ip_xlate, &dev, sic.src_mac_xlate, is_v4)) {
+ 		sfe_cm_incr_exceptions(SFE_CM_EXCEPTION_NO_SRC_XLATE_DEV);
+@@ -545,6 +604,7 @@
+ 		sfe_cm_incr_exceptions(SFE_CM_EXCEPTION_NO_DEST_XLATE_DEV);
+ 		goto done1;
+ 	}
++	dest_dev_use = dest_dev;
+ 
+ #if (!SFE_HOOK_ABOVE_BRIDGE)
+ 	/*
+@@ -558,8 +618,7 @@
+ 			DEBUG_TRACE("no port found on bridge\n");
+ 			goto done2;
+ 		}
+-
+-		src_dev = src_br_dev;
++		src_dev_use = src_br_dev;
+ 	}
+ 
+ 	if (dest_dev->priv_flags & IFF_EBRIDGE) {
+@@ -569,8 +628,7 @@
+ 			DEBUG_TRACE("no port found on bridge\n");
+ 			goto done3;
+ 		}
+-
+-		dest_dev = dest_br_dev;
++		dest_dev_use = dest_br_dev;
+ 	}
+ #else
+ 	/*
+@@ -584,8 +642,7 @@
+ 			DEBUG_TRACE("no bridge found for: %s\n", src_dev->name);
+ 			goto done2;
+ 		}
+-
+-		src_dev = src_br_dev;
++		src_dev_use = src_br_dev;
+ 	}
+ 
+ 	if (dest_dev->priv_flags & IFF_BRIDGE_PORT) {
+@@ -596,20 +653,24 @@
+ 			goto done3;
+ 		}
+ 
+-		dest_dev = dest_br_dev;
++		dest_dev_use = dest_br_dev;
+ 	}
+ #endif
+ 
+-	sic.src_dev = src_dev;
+-	sic.dest_dev = dest_dev;
++	sic.src_dev = src_dev_use;
++	sic.dest_dev = dest_dev_use;
+ 
+-	sic.src_mtu = src_dev->mtu;
+-	sic.dest_mtu = dest_dev->mtu;
++	sic.src_mtu = src_dev_use->mtu;
++	sic.dest_mtu = dest_dev_use->mtu;
  
  	if (likely(is_v4)) {
 -		sfe_ipv4_create_rule(&sic);
@@ -136,7 +207,7 @@ diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
  	}
  
  	/*
-@@ -990,17 +1050,6 @@
+@@ -990,17 +1051,6 @@
  		goto exit3;
  	}
  
@@ -154,7 +225,7 @@ diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
  	spin_lock_init(&sc->lock);
  
  	/*
-@@ -1010,6 +1059,12 @@
+@@ -1010,6 +1060,12 @@
  	RCU_INIT_POINTER(athrs_fast_nat_recv, sfe_cm_recv);
  
  	/*
@@ -169,7 +240,7 @@ diff -aruN shortcut-fe/sfe_cm.c shortcut-fe_new/sfe_cm.c
  	sfe_ipv4_register_sync_rule_callback(sfe_cm_sync_rule);
 diff -aruN shortcut-fe/sfe_cm.h shortcut-fe_new/sfe_cm.h
 --- shortcut-fe/sfe_cm.h	2015-09-03 12:06:02.074343400 +0530
-+++ shortcut-fe_new/sfe_cm.h	2015-09-03 14:49:58.973347087 +0530
++++ shortcut-fe_new/sfe_cm.h	2015-10-28 12:14:12.278246568 +0530
 @@ -20,6 +20,11 @@
   */
  #define SFE_CREATE_FLAG_NO_SEQ_CHECK 0x1
@@ -184,7 +255,7 @@ diff -aruN shortcut-fe/sfe_cm.h shortcut-fe_new/sfe_cm.h
   * IPv6 address structure
 diff -aruN shortcut-fe/sfe_ipv4.c shortcut-fe_new/sfe_ipv4.c
 --- shortcut-fe/sfe_ipv4.c	2015-09-03 12:06:02.078343400 +0530
-+++ shortcut-fe_new/sfe_ipv4.c	2015-09-28 22:27:13.481818387 +0530
++++ shortcut-fe_new/sfe_ipv4.c	2015-10-28 12:14:12.278246568 +0530
 @@ -248,6 +248,7 @@
  	 */
  	uint64_t rx_packet_count64;	/* Number of packets RX'd */
@@ -435,7 +506,7 @@ diff -aruN shortcut-fe/sfe_ipv4.c shortcut-fe_new/sfe_ipv4.c
  	kobject_put(si->sys_sfe_ipv4);
 diff -aruN shortcut-fe/sfe_ipv6.c shortcut-fe_new/sfe_ipv6.c
 --- shortcut-fe/sfe_ipv6.c	2015-09-03 12:06:02.078343400 +0530
-+++ shortcut-fe_new/sfe_ipv6.c	2015-09-28 22:29:09.888526147 +0530
++++ shortcut-fe_new/sfe_ipv6.c	2015-10-28 12:14:12.278246568 +0530
 @@ -273,6 +273,7 @@
  	 */
  	uint64_t rx_packet_count64;	/* Number of packets RX'd */
