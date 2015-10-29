@@ -16,6 +16,7 @@ si::sysinit:/etc/init.d/rcS
 #       run level entries with wait below.
 rmts:2345:respawn:/sbin/rmt_storage
 tftp:2345:respawn:/sbin/tftp_server
+scrb:2345:respawn:/sbin/fs-scrub-daemon
 
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
