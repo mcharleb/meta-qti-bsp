@@ -17,4 +17,4 @@ FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
-EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmfermium', '--enable-target-mdmfermium=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdm9607', '--enable-target-mdm9607=yes', '', d)}"
