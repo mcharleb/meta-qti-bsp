@@ -37,14 +37,14 @@ diff -rupN a/pimd.conf b/pimd.conf
  # By default, all non-loopback multicast capable interfaces are enabled.
  #phyint de1 disable
  
-+phyint rmnet0 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet1 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet2 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet3 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet4 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet5 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet6 enable altnet 0.0.0.0 masklen 0
-+phyint rmnet7 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data0 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data1 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data2 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data3 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data4 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data5 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data6 enable altnet 0.0.0.0 masklen 0
++phyint rmnet_data7 enable altnet 0.0.0.0 masklen 0
 +
  # Smaller value means "higher" priority
  cand_rp time 30 priority 20
