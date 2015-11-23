@@ -5,7 +5,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://shortcut-fe/shortcut-fe/ \
-		   file://shortcut.patch \
 		   file://start_shortcut_fe_le "
 
 S = "${WORKDIR}/shortcut-fe/shortcut-fe"
