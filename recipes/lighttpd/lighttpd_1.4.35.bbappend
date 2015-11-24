@@ -23,4 +23,5 @@ EXTRA_OECONF += " \
 do_install_append() {
     install -m 0755 ${WORKDIR}/openssl.cnf ${D}${sysconfdir}
     install -m 0770 ${WORKDIR}/lighttpd.user ${D}/www/lighttpd.user
+    rm -rf ${D}/www/logs ${D}/www/var
 }
