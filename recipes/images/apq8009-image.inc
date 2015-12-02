@@ -12,6 +12,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 #IMAGE_INSTALL += "alsa-intf"
 IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
+IMAGE_INSTALL += "tinycompress"
 
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
