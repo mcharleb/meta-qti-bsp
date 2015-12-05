@@ -22,8 +22,9 @@ mount -o remount,ro /
 echo "Remounted / as RO..."
 sync
 umount -f -a -r > /dev/null 2>&1
-echo "Detaching..."
-ubidetach -d 1 /dev/ubi_ctrl
-ubidetach -d 2 /dev/ubi_ctrl
+mount -t sysfs none /sys
+echo "Running ubidetach commands..."
+ubidetach -d 1
+umount /sys -f
 
 : exit 0
