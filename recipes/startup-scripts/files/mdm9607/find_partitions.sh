@@ -43,7 +43,7 @@ FindAndMountUBI () {
     do
         if [ -c $device ]
         then
-            mount -t ubifs /dev/ubi1_0 $dir -o bulk_read
+            mount -t ubifs -o ro /dev/ubi1_0 $dir -o bulk_read
             break
         else
             sleep 0.010
