@@ -32,6 +32,10 @@
 FindAndMountUBI () {
    partition=$1
    dir=$2
+   if [ ! -d $dir ]
+   than
+	mkdir -p $dir
+   fi
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
@@ -61,7 +65,7 @@ FindAndMountVolumeUBI () {
 mtd_file=/proc/mtd
 
 fstype="UBI"
-eval FindAndMountVolume${fstype} usrfs /usr
+eval FindAndMountVolume${fstype} usrfs /data
 
 eval FindAndMount${fstype} modem /firmware
 
