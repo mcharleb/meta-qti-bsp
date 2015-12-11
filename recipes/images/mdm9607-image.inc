@@ -90,6 +90,7 @@ IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
 IMAGE_INSTALL += "sfe"
+IMAGE_INSTALL += "tinyproxy"
 
 # Below packages are open source packages that depend on proprietary packages
 
