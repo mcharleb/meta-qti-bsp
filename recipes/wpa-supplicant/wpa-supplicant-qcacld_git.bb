@@ -7,6 +7,7 @@ SRC_URI = "file://external/wpa_supplicant_8/"
 SRC_URI += "file://defconfig-qcacld"
 
 DEPENDS += "qmi"
+DEPENDS += "qmi-framework"
 
 S = "${WORKDIR}/external/wpa_supplicant_8/wpa_supplicant"
 
