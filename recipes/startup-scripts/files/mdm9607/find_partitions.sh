@@ -32,10 +32,6 @@
 FindAndMountUBI () {
    partition=$1
    dir=$2
-   if [ ! -d $dir ]
-   than
-	mkdir -p $dir
-   fi
 
    mtd_block_number=`cat $mtd_file | grep -i $partition | sed 's/^mtd//' | awk -F ':' '{print $1}'`
    echo "MTD : Detected block device : $dir for $partition"
@@ -58,7 +54,10 @@ FindAndMountUBI () {
 FindAndMountVolumeUBI () {
    volume_name=$1
    dir=$2
-   mkdir -p $dir
+   if [ ! -d $dir ]
+   then
+       mkdir -p $dir
+   fi
    mount -t ubifs ubi0:$volume_name $dir -o bulk_read
 }
 
