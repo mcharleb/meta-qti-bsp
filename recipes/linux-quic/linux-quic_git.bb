@@ -16,6 +16,8 @@ KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG          = "mdm_defconfig"
+KERNEL_DEFCONFIG_mdmcalifornium          = "mdm_defconfig"
+KERNEL_DEFCONFIG_mdmcalifornium-perf     = "mdm-perf_defconfig"
 KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
 KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
 KERNEL_DEFCONFIG_mdm9607-perf  = "mdm9607-perf_defconfig"
