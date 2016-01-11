@@ -6,7 +6,6 @@ DEPENDS = " \
              pkgconfig-native \
              gtk-doc-native \
              gettext-native \
-             yaffs2-utils-native \
              e2fsprogs-native \
              ext4-utils-native \
              virtual/bootloader \
