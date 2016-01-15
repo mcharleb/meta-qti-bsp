@@ -25,6 +25,7 @@ EXTRA_OECONF = "\
   --enable-test \
   --enable-datafiles \
   --disable-systemd \
+  --with-glib \
 "
 #  unused param
 #  --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
