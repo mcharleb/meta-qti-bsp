@@ -1,4 +1,4 @@
-inherit autotools-brokensep module update-rc.d
+inherit autotools-brokensep module
 DESCRIPTION = "Shortcut Forward Engine Driver"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
@@ -16,8 +16,3 @@ do_install() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${WORKDIR}/start_shortcut_fe_le ${D}${sysconfdir}/init.d
 }
-
-INITSCRIPT_NAME = "start_shortcut_fe_le"
-INITSCRIPT_PARAMS = "start 91 5 . stop 15 0 1 6 ."
-
-
