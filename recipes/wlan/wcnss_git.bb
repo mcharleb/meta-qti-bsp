@@ -22,7 +22,7 @@ do_install() {
 }
 
 INITSCRIPT_NAME = "set_wcnss_mode"
-INITSCRIPT_PARAMS = "start 80 2 3 4 5 . stop 20 0 1 6 ."
+INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 20 0 1 6 ."
 
 FILES_${PN} = "/lib/firmware/*"
 FILES_${PN} += "/etc/*"
