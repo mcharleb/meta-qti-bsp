@@ -1,0 +1,1 @@
+require perl-rdepends_${PV}.inc
