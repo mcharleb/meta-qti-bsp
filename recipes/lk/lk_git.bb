@@ -24,6 +24,7 @@ MY_TARGET_mdm9607-perf  = "mdm9607"
 LIBGCC             = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.2/libgcc.a"
 
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}'"
+EXTRA_OEMAKE_append_mdmcalifornium = " SIGNED_KERNEL=1"
 
 do_install() {
         install -d ${D}/boot
