@@ -18,6 +18,7 @@ FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdm9607', '--enable-target-mdm9607=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmcalifornium', '--enable-target-mdmcalifornium=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-target-apq8009=yes', '', d)}"
 
 INITSCRIPT_NAME   = "wlan"
