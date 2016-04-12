@@ -8,6 +8,7 @@ DEPENDS = " \
              gettext-native \
              e2fsprogs-native \
              ext4-utils-native \
+             mtd-utils-native \
              virtual/bootloader \
 "
 

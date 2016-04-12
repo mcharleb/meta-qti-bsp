@@ -2,4 +2,4 @@
 include ${MACHINE}-image.inc
 
 # Build the image
-require mdm-image.bb
+require machine-image.bb

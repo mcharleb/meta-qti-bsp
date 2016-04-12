@@ -1,4 +1,4 @@
-DEPENDS += "mdm-image"
+DEPENDS += "machine-image"
 
 OTA_TARGET_BASENAME_EXT4     = "${MACHINE}-ota-target-image-ext4"
 OTA_TARGET_IMAGE_ROOTFS_EXT4 = "${IMAGE_ROOTFS}/../${OTA_TARGET_BASENAME_EXT4}"
@@ -28,7 +28,7 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_EXT4}"
 # copy radio directory content into RADIO directory
-cp -r ${WORKSPACE}/oe-core/meta-msm/recipes/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
+cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/RADIO/.
 
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/BOOTABLE_IMAGES/boot.img
