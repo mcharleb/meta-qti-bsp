@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9640|mdm9640-perf|mdm9607|mdm9607-perf|mdmcalifornium|apq8009)"
+COMPATIBLE_MACHINE = "(mdmcalifornium|apq8009|apq8096|apq8053)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
@@ -11,18 +11,22 @@ EXTRA_KERNEL_CMD_PARAMS ?= ""
 KERNEL_IMAGETYPE = ""
 # Where built kernel lies in the kernel tree
 zImage_VAR="zImage"
+zImage_VAR_apq8053="Image.gz-dtb"
+
 KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
 #KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
 
+DEPENDS_append_aarch64 = " libgcc"
+KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
+
+# To be moved to machine specific conf
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG          = "mdm_defconfig"
-KERNEL_DEFCONFIG_mdmcalifornium          = "mdm_defconfig"
-KERNEL_DEFCONFIG_mdmcalifornium-perf     = "mdm-perf_defconfig"
-KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
-KERNEL_DEFCONFIG_apq8009  = "msm8909-1gb_defconfig"
-KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
-KERNEL_DEFCONFIG_mdm9607-perf  = "mdm9607-perf_defconfig"
+KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
+KERNEL_DEFCONFIG_apq8053          = "msmcortex_defconfig"
+
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
@@ -134,7 +138,7 @@ do_deploy () {
 # Make bootimage
 
     install -m 0644 ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
-    dtb_files=`find ${B}/arch/arm/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
+    dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
     # Create separate images with dtb appended to zImage for all targets.
     for d in ${dtb_files}; do
@@ -143,11 +147,11 @@ do_deploy () {
 	 #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
        qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
 	   if [ ${qcom_check} == "qcom" ]; then
-		cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/arm/boot/dts/${d}.dtb > ${B}/arch/arm/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+		cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
 	   else
-        cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/arm/boot/dts/${d}.dtb > ${B}/arch/arm/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/arm/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+        cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
 	   fi
     done
 

@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
-SRC_URI += "file://fstab"
+SRC_URI_append_apq8053 = "file://${BASEMACHINE}/fstab"
 
 dirs755 += "/media /media/card /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
