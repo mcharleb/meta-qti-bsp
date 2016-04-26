@@ -1,0 +1,23 @@
+From 7afd307afe0a2d8acdb993c1f092f49d489e1a93 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Tue, 29 Mar 2016 16:34:46 -0700
+Subject: [PATCH 1/1] include sync.h and sw_sync.h in kernel header
+
+Change-Id: I5aa80d8ae32bc671d466d0b1274888a11b4df07b
+---
+ include/uapi/linux/Kbuild | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/uapi/linux/Kbuild b/include/uapi/linux/Kbuild
+index af08d0e..218bba3 100644
+--- a/include/uapi/linux/Kbuild
++++ b/include/uapi/linux/Kbuild
+@@ -505,3 +505,5 @@ header-y += hw_breakpoint.h
+ header-y += zorro.h
+ header-y += zorro_ids.h
+ header-y += android_pmem.h
++header-y += sync.h
++header-y += sw_sync.h
+-- 
+1.8.2.1
+
