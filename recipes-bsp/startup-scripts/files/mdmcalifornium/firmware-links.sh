@@ -60,7 +60,8 @@ fwfiles=$(ls modem* *.bin mba*)
 # Check if the links with similar names
 # have been created in /lib/firmware
 
-mkdir -p /lib/firmware
+qcapath="qca9377"
+mkdir -p /lib/firmware/$qcapath
 cd /lib/firmware
 linksNeeded=0
 
@@ -145,6 +146,13 @@ case $linksNeeded in
       echo "Nothing to do. No firmware links needed."
       ;;
 esac
+
+cd $fwpath/$qcapath
+qcafiles=$(ls )
+for files in $qcafiles
+do
+	ln -s $fwpath/$qcapath/$files /lib/firmware/$qcapath/$files 2>/dev/null
+done
 
 cd /
 exit 0
