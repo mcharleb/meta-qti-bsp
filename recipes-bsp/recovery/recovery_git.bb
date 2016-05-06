@@ -27,12 +27,12 @@ FILES_${PN} += "/tmp"
 FILES_${PN} += "/res"
 FILES_${PN} += "/data"
 do_install_append() {
-        install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes/base-files-recovery/fstab -D ${D}${sysconfdir}/fstab
+        install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}${sysconfdir}/fstab
         install -d ${D}/cache/
         install -d ${D}/tmp/
         install -d ${D}/res/
         install -d ${D}/data/
         install -d ${D}/system/
-        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
+        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
 }

@@ -28,7 +28,7 @@ mkdir -p ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO
 
 echo "base image rootfs: ${BASE_IMAGE_ROOTFS_UBI}"
 # copy radio directory content into RADIO directory
-cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
+cp -r ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/${MACHINE}/radio/. ${OTA_TARGET_IMAGE_ROOTFS_UBI}/RADIO/.
 
 # copy the boot\recovery images
 cp ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img ${OTA_TARGET_IMAGE_ROOTFS_UBI}/BOOTABLE_IMAGES/boot.img
