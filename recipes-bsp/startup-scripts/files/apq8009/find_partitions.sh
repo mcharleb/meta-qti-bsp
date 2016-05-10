@@ -37,5 +37,5 @@ FindAndMountEXT4 () {
    mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
 }
 
-FindAndMountEXT4 userdata /usr
+FindAndMountEXT4 userdata /data
 exit 0
