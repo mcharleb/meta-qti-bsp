@@ -3,13 +3,14 @@
 # our image...
 DEPENDS = " \
     virtual/kernel \
-    virtual/bootloader \
     pkgconfig-native \
     gtk-doc-native \
     gettext-native \
     mkbootimg-native \
     dtbtool-native \
 "
+DEPENDS_append_aarch64 += "lib32-lk"
+DEPENDS_append_arm += "lk"
 
 # Image output types
 IMAGE_FSTYPES = "tar.gz"

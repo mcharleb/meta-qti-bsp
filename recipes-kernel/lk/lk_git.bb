@@ -20,19 +20,20 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 MY_TARGET          = "${BASEMACHINE}"
+MY_TARGET_mdmcalifornium = "mdm9640"
 MY_TARGET_apq8009  = "msm8909"
 MY_TARGET_apq8096  = "msm8996"
 MY_TARGET_mdm9607  = "mdm9607"
 MY_TARGET_mdm9607-perf  = "mdm9607"
 MY_TARGET_apq8053 = "msm8953"
 
+BOOTLOADER_NAME_mdmcalifornium = "appsboot"
 BOOTLOADER_NAME_apq8096 = "emmc_appsboot"
 BOOTLOADER_NAME_apq8053 = "emmc_appsboot"
 
 LIBGCC             = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
 
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}'"
-EXTRA_OEMAKE_append_mdmcalifornium = " SIGNED_KERNEL=1"
 EXTRA_OEMAKE_append_apq8053 = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
 EXTRA_OEMAKE_append_apq8096 = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
 

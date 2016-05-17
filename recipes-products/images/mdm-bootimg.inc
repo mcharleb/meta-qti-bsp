@@ -11,6 +11,9 @@ DEPENDS = " \
              mtd-utils-native \
 "
 
+DEPENDS_append_aarch64 += "lib32-lk"
+DEPENDS_append_arm += "lk"
+
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
 
