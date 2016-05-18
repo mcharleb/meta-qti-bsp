@@ -5,8 +5,7 @@ SECTION = "kernel/modules"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 LICENSE = "BSD"
 
-FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
-
+FILES_${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r2-${KERNEL_VERSION}"
 
@@ -47,7 +46,7 @@ python split_kernel_module_packages_append() {
 
 do_module_signing() {
     if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
-	${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
+	${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
     fi
 }
 
