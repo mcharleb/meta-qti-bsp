@@ -1,0 +1,57 @@
+From 280953b8a5aff87811b203523ce77eb483a6aeda Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Mon, 13 Jun 2016 19:44:40 +0530
+Subject: [PATCH 1/1] Allow preview dumps
+
+Change-Id: Id61aa8637b21a0d64a3242e6bb0d351c134f5c51
+---
+ QCamera2/stack/mm-camera-test/src/mm_qcamera_preview.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
+
+diff --git a/QCamera2/stack/mm-camera-test/src/mm_qcamera_preview.c b/QCamera2/stack/mm-camera-test/src/mm_qcamera_preview.c
+index ce9d632..c280fb9 100644
+--- a/QCamera2/stack/mm-camera-test/src/mm_qcamera_preview.c
++++ b/QCamera2/stack/mm-camera-test/src/mm_qcamera_preview.c
+@@ -585,6 +585,7 @@ cam_dimension_t mm_app_get_analysis_stream_dim(
+     } else {
+         analysis_dim = *preview_dim;
+     }
++    analysis_dim = *preview_dim;
+ 
+     LOGI("analysis stream dim (%d x %d)\n",  analysis_dim.width, analysis_dim.height);
+     return analysis_dim;
+@@ -621,10 +622,6 @@ mm_camera_stream_t * mm_app_add_analysis_stream(mm_camera_test_obj_t *test_obj,
+     analysis_dim = mm_app_get_analysis_stream_dim(test_obj, &preview_dim);
+     LOGI("analysis stream dimesion: %d x %d\n",
+             analysis_dim.width, analysis_dim.height);
+-    if (analysis_dim.width == 0 || analysis_dim.height == 0) {
+-        /* FD or PAAF might not be enabled , use preview dim */
+-        return NULL;
+-    }
+ 
+     stream->s_config.mem_vtbl.get_bufs = mm_app_stream_initbuf;
+     stream->s_config.mem_vtbl.put_bufs = mm_app_stream_deinitbuf;
+@@ -642,8 +639,7 @@ mm_camera_stream_t * mm_app_add_analysis_stream(mm_camera_test_obj_t *test_obj,
+     stream->s_config.stream_info->streaming_mode = CAM_STREAMING_MODE_CONTINUOUS;
+     stream->s_config.stream_info->fmt = DEFAULT_PREVIEW_FORMAT;
+     stream->s_config.stream_info->dim = analysis_dim;
+-    stream->s_config.padding_info =
+-        cam_cap->analysis_info[CAM_ANALYSIS_INFO_FD_STILL].analysis_padding_info;
++    stream->s_config.padding_info = cam_cap->padding_info;
+ 
+     rc = mm_app_config_stream(test_obj, channel, stream, &stream->s_config);
+     if (MM_CAMERA_OK != rc) {
+@@ -696,8 +692,8 @@ mm_camera_stream_t * mm_app_add_preview_stream(mm_camera_test_obj_t *test_obj,
+     abc.type[0] = CAM_STREAM_TYPE_PREVIEW;
+ 
+     abc.postprocess_mask[1] = analysis_pp_mask;
+-    abc.stream_sizes[1].width = analysis_dim.width;
+-    abc.stream_sizes[1].height = analysis_dim.height;
++    abc.stream_sizes[1].width = preview_dim.width;
++    abc.stream_sizes[1].height = preview_dim.height;
+     abc.type[1] = CAM_STREAM_TYPE_ANALYSIS;
+ 
+     abc.buffer_info.min_buffers = 10;
+-- 
+1.8.2.1
+

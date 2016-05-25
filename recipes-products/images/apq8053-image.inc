@@ -66,7 +66,7 @@ IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "liblog"
 #IMAGE_INSTALL += "libstdc++"
-#IMAGE_INSTALL += "libxml2"
+IMAGE_INSTALL += "libxml2"
 #IMAGE_INSTALL += "lighttpd"
 #IMAGE_INSTALL += "loc-api"
 #IMAGE_INSTALL += "minidlna"
@@ -95,6 +95,11 @@ IMAGE_INSTALL += "wcnss"
 IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+
+#32-bit packages
+#IMAGE_INSTALL += "lib32-media"
+#IMAGE_INSTALL += "lib32-camera"
+
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
