@@ -12,9 +12,11 @@ KERNEL_IMAGETYPE = ""
 # Where built kernel lies in the kernel tree
 zImage_VAR="zImage"
 zImage_VAR_apq8053="Image.gz-dtb"
+zImage_VAR_apq8096="Image.gz-dtb"
 
 KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
 #KERNEL_IMAGEDEST = "boot"
+KERNEL_IMAGEDEST_apq8096 = "boot"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 DEPENDS_append_aarch64 = " libgcc"
@@ -35,7 +37,6 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
-SRC_URI  += "file://0001-include-sync.h-and-sw_sync.h-in-kernel-header.patch"
 SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
@@ -43,6 +44,7 @@ PV = "git-${GITVER}"
 PR = "r4"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
+DEPENDS_apq8096 += "mkbootimg-native dtc-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
@@ -179,4 +181,29 @@ do_deploy () {
         --base ${MACHINE_KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
+}
+
+do_deploy_apq8096() {
+	if test -n "${KERNEL_DEVICETREE}"; then	179
+		for DTB in ${KERNEL_DEVICETREE}; do
+                        if echo ${DTB} | grep -q '/dts/'; then
+                                bbwarn "${DTB} contains the full path to the the dts file, but only the dtb name should be used."
+			        DTB=`basename ${DTB} | sed 's,\.dts$,.dtb,g'`
+			fi
+			DTB_BASE_NAME=`basename ${DTB} .dtb`
+			DTB_NAME=`echo ${KERNEL_IMAGE_BASE_NAME} | sed "s/${MACHINE}/${DTB_BASE_NAME}/g"`
+                        DTB_SYMLINK_NAME=`echo ${KERNEL_IMAGE_SYMLINK_NAME} | sed "s/${MACHINE}/${DTB_BASE_NAME}/g"`
+		        DTB_PATH="${B}/arch/${ARCH}/boot/dts/${DTB}"
+		        if [ ! -e "${DTB_PATH}" ]; then
+			        DTB_PATH="${B}/arch/${ARCH}/boot/${DTB}"
+			fi
+			install -d ${DEPLOYDIR}
+			install -m 0644 ${DTB_PATH} ${DEPLOYDIR}/${DTB_NAME}.dtb
+			cd ${DEPLOYDIR}
+			ln -sf ${DTB_NAME}.dtb ${DTB_SYMLINK_NAME}.dtb
+			cd -
+		done
+        fi
+    rm -f "${DEPLOYDIR}/devicetree.img" "${DEPLOYDIR}/boot.img" "{DEPLOYDIR}/initrd"
+    mkbootimg --kernel "${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION}" --ramdisk /dev/null -o "${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img" --cmdline "${EXTRA_KERNEL_CMD_PARAMS}" --base "${KERNEL_BASE}" --pagesize "${PAGE_SIZE}"
 }
