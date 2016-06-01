@@ -25,7 +25,7 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG          = "mdm_defconfig"
 KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
-KERNEL_DEFCONFIG_apq8053          = "msmcortex_defconfig"
+KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -38,7 +38,7 @@ SRC_DIR   =  "${WORKSPACE}/kernel"
 S         =  "${WORKDIR}/kernel"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git-${GITVER}"
-PR = "r3"
+PR = "r4"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
@@ -48,9 +48,8 @@ RDEPENDS_kernel-base = ""
 FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
 
 do_configure () {
-	oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_DEFCONFIG}
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_DEFCONFIG}
 }
-
 
 do_shared_workdir () {
         cd ${B}
@@ -137,22 +136,22 @@ do_install_append() {
 do_deploy () {
 # Make bootimage
 
-    install -m 0644 ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+    mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
     dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
     # Create separate images with dtb appended to zImage for all targets.
     for d in ${dtb_files}; do
-	 #Strip qcom from the result if its present.
+    #Strip qcom from the result if its present.
        targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
-	 #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
+    #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
        qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
-	   if [ ${qcom_check} == "qcom" ]; then
-		cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-	   else
+       if [ ${qcom_check} == "qcom" ]; then
+        cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+        ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+       else
         cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-	    ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-	   fi
+        ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+       fi
     done
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
@@ -160,12 +159,10 @@ do_deploy () {
 
     # Updated base address according to new memory map.
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
-        --dt ${D}/${KERNEL_IMAGEDEST}/masterDTB \
         --ramdisk /dev/null \
         --cmdline "${cmdparams}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
-        --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET} \
         --ramdisk_offset 0x0 \
         --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 

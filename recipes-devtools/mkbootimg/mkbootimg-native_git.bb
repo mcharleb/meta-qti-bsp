@@ -9,7 +9,7 @@ PROVIDES = "mkbootimg-native"
 
 DEPENDS = "libmincrypt-native"
 
-PR = "r5"
+PR = "r6"
 
 MY_PN = "mkbootimg"
 
@@ -20,7 +20,7 @@ do_fetch () {
 	cp -f ${THISDIR}/files/makefile ${S}
 }
 
-EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='${libdir}/mincrypt/libmincrypt.a'"
+EXTRA_OEMAKE = "INCLUDES='-Imincrypt' LIBS='${libdir}/libmincrypt.a'"
 
 do_install() {
 	install -d ${D}${bindir}
