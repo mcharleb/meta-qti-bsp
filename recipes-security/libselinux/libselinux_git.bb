@@ -1,12 +1,12 @@
-inherit native autotools-brokensep pkgconfig
+inherit autotools-brokensep pkgconfig
 
 DESCRIPTION = "Libselinux"
 LICENSE = "PD"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=84b4d2c6ef954a2d4081e775a270d0d0"
 
-PR = "r1"
+PR = "r0"
 
-DEPENDS = "libpcre-native libmincrypt-native libcutils-native"
+DEPENDS = "libpcre libmincrypt liblog libcutils"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/libselinux/"
