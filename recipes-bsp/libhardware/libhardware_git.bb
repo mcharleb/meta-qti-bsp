@@ -8,10 +8,9 @@ ${LICENSE};md5=89aea4e17d99a7cacdbeed46a0096b10"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://hardware/libhardware/"
-SRC_URI  += "file://autotools.patch"
-S = "${WORKDIR}/hardware/${PN}"
+S = "${WORKDIR}/hardware/libhardware"
 
-PR = "r5"
+PR = "r6"
 
 DEPENDS = "system-core"
 
@@ -21,4 +20,17 @@ do_install_append () {
         install -m 0644 ${S}/include/hardware/hardware.h -D ${D}${includedir}/hardware/hardware.h
         install -m 0644 ${S}/include/hardware/gralloc.h -D ${D}${includedir}/hardware/gralloc.h
         install -m 0644 ${S}/include/hardware/fused_location.h -D ${D}${includedir}/hardware/fused_location.h
+        install -m 0644 ${S}/include/hardware/camera.h -D ${D}${includedir}/hardware/camera.h
+        install -m 0644 ${S}/include/hardware/camera3.h -D ${D}${includedir}/hardware/camera3.h
+        install -m 0644 ${S}/include/hardware/camera_common.h -D ${D}${includedir}/hardware/camera_common.h
+        install -m 0644 ${S}/include/hardware/fb.h -D ${D}${includedir}/hardware/fb.h
+        install -m 0644 ${S}/include/hardware/power.h -D ${D}${includedir}/hardware/power.h
+        install -m 0644 ${S}/include/hardware/audio.h -D ${D}${includedir}/hardware/audio.h
+        install -m 0644 ${S}/include/hardware/sound_trigger.h -D ${D}${includedir}/hardware/sound_trigger.h
+        install -m 0644 ${S}/include/hardware/audio_alsaops.h -D ${D}${includedir}/hardware/audio_alsaops.h
+        install -m 0644 ${S}/include/hardware/audio_effect.h -D ${D}${includedir}/hardware/audio_effect.h
+        install -m 0644 ${S}/include/hardware/audio_policy.h -D ${D}${includedir}/hardware/audio_policy.h
+        install -m 0644 ${S}/include/hardware/bluetooth.h -D ${D}${includedir}/hardware/bluetooth.h
+        install -m 0644 ${S}/include/hardware/bt_*.h -D ${D}${includedir}/hardware/
+        install -m 0644 ${S}/modules/gralloc/gralloc_priv.h -D ${D}${includedir}/
 }
