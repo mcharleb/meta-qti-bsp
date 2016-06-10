@@ -27,6 +27,7 @@ MY_TARGET_mdm9607  = "mdm9607"
 MY_TARGET_mdm9607-perf  = "mdm9607"
 MY_TARGET_apq8053 = "msm8953"
 
+BOOTLOADER_NAME_mdm9607 = "appsboot"
 BOOTLOADER_NAME_mdmcalifornium = "appsboot"
 BOOTLOADER_NAME_apq8096 = "emmc_appsboot"
 BOOTLOADER_NAME_apq8053 = "emmc_appsboot"

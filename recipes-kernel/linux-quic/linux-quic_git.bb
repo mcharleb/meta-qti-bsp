@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdmcalifornium|apq8009|apq8096|apq8053)"
+COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
@@ -24,6 +24,7 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 # To be moved to machine specific conf
 # Provide a config baseline for things so the kernel will build...
 KERNEL_DEFCONFIG          = "mdm_defconfig"
+KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
 KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
 KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
 
