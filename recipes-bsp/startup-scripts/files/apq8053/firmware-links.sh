@@ -42,7 +42,7 @@ cd /firmware/image
 # Get the list of files in /firmware/image
 # for which sym links have to be created
 
-fwfiles=$(ls modem* adsp* wcnss* *.bin mba*)
+fwfiles=$(ls modem* adsp* wcnss* *.bin mba* venus*)
 
 # Check if the links with similar names
 # have been created in /lib/firmware
@@ -126,8 +126,19 @@ case $linksNeeded in
             echo "PIL no mba image found"
             ;;
       esac
-	  ;;
 
+      case `ls venus.mdt 2>/dev/null` in
+         venus.mdt)
+            for imgfile in venus*
+            do
+               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+            done
+            ;;
+         *)
+            echo "PIL no venus image found"
+            ;;
+      esac
+	  ;;
    *)
       echo "Nothing to do. No firmware links needed."
       ;;
