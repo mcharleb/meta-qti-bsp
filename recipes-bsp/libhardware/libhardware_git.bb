@@ -18,6 +18,8 @@ do_install_append () {
         install -d ${D}${includedir}
         install -m 0644 ${S}/include/hardware/gps.h -D ${D}${includedir}/hardware/gps.h
         install -m 0644 ${S}/include/hardware/hardware.h -D ${D}${includedir}/hardware/hardware.h
+        install -m 0644 ${S}/include/hardware/hwcomposer.h -D ${D}${includedir}/hardware/hwcomposer.h
+        install -m 0644 ${S}/include/hardware/hwcomposer_defs.h -D ${D}${includedir}/hardware/hwcomposer_defs.h
         install -m 0644 ${S}/include/hardware/gralloc.h -D ${D}${includedir}/hardware/gralloc.h
         install -m 0644 ${S}/include/hardware/fused_location.h -D ${D}${includedir}/hardware/fused_location.h
         install -m 0644 ${S}/include/hardware/camera.h -D ${D}${includedir}/hardware/camera.h
