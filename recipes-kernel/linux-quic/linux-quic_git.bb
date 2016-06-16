@@ -135,37 +135,48 @@ do_install_append() {
     oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
-do_deploy () {
-# Make bootimage
+nand_boot_flag = "${@base_contains('DISTRO_FEATURES', 'nand-boot', '1', '0', d)}"
+
+
+do_deploy_prepend() {
 
     mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
-    dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
+    if [ ${nand_boot_flag} == "1" ]; then
+        dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
-    # Create separate images with dtb appended to zImage for all targets.
-    for d in ${dtb_files}; do
-    #Strip qcom from the result if its present.
-       targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
-    #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
-       qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
-       if [ ${qcom_check} == "qcom" ]; then
-        cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-        ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-       else
-        cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-        ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-       fi
-    done
+        # Create separate images with dtb appended to zImage for all targets.
+        for d in ${dtb_files}; do
+            #Strip qcom from the result if its present.
+            targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
+            #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
+            qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
+            if [ ${qcom_check} == "qcom" ]; then
+                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+                ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+            else
+                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+                ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
+            fi
+        done
+    fi
+}
+
+do_deploy () {
+
+    extra_mkbootimg_params=""
+    if [ ${nand_boot_flag} == "1" ]; then
+        extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET}'
+    fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
     cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
 
-    # Updated base address according to new memory map.
+    # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
         --cmdline "${cmdparams}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
         --ramdisk_offset 0x0 \
-        --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
-
+        ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
