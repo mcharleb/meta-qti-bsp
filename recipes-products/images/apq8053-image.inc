@@ -100,6 +100,7 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 #32-bit packages
 #IMAGE_INSTALL += "lib32-media"
 #IMAGE_INSTALL += "lib32-camera"
+IMAGE_INSTALL += "lib32-tinyalsa"
 
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
