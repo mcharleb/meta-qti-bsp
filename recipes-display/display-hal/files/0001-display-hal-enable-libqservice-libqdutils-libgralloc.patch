@@ -1,150 +1,19 @@
-From bbe7a05d847a4948385352b5ddb28d03e1cd331c Mon Sep 17 00:00:00 2001
-From: Sourabh Banerjee <sbanerje@codeaurora.org>
-Date: Fri, 10 Jun 2016 12:13:15 +0530
+From 04536462bd1eb18ebf32ee1a351cf51121b064d1 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <vkraleti@codeaurora.org>
+Date: Wed, 13 Jul 2016 16:41:59 +0530
 Subject: [PATCH 1/1] display-hal: enable libqservice libqdutils libgralloc for
  linux
 
-Change-Id: I21b8820311d34ccd35bec12a5526e14fa187d440
+Change-Id: Ibc1075d01a25b01492c7ee2be513c3335fa70638
 ---
- Android.mk                 |  6 ++++++
- libgralloc/Android.mk      | 15 ++++++++++++++-
- libgralloc/framebuffer.cpp |  4 ++++
- libqdutils/Android.mk      | 10 ++++++++++
- libqservice/Android.mk     |  7 +++++++
- 5 files changed, 41 insertions(+), 1 deletion(-)
+ libqservice/Android.mk | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Android.mk b/Android.mk
-index b5961ad..5ffd3bc 100644
---- a/Android.mk
-+++ b/Android.mk
-@@ -1,13 +1,19 @@
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- display-hals := libcopybit liblight libmemtrack libqservice libqdutils
-+else
-+display-hals := libqservice libqdutils
-+endif
- ifneq ($(TARGET_USES_GRALLOC1), true)
-     display-hals += libgralloc
- else
-     display-hals += libgralloc1
- endif
- 
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- display-hals += hdmi_cec
- sdm-libs := sdm/libs
- display-hals += $(sdm-libs)/utils $(sdm-libs)/core $(sdm-libs)/hwc $(sdm-libs)/hwc2
-+endif
- 
- ifeq ($(call is-vendor-board-platform,QCOM),true)
-     include $(call all-named-subdir-makefiles,$(display-hals))
-diff --git a/libgralloc/Android.mk b/libgralloc/Android.mk
-index 03da814..7e94255 100644
---- a/libgralloc/Android.mk
-+++ b/libgralloc/Android.mk
-@@ -22,9 +22,16 @@ LOCAL_MODULE_RELATIVE_PATH    := hw
- LOCAL_MODULE_TAGS             := optional
- LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes)
- LOCAL_SHARED_LIBRARIES        := $(common_libs) libmemalloc libqdMetaData
--LOCAL_SHARED_LIBRARIES        += libqdutils libGLESv1_CM
- LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdgralloc\" -Wno-sign-conversion
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
-+LOCAL_SHARED_LIBRARIES        += libqdutils libGLESv1_CM
- LOCAL_CLANG                   := true
-+else
-+LOCAL_SHARED_LIBRARIES        += libqdutils
-+LOCAL_CFLAGS                  += -std=c++11
-+LOCAL_CFLAGS                  += -DADRENO200_DISABLED
-+LOCAL_CLANG                   := false
-+endif
- LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps) $(kernel_deps)
- LOCAL_SRC_FILES               := gpu.cpp gralloc.cpp framebuffer.cpp mapper.cpp
- LOCAL_COPY_HEADERS_TO         := $(common_header_export_path)
-@@ -40,7 +47,13 @@ LOCAL_MODULE_TAGS             := optional
- LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes)
- LOCAL_SHARED_LIBRARIES        := $(common_libs) libqdutils libdl
- LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdmemalloc\" -Wno-sign-conversion
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- LOCAL_CLANG                   := true
-+else
-+LOCAL_CFLAGS                  += -std=c++11
-+LOCAL_CFLAGS                  += -include algorithm
-+LOCAL_CLANG                   := false
-+endif
- LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps) $(kernel_deps)
- LOCAL_SRC_FILES               := ionalloc.cpp alloc_controller.cpp
- LOCAL_COPY_HEADERS            := alloc_controller.h memalloc.h
-diff --git a/libgralloc/framebuffer.cpp b/libgralloc/framebuffer.cpp
-index 5c297c1..7d0b00c 100644
---- a/libgralloc/framebuffer.cpp
-+++ b/libgralloc/framebuffer.cpp
-@@ -34,7 +34,9 @@
- #include <linux/fb.h>
- #include <linux/msm_mdp.h>
- 
-+#ifndef ADRENO200_DISABLED
- #include <GLES/gl.h>
-+#endif
- 
- #include "gralloc_priv.h"
- #include "fb_priv.h"
-@@ -99,7 +101,9 @@ static int fb_compositionComplete(struct framebuffer_device_t* dev)
-     if(!dev) {
-         return -1;
-     }
-+#ifndef ADRENO200_DISABLED
-     glFinish();
-+#endif
- 
-     return 0;
- }
-diff --git a/libqdutils/Android.mk b/libqdutils/Android.mk
-index f56f774..ea1bc61 100644
---- a/libqdutils/Android.mk
-+++ b/libqdutils/Android.mk
-@@ -7,7 +7,12 @@ LOCAL_MODULE_TAGS             := optional
- LOCAL_SHARED_LIBRARIES        := $(common_libs) libui libbinder libqservice
- LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes)
- LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdutils\" -Wno-sign-conversion
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- LOCAL_CLANG                   := true
-+else
-+LOCAL_CFLAGS                  += -std=c++11
-+LOCAL_CLANG                   := false
-+endif
- LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
- LOCAL_COPY_HEADERS_TO         := $(common_header_export_path)
- LOCAL_COPY_HEADERS            := display_config.h
-@@ -26,7 +31,12 @@ LOCAL_ADDITIONAL_DEPENDENCIES   := $(common_deps)
- LOCAL_SRC_FILES                 := qdMetaData.cpp
- LOCAL_CFLAGS                    := $(common_flags) -Wno-sign-conversion
- LOCAL_CFLAGS                    += -DLOG_TAG=\"DisplayMetaData\"
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- LOCAL_CLANG                     := true
-+else
-+LOCAL_CFLAGS                    += -std=c++11
-+LOCAL_CLANG                     := false
-+endif
- LOCAL_MODULE_TAGS               := optional
- LOCAL_MODULE                    := libqdMetaData
- include $(BUILD_SHARED_LIBRARY)
 diff --git a/libqservice/Android.mk b/libqservice/Android.mk
-index 285afca..7c09678 100644
+index 5c1eaba..c36f4bb 100644
 --- a/libqservice/Android.mk
 +++ b/libqservice/Android.mk
-@@ -7,7 +7,12 @@ LOCAL_MODULE_TAGS             := optional
- LOCAL_C_INCLUDES              := $(common_includes) $(kernel_includes)
- LOCAL_SHARED_LIBRARIES        := $(common_libs) libbinder
- LOCAL_CFLAGS                  := $(common_flags) -DLOG_TAG=\"qdqservice\" -Wno-sign-conversion
-+ifneq ($(QTI_LINUX_DISPLAY_HAL), true)
- LOCAL_CLANG                   := true
-+else
-+LOCAL_CFLAGS                  += -std=c++11
-+LOCAL_CLANG                   := false
-+endif
- LOCAL_ADDITIONAL_DEPENDENCIES := $(common_deps)
- LOCAL_SRC_FILES               := QService.cpp \
-                                  IQService.cpp \
-@@ -15,6 +20,8 @@ LOCAL_SRC_FILES               := QService.cpp \
+@@ -14,6 +14,8 @@ LOCAL_SRC_FILES               := QService.cpp \
                                   IQHDMIClient.cpp
  LOCAL_COPY_HEADERS_TO         := $(common_header_export_path)
  LOCAL_COPY_HEADERS            := IQService.h \
@@ -154,5 +23,5 @@ index 285afca..7c09678 100644
  
  
 -- 
-1.8.2.1
+1.9.1
 
