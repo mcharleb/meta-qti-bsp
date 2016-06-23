@@ -20,6 +20,11 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
 
+COMPOSITION         = "9025"
+COMPOSITION_apq8009 = "9091"
+COMPOSITION_apq8053 = "901D"
+COMPOSITION_apq8096 = "901D"
+
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
@@ -32,7 +37,7 @@ do_install_append() {
    install -m 0755 ${S}/usb/debuger/debugFiles -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/help -D ${D}${base_sbindir}/usb/debuger/
    install -m 0755 ${S}/usb/debuger/usb_debug -D ${D}${base_sbindir}/
-   ln -s  /sbin/usb/compositions/9025 ${D}${base_sbindir}/usb/boot_hsusb_composition
+   ln -s  /sbin/usb/compositions/${COMPOSITION} ${D}${base_sbindir}/usb/boot_hsusb_composition
    ln -s  /sbin/usb/compositions/empty ${D}${base_sbindir}/usb/boot_hsic_composition
 }
 
