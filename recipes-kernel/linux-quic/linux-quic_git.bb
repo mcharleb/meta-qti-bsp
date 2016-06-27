@@ -185,27 +185,3 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
-do_deploy_apq8096() {
-	if test -n "${KERNEL_DEVICETREE}"; then	179
-		for DTB in ${KERNEL_DEVICETREE}; do
-                        if echo ${DTB} | grep -q '/dts/'; then
-                                bbwarn "${DTB} contains the full path to the the dts file, but only the dtb name should be used."
-			        DTB=`basename ${DTB} | sed 's,\.dts$,.dtb,g'`
-			fi
-			DTB_BASE_NAME=`basename ${DTB} .dtb`
-			DTB_NAME=`echo ${KERNEL_IMAGE_BASE_NAME} | sed "s/${MACHINE}/${DTB_BASE_NAME}/g"`
-                        DTB_SYMLINK_NAME=`echo ${KERNEL_IMAGE_SYMLINK_NAME} | sed "s/${MACHINE}/${DTB_BASE_NAME}/g"`
-		        DTB_PATH="${B}/arch/${ARCH}/boot/dts/${DTB}"
-		        if [ ! -e "${DTB_PATH}" ]; then
-			        DTB_PATH="${B}/arch/${ARCH}/boot/${DTB}"
-			fi
-			install -d ${DEPLOYDIR}
-			install -m 0644 ${DTB_PATH} ${DEPLOYDIR}/${DTB_NAME}.dtb
-			cd ${DEPLOYDIR}
-			ln -sf ${DTB_NAME}.dtb ${DTB_SYMLINK_NAME}.dtb
-			cd -
-		done
-        fi
-    rm -f "${DEPLOYDIR}/devicetree.img" "${DEPLOYDIR}/boot.img" "{DEPLOYDIR}/initrd"
-    mkbootimg --kernel "${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}" --ramdisk /dev/null -o "${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img" --cmdline "${EXTRA_KERNEL_CMD_PARAMS}" --base "${KERNEL_BASE}" --pagesize "${PAGE_SIZE}"
-}
