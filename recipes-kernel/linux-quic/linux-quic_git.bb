@@ -142,7 +142,9 @@ nand_boot_flag = "${@base_contains('DISTRO_FEATURES', 'nand-boot', '1', '0', d)}
 
 do_deploy_prepend() {
 
-    mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+    if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
+        mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+    fi
     if [ ${nand_boot_flag} == "1" ]; then
         dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
@@ -205,5 +207,5 @@ do_deploy_apq8096() {
 		done
         fi
     rm -f "${DEPLOYDIR}/devicetree.img" "${DEPLOYDIR}/boot.img" "{DEPLOYDIR}/initrd"
-    mkbootimg --kernel "${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION}" --ramdisk /dev/null -o "${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img" --cmdline "${EXTRA_KERNEL_CMD_PARAMS}" --base "${KERNEL_BASE}" --pagesize "${PAGE_SIZE}"
+    mkbootimg --kernel "${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}" --ramdisk /dev/null -o "${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img" --cmdline "${EXTRA_KERNEL_CMD_PARAMS}" --base "${KERNEL_BASE}" --pagesize "${PAGE_SIZE}"
 }
