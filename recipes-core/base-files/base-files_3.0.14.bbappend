@@ -4,7 +4,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI += "file://fstab"
-SRC_URI_append_apq8096 = "file://${BASEMACHINE}/fstab"
 
 dirs755 += "/media /media/card /media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
