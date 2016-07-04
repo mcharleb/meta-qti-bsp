@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0;md5=89aea4e17d99a7ca
 
 SRCREV = "${AUTOREV}"
 
-FILESPATH =+ "${WORKSPACE}:"
-SRC_URI   = "file://hardware/qcom/display/"
+FILESPATH =+ "${WORKSPACE}/display:"
+SRC_URI   = "file://display-hal"
 SRC_URI  += "file://0001-display-hal-enable-libqservice-libqdutils-libgralloc.patch"
-S = "${WORKDIR}/hardware/qcom/display"
+S = "${WORKDIR}/display-hal"
 
 PR = "r1"
 
