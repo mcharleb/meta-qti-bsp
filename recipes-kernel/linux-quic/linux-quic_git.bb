@@ -29,6 +29,7 @@ KERNEL_DEFCONFIG          = "mdm_defconfig"
 KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
 KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
 KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
+KERNEL_DEFCONFIG_apq8053-perf  = "msmcortex-perf_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
