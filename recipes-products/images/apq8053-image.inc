@@ -88,6 +88,7 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-usb"
 IMAGE_INSTALL += "system-conf"
+IMAGE_INSTALL += "system-media"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
@@ -100,6 +101,7 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 #32-bit packages
 #IMAGE_INSTALL += "lib32-media"
 #IMAGE_INSTALL += "lib32-camera"
+IMAGE_INSTALL += "lib32-tinyalsa"
 
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
