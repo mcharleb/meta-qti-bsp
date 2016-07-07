@@ -6,7 +6,7 @@ IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
-IMAGE_INSTALL += "alsa-intf"
+#IMAGE_INSTALL += "alsa-intf"
 #IMAGE_INSTALL += "avahi-systemd"
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
@@ -94,5 +94,5 @@ QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
 do_makesystem() {
-    make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-sysfs.ext4 ${IMAGE_ROOTFS}
+    make_ext4fs -s -l ${SYSTEM_SIZE_EXT4} ${DEPLOY_DIR_IMAGE}/${MACHINE}-${PRODUCT}-sysfs.ext4 ${IMAGE_ROOTFS}
 }
