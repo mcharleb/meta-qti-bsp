@@ -17,13 +17,15 @@ DEPENDS += "system-core"
 DEPENDS += "libhardware"
 DEPENDS += "native-frameworks"
 
-export TARGET_LIBRARY_SUPPRESS_LIST="libbacktrace libbase libunwind libui libhardware libbinder"
+export TARGET_LIBRARY_SUPPRESS_LIST="libbacktrace libbase libunwind libhardware libbinder"
 
+EXTRA_OEMAKE += "TARGET_IS_HEADLESS=true"
 EXTRA_OEMAKE += "QTI_LINUX_DISPLAY_HAL=true"
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 
 CFLAGS += "-include ${STAGING_KERNEL_BUILDDIR}/include/generated/asm-offsets.h"
 CFLAGS += "-Wno-error=unused-parameter"
+CFLAGS += "-Wno-error=conversion"
 CFLAGS += "-Wno-uninitialized -Wno-error=attributes"
 CFLAGS += "-I${STAGING_INCDIR}/system"
 CFLAGS += "-I${STAGING_INCDIR}"
@@ -61,4 +63,3 @@ do_fix_sysroot () {
    fi
 }
 addtask fix_sysroot after do_install before do_populate_sysroot
-
