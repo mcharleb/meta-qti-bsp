@@ -12,11 +12,48 @@ S = "${WORKDIR}/mtd-utils"
 
 PR = "r1"
 
-EXTRA_OEMAKE = "'CC=${CC}' 'RANLIB=${RANLIB}' 'AR=${AR}' 'CFLAGS=${CFLAGS} -I${S}/include -DWITHOUT_XATTR' 'BUILDDIR=${S}'"
+EXTRA_OEMAKE = "'CC=${CC}' 'RANLIB=${RANLIB}' 'AR=${AR}' 'CFLAGS=${CFLAGS} -I${S}/include -I${S}/ubi-utils/include -I${S}/tests/fs-tests/lib -DWITHOUT_XATTR' 'BUILDDIR=${S}'"
 
+do_compile_append () {
+	oe_runmake tests
+}
+
+ubi_tests = " \
+	integ \
+	io_basic \
+	io_paral \
+	io_read \
+	io_update \
+	mkvol_bad \
+	mkvol_basic \
+	mkvol_paral \
+	rsvol \
+	volrefcnt \
+	"
+
+checkfs_tests = " \
+	checkfs \
+	makefiles \
+	"
+
+MTD_TEST_BIN_PATH = "${WORKSPACE}/filesystems/bin/target/mtd-utils"
 do_install () {
 	oe_runmake install DESTDIR=${D} SBINDIR=${sbindir} MANDIR=${mandir} INCLUDEDIR=${includedir}
+
+	mkdir -p ${MTD_TEST_BIN_PATH}/fstests/
+	find ${S}/tests/fs-tests/ -executable -type f -exec cp {} ${MTD_TEST_BIN_PATH}/fstests/ \;
+
+	mkdir -p ${MTD_TEST_BIN_PATH}/ubi-tests/
+	for test in ${ubi_tests}; do
+		cp ${S}/$test ${MTD_TEST_BIN_PATH}/ubi-tests/
+	done
+
+	mkdir -p ${MTD_TEST_BIN_PATH}/checkfs/
+	for test in ${checkfs_tests}; do
+		cp ${S}/$test ${MTD_TEST_BIN_PATH}/checkfs/
+	done
 }
+
 
 PACKAGES =+ "mtd-utils-jffs2 mtd-utils-ubifs mtd-utils-misc"
 
