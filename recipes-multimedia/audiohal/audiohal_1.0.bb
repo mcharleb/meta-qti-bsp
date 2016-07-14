@@ -14,9 +14,9 @@ SRC_URI += "file://mixer_paths_wcd9326.xml"
 S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
 
-DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader"
+DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloader surround-sound-3mic"
 
-EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I${STAGING_KERNEL_BUILDDIR}/usr/include -I.""
+EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I. -I${STAGING_KERNEL_BUILDDIR}/usr/include -I${STAGING_INCDIR}/surround_sound_3mic -I${STAGING_INCDIR}/sound_trigger""
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF += "--with-glib"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_HDMI_EDID=false"
