@@ -10,13 +10,14 @@ DEPENDS = "conntrack-tools"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=3775480a712fc46a69647678acb234cb"
 
 # Package Revision (update whenever recipe is changed)
-PR = "r6"
+PR = "r7"
 
 SRC_URI = "\
     https://www.codeaurora.org/mirrored_source/quic/le/${PN}-${PV}.tar.gz \
     file://0001-certification-fixes.patch \
     file://0001-presentation-page.patch \
     file://0001-port-desc.patch \
+    file://0001-security-fix.patch \
 "
 
 SRC_URI[md5sum] = "f91dc5647b1d2c13a82082a481a53e3d"
