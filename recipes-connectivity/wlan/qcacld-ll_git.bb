@@ -4,9 +4,10 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD low latency driver"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-FILES_${PN}     += "${base_libdir}/firmware/wlan/*"
+FILES_${PN}     += "lib/firmware/wlan/*"
 FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
-RPROVIDES_${PN} += "kernel-module-wlan"
+PROVIDES_NAME   = "kernel-module-wlan"
+RPROVIDES_${PN} += "${PROVIDES_NAME}"
 
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r8-${KERNEL_VERSION}"
@@ -19,7 +20,7 @@ SRC_URI = "file://wlan/qcacld-2.0/"
 
 S = "${WORKDIR}/wlan/qcacld-2.0/"
 
-FIRMWARE_PATH = "${D}${base_libdir}/firmware/wlan/qca_cld"
+FIRMWARE_PATH = "${D}/lib/firmware/wlan/qca_cld"
 
 # Explicitly disable HL to enable LL as current WLAN driver is not having
 # simultaneous support of HL and LL.
@@ -35,7 +36,23 @@ do_install () {
 
     install -d ${FIRMWARE_PATH}
     install -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${FIRMWARE_PATH}/
+    # if 64 bit then we need to install the config file into /lib/ instead of
+    # /lib64/ since the software doesn't look in that location
+    if [ ${SITEINFO_BITS}  = 64 ]; then
+        install -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${FIRMWARE_PATH}/
+    fi
 
     install -d ${D}${includedir}/qcacld/
     install -m 0644 ${S}/CORE/SVC/external/wlan_nlink_common.h ${D}${includedir}/qcacld/
 }
+
+do_module_signing() {
+    if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
+        bbnote "Signing ${PN} module"
+        ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PROVIDES_NAME}/lib/modules/${KERNEL_VERSION}/extra/wlan.ko
+    else
+        bbnote "${PN} module is not being signed"
+    fi
+}
+
+addtask module_signing after do_package before do_package_write_ipk
