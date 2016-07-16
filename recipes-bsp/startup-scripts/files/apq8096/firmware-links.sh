@@ -29,20 +29,13 @@
 # firmware-links        init.d script to install the firmware links
 #
 
-# No path is set up at this point so we have to do it here.
-PATH=/sbin:/bin:/usr/sbin:/usr/bin
-export PATH
-
-mkdir -p /firmware
-mount -t vfat /dev/mmcblk0p1 /firmware
-
 # Check for images and set up symlinks
 cd /firmware/image
 
 # Get the list of files in /firmware/image
 # for which sym links have to be created
 
-fwfiles=$(ls modem* adsp* wcnss* *.bin mba*)
+fwfiles=$(ls)
 
 # Check if the links with similar names
 # have been created in /lib/firmware
@@ -63,7 +56,7 @@ do
    # with the name $fwfile is not present
    # need to create links.
 
-   fw_file=$(ls $fwfile)
+   fw_file=$(ls $fwfile 2>/dev/null)
    if [ "$fw_file" == "$fwfile" ]
    then
       continue
@@ -77,57 +70,11 @@ case $linksNeeded in
    1)
       cd /firmware/image
 
-      case `ls modem.mdt 2>/dev/null` in
-         modem.mdt)
-            for imgfile in mba.mbn modem*
+      for imgfile in `ls`
             do
                ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
             done
-            ;;
-        *)
-            # trying to log here but nothing will be logged since it is
-            # early in the boot process. Is there a way to log this message?
-            echo "PIL no modem image found"
-            ;;
-      esac
-
-      case `ls adsp.mdt 2>/dev/null` in
-         adsp.mdt)
-            for imgfile in adsp*
-            do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-            ;;
-         *)
-            echo "PIL no adsp image found"
-            ;;
-      esac
-
-      case `ls wcnss.mdt 2>/dev/null` in
-         wcnss.mdt)
-            for imgfile in wcnss*
-            do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-            ;;
-         *)
-            echo "PIL no wcnss image found"
-            ;;
-      esac
-
-      case `ls mba.mdt 2>/dev/null` in
-         mba.mdt)
-            for imgfile in mba*
-            do
-               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
-            done
-            ;;
-         *)
-            echo "PIL no mba image found"
-            ;;
-      esac
-	  ;;
-
+      ;;
    *)
       echo "Nothing to do. No firmware links needed."
       ;;
