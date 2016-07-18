@@ -31,6 +31,7 @@ KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
 KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
 KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
 KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
+KERNEL_DEFCONFIG_apq8009-perf  = "msm8909-perf_defconfig"
 KERNEL_DEFCONFIG_apq8053-perf  = "msmcortex-perf_defconfig"
 
 KERNEL_PRIORITY           = "9001"
