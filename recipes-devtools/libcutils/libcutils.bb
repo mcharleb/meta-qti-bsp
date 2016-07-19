@@ -10,13 +10,16 @@ PR = "r0"
 
 DEPENDS += "liblog"
 
+BBCLASSEXTEND = "native"
+
 FILESPATH =+ "${WORKSPACE}/system/core/:"
 SRC_URI   = "file://libcutils"
 
 S = "${WORKDIR}/libcutils"
 
-EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include"
-EXTRA_OECONF_append = " --with-host-os=${HOST_OS}"
+EXTRA_OECONF  = " --with-core-includes=${WORKSPACE}/system/core/include"
+EXTRA_OECONF += " --with-host-os=${HOST_OS}"
+EXTRA_OECONF += " --disable-static"
 
 FILES_${PN}-dbg    = "${libdir}/.debug/libcutils.*"
 FILES_${PN}        = "${libdir}/libcutils.so.* ${libdir}/pkgconfig/*"
