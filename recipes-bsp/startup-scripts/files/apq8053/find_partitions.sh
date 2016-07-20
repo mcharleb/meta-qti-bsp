@@ -38,5 +38,6 @@ FindAndMountEXT4 () {
 }
 
 FindAndMountEXT4 userdata /data
+FindAndMountEXT4 dsp /dsp
 
 exit 0
