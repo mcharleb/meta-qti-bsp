@@ -6,10 +6,11 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
+TARGET = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
 FILESPATH =+ "${WORKSPACE}/:"
 SRC_URI  = "file://hardware/qcom/audio/"
-SRC_URI += "file://audio_output_policy.conf"
-SRC_URI += "file://mixer_paths_wcd9326.xml"
+SRC_URI += "file://${TARGET}/"
 
 S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
@@ -33,15 +34,14 @@ EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_DTS_EAGLE=false"
 EXTRA_OECONF += "DOLBY_DDP=false"
 EXTRA_OECONF += "DS1_DOLBY_DAP=false"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_DEV_ARBI=false"
-EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_SOURCE_TRACKING=false"
+EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_SOURCE_TRACKING=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_LISTEN=false"
 EXTRA_OECONF += "BOARD_SUPPORTS_SOUND_TRIGGER=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_PM_SUPPORT=false"
 
 do_install_append() {
    install -d ${D}${sysconfdir}
-   install -m 0755 ${WORKDIR}/audio_output_policy.conf ${D}${sysconfdir}/
-   install -m 0755 ${WORKDIR}/mixer_paths_wcd9326.xml ${D}${sysconfdir}/
+   install -m 0755 ${WORKDIR}/${TARGET}/* ${D}${sysconfdir}/
    #Userspace expects hal name to be audio.primary.default
    cd  ${D}/${libdir}/ && ln -s audio_primary_default.so audio.primary.default.so
 }
