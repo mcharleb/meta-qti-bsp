@@ -8,7 +8,6 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://camera/lib"
-SRC_URI  += "file://0001-Allow-preview-dumps.patch"
 
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/lib"
