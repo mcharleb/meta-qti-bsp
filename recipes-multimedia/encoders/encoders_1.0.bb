@@ -13,3 +13,7 @@ EXTRA_OECONF_append += "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 EXTRA_OECONF_append += "--with-glib"
 
 DEPENDS = "media"
+
+FILES_${PN}-dbg  = "${libdir}/.debug/*"
+FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${sysconfdir}/* ${bindir}/* ${libdir}/pkgconfig/*"
+FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
