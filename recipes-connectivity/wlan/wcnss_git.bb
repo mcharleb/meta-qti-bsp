@@ -25,7 +25,14 @@ do_install_apq8009() {
     install -d ${D}/etc
     install -d ${D}/etc/init.d
     install "${WORKDIR}"/set_wcnss_mode ${D}/etc/init.d
+    mkdir -p ${D}/lib/firmware/wlan/prima
+    cp -pP ${S}/WCNSS_cfg.dat ${S}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
+}
 
+do_install_apq8017() {
+    install -d ${D}/etc
+    install -d ${D}/etc/init.d
+    install "${WORKDIR}"/set_wcnss_mode ${D}/etc/init.d
     mkdir -p ${D}/lib/firmware/wlan/prima
     cp -pP ${S}/WCNSS_cfg.dat ${S}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
 }
