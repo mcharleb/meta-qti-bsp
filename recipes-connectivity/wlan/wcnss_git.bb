@@ -21,6 +21,15 @@ do_install() {
     cp -pPr ${S}/* ${D}/lib/firmware/wlan/prima
 }
 
+do_install_apq8009() {
+    install -d ${D}/etc
+    install -d ${D}/etc/init.d
+    install "${WORKDIR}"/set_wcnss_mode ${D}/etc/init.d
+
+    mkdir -p ${D}/lib/firmware/wlan/prima
+    cp -pP ${S}/WCNSS_cfg.dat ${S}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
+}
+
 INITSCRIPT_NAME = "set_wcnss_mode"
 INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 20 0 1 6 ."
 
