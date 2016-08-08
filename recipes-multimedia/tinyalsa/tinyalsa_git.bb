@@ -2,8 +2,9 @@ inherit autotools
 
 DESCRIPTION = "Tinyalsa Library"
 LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://git/pcm.c;md5=1273a12ea723a3dfb8c6f2d1d6cf3d05"
-PR = "r0"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+PR = "r1"
 
 SRCREV = "${AUTOREV}"
 SRC_URI = "git://codeaurora.org/quic/le/platform/external/tinyalsa.git;protocol=git;branch=github/master \
