@@ -30,6 +30,7 @@ BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsbo
 
 LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
 
+CFLAGS_apq8009 += " -mfloat-abi=hard -mfpu=neon"
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}'"
 
 EXTRA_OEMAKE_append_emmc-boot = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
