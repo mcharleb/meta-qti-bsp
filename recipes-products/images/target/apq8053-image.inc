@@ -97,6 +97,10 @@ IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "qcacld-utils"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+IMAGE_INSTALL += "lib32-libbt-vendor"
+IMAGE_INSTALL += "lib32-fluoride"
+IMAGE_INSTALL += "lib32-bt-property"
+IMAGE_INSTALL += "lib32-bt-app"
 
 #32-bit packages
 IMAGE_INSTALL += "lib32-media"
