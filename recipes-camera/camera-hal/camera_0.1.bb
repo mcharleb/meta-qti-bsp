@@ -8,6 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://camera/lib"
+SRC_URI  += "file://0001-QCamera2-Don-t-bail-out-if-we-fail-to-configure-anal.patch"
 
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/lib"
