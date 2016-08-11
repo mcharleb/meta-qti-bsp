@@ -110,6 +110,8 @@ IMAGE_INSTALL += "lib32-audiohal"
 IMAGE_INSTALL += "lib32-encoders"
 IMAGE_INSTALL += "lib32-gtest"
 
+IMAGE_INSTALL += "lib32-qmmf-sdk"
+
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
