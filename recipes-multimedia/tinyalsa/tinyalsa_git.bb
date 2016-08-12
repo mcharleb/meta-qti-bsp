@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 PR = "r1"
 
-SRCREV = "${AUTOREV}"
+SRCREV = "b47a014f1460ffd6479fd8306c679475b03f27f1"
 SRC_URI = "git://codeaurora.org/quic/le/platform/external/tinyalsa.git;protocol=git;branch=github/master \
            file://Makefile.am \
            file://configure.ac \
