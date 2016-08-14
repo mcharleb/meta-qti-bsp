@@ -13,6 +13,8 @@ S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 DEPENDS += "libhardware"
 
+CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION"
+
 EXTRA_OECONF = " \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                "
