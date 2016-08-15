@@ -1,4 +1,4 @@
-inherit deploy externalsrc
+inherit deploy
 
 DESCRIPTION = "Little Kernel bootloader"
 LICENSE = "MIT"
@@ -12,10 +12,11 @@ FILESPATH =+ "${WORKSPACE}:"
 
 PV       = "1.0"
 PR       = "r1"
-EXTERNALSRC="${WORKSPACE}/bootable/bootloader/lk"
-EXTERNALSRC_BUILD="${WORKSPACE}/bootable/bootloader/lk"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+FILESPATH =+ "${WORKSPACE}:"
+SRC_URI   =  "file://bootable/bootloader/lk"
+S         =  "${WORKDIR}/bootable/lk"
 
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
