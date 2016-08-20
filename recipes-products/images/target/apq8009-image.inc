@@ -28,6 +28,9 @@ IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "tinycompress"
 
+# AUDIO HAL
+IMAGE_INSTALL += "audiohal"
+
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
 #IMAGE_INSTALL += "avahi-daemon"
