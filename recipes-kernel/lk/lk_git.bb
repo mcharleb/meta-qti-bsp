@@ -8,14 +8,18 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 
 PROVIDES = "virtual/bootloader"
 
-FILESPATH =+ "${WORKSPACE}:"
-
-PV       = "1.0"
+PV       = "2.0"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
+
 SRC_URI   =  "file://bootable/bootloader/lk"
+
+SRCREV_apq8009 = "b8f390e9dad753e516530ba5c1236038388f2442"
+SRC_URI_apq8009 = "git://source.codeaurora.org/quic/la/kernel/lk.git;\
+protocol=git;branch=LNX.LE.6.0.1;destsuffix=bootable/lk"
+
 S         =  "${WORKDIR}/bootable/lk"
 
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
@@ -32,7 +36,6 @@ BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsbo
 
 LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
 
-CFLAGS_apq8009 += " -mfloat-abi=hard -mfpu=neon"
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}'"
 
 EXTRA_OEMAKE_append_emmc-boot = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
