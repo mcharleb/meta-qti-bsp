@@ -4,7 +4,7 @@ DESCRIPTION = "Qualcomm Atheros WLAN"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-KERNEL_VERSION = "${@get_kernelversion('${STAGING_KERNEL_DIR}')}"
+KERNEL_VERSION = "${@get_kernelversion_headers('${STAGING_KERNEL_DIR}')}"
 
 FILES_${PN} += "\
     ${base_libdir}/modules/${KERNEL_VERSION}/kernel/drivers/net/wireless/ar6000.ko \
