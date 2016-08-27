@@ -95,6 +95,11 @@ IMAGE_INSTALL += "wcnss"
 IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+IMAGE_INSTALL += "bt-app"
+IMAGE_INSTALL += "bt-property"
+IMAGE_INSTALL += "fluoride"
+IMAGE_INSTALL += "libbt-vendor"
+
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
