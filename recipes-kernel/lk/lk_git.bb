@@ -8,18 +8,13 @@ HOMEPAGE = "https://www.codeaurora.org/gitweb/quic/la?p=kernel/lk.git"
 
 PROVIDES = "virtual/bootloader"
 
-PV       = "2.0"
+PV       = "3.0"
 PR       = "r1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
 
 SRC_URI   =  "file://bootable/bootloader/lk"
-
-SRCREV_apq8009 = "b8f390e9dad753e516530ba5c1236038388f2442"
-SRC_URI_apq8009 = "git://source.codeaurora.org/quic/la/kernel/lk.git;\
-protocol=git;branch=LNX.LE.6.0.1;destsuffix=bootable/lk"
-
 S         =  "${WORKDIR}/bootable/lk"
 
 BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
