@@ -30,7 +30,7 @@
 #
 
 mount /data
-#mount /firmware
+mount /firmware
 mount /mnt/persist
 
 exit 0
