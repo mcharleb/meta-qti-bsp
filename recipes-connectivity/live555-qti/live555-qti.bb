@@ -59,3 +59,7 @@ FILES_${PN}-libUsageEnvironment-dbg    = "${libdir}/.debug/libUsageEnvironment.*
 FILES_${PN}-libUsageEnvironment        = "${libdir}/libUsageEnvironment.so"
 FILES_${PN}-libUsageEnvironment-dev    = "${libdir}/libUsageEnvironment.so ${includedir}"
 
+FILES_${PN} = "${libdir}/lib*.so"
+FILES_${PN}-dev = "${libdir}/lib*.so ${includedir}"
+FILES_${PN}-dbg = "${libdir}/.debug"
+PACKAGES = "${PN} ${PN}-dbg ${PN}-dev"

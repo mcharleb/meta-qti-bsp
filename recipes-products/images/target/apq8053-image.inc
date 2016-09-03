@@ -103,6 +103,9 @@ IMAGE_INSTALL += "lib32-bt-property"
 IMAGE_INSTALL += "lib32-bt-app"
 
 #32-bit packages
+IMAGE_INSTALL += "lib32-live555-qti"
+IMAGE_INSTALL += "lib32-qmmf-support"
+IMAGE_INSTALL += "lib32-qmmf-webserver"
 IMAGE_INSTALL += "lib32-media"
 IMAGE_INSTALL += "lib32-camera"
 IMAGE_INSTALL += "lib32-tinyalsa"
