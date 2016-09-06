@@ -10,7 +10,7 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://system/core/"
 
 S = "${WORKDIR}/system/core"
-PR = "r17"
+PR = "r18"
 
 DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils"
 
@@ -27,6 +27,7 @@ COMPOSITION_apq8096 = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
+   install -m 0755 ${S}/logd/start_logd -D ${D}${sysconfdir}/init.d/logd
    install -m 0755 ${S}/usb/start_usb -D ${D}${sysconfdir}/init.d/usb
    install -m 0755 ${S}/rootdir/etc/init.qcom.post_boot.sh -D ${D}${sysconfdir}/init.d/init_qcom_post
    install -m 0755 ${S}/usb/usb_composition -D ${D}${base_sbindir}/
@@ -45,6 +46,10 @@ INITSCRIPT_PACKAGES =+ "${PN}-usb"
 INITSCRIPT_NAME_${PN}-usb = "usb"
 INITSCRIPT_PARAMS_${PN}-usb = "start 30 S ."
 
+INITSCRIPT_PACKAGES =+ "${PN}-logd"
+INITSCRIPT_NAME_${PN}-logd = "logd"
+INITSCRIPT_PARAMS_${PN}-logd = "start 10 S ."
+
 PACKAGES =+ "${PN}-adbd-dbg ${PN}-adbd ${PN}-adbd-dev"
 FILES_${PN}-adbd-dbg = "${base_sbindir}/.debug/adbd ${libdir}/.debug/libadbd.*"
 FILES_${PN}-adbd     = "${base_sbindir}/adbd ${sysconfdir}/init.d/adbd ${libdir}/libadbd.so.*"
@@ -58,6 +63,10 @@ FILES_${PN}-usb     += "${base_sbindir}/usb/* ${base_sbindir}/usb_debug ${base_s
 PACKAGES =+ "${PN}-init-qcom-post"
 FILES_${PN}-init-qcom-post = " ${sysconfdir}/init.d/init_qcom_post"
 INSANE_SKIP_${PN}-init-qcom-post = "file-rdeps"
+
+PACKAGES =+ "${PN}-logd-dbg ${PN}-logd"
+FILES_${PN}-logd-dbg  = "${base_sbindir}/.debug/logd"
+FILES_${PN}-logd      = "${sysconfdir}/init.d/logd ${base_sbindir}/logd"
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
 FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.*"
