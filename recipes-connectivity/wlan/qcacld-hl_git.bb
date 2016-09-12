@@ -49,3 +49,11 @@ do_install () {
     install -d ${D}${includedir}/qcacld/
     install -m 0644 ${S}/CORE/SVC/external/wlan_nlink_common.h ${D}${includedir}/qcacld/
 }
+
+do_module_signing() {
+    if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
+	${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
+    fi
+}
+
+addtask module_signing after do_package before do_package_write_ipk
