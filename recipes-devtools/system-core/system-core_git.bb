@@ -16,6 +16,7 @@ DEPENDS = "virtual/kernel openssl glib-2.0 libselinux safe-iop ext4-utils"
 
 EXTRA_OECONF = " --with-host-os=${HOST_OS} --with-glib"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF_append = " --with-logd-logging"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/ext4_utils"
 CPPFLAGS += "-I${STAGING_INCDIR}/libselinux"
