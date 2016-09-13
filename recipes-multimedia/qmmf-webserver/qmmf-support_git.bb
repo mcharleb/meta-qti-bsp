@@ -17,6 +17,7 @@ DEPENDS += "live555-qti"
 DEPENDS += "qmmf-sdk"
 
 TARGET_CFLAGS += "-I${STAGING_INCDIR} -I${STAGING_INCDIR}/recorder/"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include -I${STAGING_INCDIR}/mm-mux"
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-webserver"
