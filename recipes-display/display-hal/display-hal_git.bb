@@ -8,7 +8,6 @@ SRCREV = "${AUTOREV}"
 
 FILESPATH =+ "${WORKSPACE}/display:"
 SRC_URI   = "file://display-hal"
-SRC_URI  += "file://0001-display-hal-enable-libqservice-libqdutils-libgralloc.patch"
 S = "${WORKDIR}/display-hal"
 
 PR = "r1"
