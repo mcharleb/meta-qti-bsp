@@ -89,6 +89,10 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
 IMAGE_INSTALL += "sfe"
 IMAGE_INSTALL += "tinyproxy"
+IMAGE_INSTALL += "bt-app"
+IMAGE_INSTALL += "bt-property"
+IMAGE_INSTALL += "fluoride"
+IMAGE_INSTALL += "libbt-vendor"
 
 # Below packages are open source packages that depend on proprietary packages
 

@@ -17,7 +17,7 @@ S = "${WORKDIR}/system/bt/"
 FILES_${PN} += "${libdir}"
 INSANE_SKIP_${PN} = "dev-so"
 
-CFLAGS_append = " -DHCI_USE_MCT -DUSE_ANDROID_LOGGING "
+CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
@@ -25,6 +25,12 @@ EXTRA_OECONF = " \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                 --with-lib-path=${STAGING_LIBDIR} \
                "
+
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
+
 do_install_append() {
 
 	install -d ${D}${sysconfdir}/bluetooth/
