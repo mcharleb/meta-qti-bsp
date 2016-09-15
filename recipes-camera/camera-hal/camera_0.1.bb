@@ -26,6 +26,7 @@ CFLAGS += "-Wno-error -Wno-uninitialized -Wno-error=attributes -Wno-error=unused
 CFLAGS += "-Wno-error=builtin-macro-redefined -Wno-error=type-limits"
 CFLAGS += "-D__unused="__attribute__((__unused__))""
 CFLAGS += "-D_GNU_SOURCE"
+CFLAGS += "-D_LE_CAMERA_"
 CFLAGS += "-DUNIX_PATH_MAX=108"
 
 CFLAGS += "-I $(OMX_HEADER_DIR)"
