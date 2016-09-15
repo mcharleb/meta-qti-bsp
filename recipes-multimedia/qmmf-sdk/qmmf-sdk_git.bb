@@ -19,6 +19,7 @@ DEPENDS += "media"
 CFLAGS += "-I${STAGING_INCDIR}"
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
 EXTRA_OECONF += " --with-mm-core=${WORKSPACE}/hardware/qcom/media/mm-core/inc"
+EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
