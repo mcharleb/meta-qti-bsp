@@ -46,9 +46,9 @@ IMAGE_INSTALL += "glib-2.0"
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
-IMAGE_INSTALL += "init-audio"
+#IMAGE_INSTALL += "init-audio"
 #IMAGE_INSTALL += "iproute2"
-#IMAGE_INSTALL += "init-mss"
+IMAGE_INSTALL += "init-mss"
 #IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "iw"
 #IMAGE_INSTALL += "jquery"
