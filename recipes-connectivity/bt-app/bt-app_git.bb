@@ -11,16 +11,19 @@ SRC_URI = "file://qcom-opensource/bt/bt-app/"
 
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
-DEPENDS += "libhardware glib-2.0"
+DEPENDS += "libhardware glib-2.0 btobex"
 
-CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING "
+CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                 --with-glib \
+                --with-lib-path=${STAGING_LIBDIR} \
+                --with-btobex \
                "
+
 do_install_append() {
         install -d ${D}${sysconfdir}/bluetooth/
 
