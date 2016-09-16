@@ -15,6 +15,7 @@ SRC_URI += "\
             file://base.cfg \
             file://syslog-startup.conf \
             file://busybox_klogd.patch;patchdir=.. \
+            file://iio.sh \
 "
 
 prefix = ""
@@ -26,6 +27,7 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
     install -m 0755 ${WORKDIR}/find-touchscreen.sh ${D}${sysconfdir}/mdev/
     install -m 0755 ${WORKDIR}/usb.sh ${D}${sysconfdir}/mdev/
+    install -m 0755 ${WORKDIR}/iio.sh ${D}${sysconfdir}/mdev/
 }
 
 #FILES_${PN}-mdev += "${sysconfdir}/mdev/* "
