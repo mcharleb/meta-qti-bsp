@@ -38,10 +38,10 @@ do_install () {
 
 # Remove dependency for wrong kernel version
 python split_kernel_module_packages_append() {
-	if modules:
-		metapkg = d.getVar('KERNEL_MODULES_META_PACKAGE', True)
-		d.delVar('RDEPENDS_' + metapkg)
-		d.delVar('RDEPENDS_kernel-module-wlan')
+        if modules:
+                metapkg = d.getVar('KERNEL_MODULES_META_PACKAGE', True)
+                d.delVar('RDEPENDS_' + metapkg)
+                d.delVar('RDEPENDS_kernel-module-wlan')
 }
 
 do_module_signing() {
