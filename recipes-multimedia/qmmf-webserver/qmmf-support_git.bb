@@ -15,6 +15,7 @@ DEPENDS += "glib-2.0"
 DEPENDS += "av-frameworks"
 DEPENDS += "live555-qti"
 DEPENDS += "qmmf-sdk"
+DEPENDS += "mm-mux"
 
 TARGET_CFLAGS += "-I${STAGING_INCDIR} -I${STAGING_INCDIR}/recorder/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include -I${STAGING_INCDIR}/mm-mux"
@@ -27,7 +28,7 @@ S = "${WORKDIR}/qmmf-webserver"
 do_package_qa () {
 }
 
-FILES_${PN} = "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"
+FILES_${PN} = "${libdir}/lib*.so.* ${bindir}/* ${libdir}/pkgconfig/*"
 FILES_${PN}-dev = "${libdir}/lib*.so* ${includedir} ${libdir}/*.la ${libdir}/*.a"
-FILES_${PN}-dbg = "${libdir}/.debug"
+FILES_${PN}-dbg = "${libdir}/.debug ${bindir}/.debug"
 PACKAGES = "${PN} ${PN}-dev ${PN}-dbg"
