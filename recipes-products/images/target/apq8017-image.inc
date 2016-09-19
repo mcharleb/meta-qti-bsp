@@ -15,6 +15,11 @@ IMAGE_INSTALL += "alsa-utils"
 IMAGE_INSTALL += "tinycompress"
 IMAGE_INSTALL += "rmtstorage"
 
+# AUDIO HAL
+IMAGE_INSTALL += "lib32-tinyalsa"
+IMAGE_INSTALL += "lib32-audiohal"
+
+
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
 #IMAGE_INSTALL += "avahi-daemon"
