@@ -34,6 +34,9 @@
     <config_params>
         <param key="input_mic_max_count" value="4"/>
     </config_params>
+    <pcm_ids>
+        <usecase name="USECASE_AUDIO_PLAYBACK_OFFLOAD2" type="out" id="24"/>
+    </pcm_ids>
 </audio_platform_info>
 
 
