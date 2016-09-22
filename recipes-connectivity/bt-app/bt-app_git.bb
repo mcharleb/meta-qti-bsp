@@ -1,4 +1,4 @@
-inherit autotools
+inherit autotools pkgconfig
 
 DESCRIPTION = "Bluetooth application layer"
 LICENSE = "Apache-2.0"
@@ -11,12 +11,13 @@ SRC_URI = "file://qcom-opensource/bt/bt-app/"
 
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
-DEPENDS += "libhardware"
+DEPENDS += "libhardware glib-2.0"
 
 CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION"
 
 EXTRA_OECONF = " \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
+                --with-glib \
                "
 do_install_append() {
         install -d ${D}${sysconfdir}/bluetooth/
