@@ -34,15 +34,9 @@ CFLAGS += "-DAID_CAMERASERVER=1047"
 LDFLAGS += "-llog -lbinder -lutils -lcutils"
 
 do_compile() {
-    # Current support is limited to 32-bit build
-    #
-    if [ "${MLPREFIX}" == "lib32-" ]; then
         androidmk_setenv
         oe_runmake -f ${LA_COMPAT_DIR}/build/core/main.mk BUILD_MODULES_IN_PATHS=${S} \
             all_modules SHOW_COMMANDS=true || die "make failed"
-    else
-        die "not supported"
-    fi
 }
 
 do_install_append () {
