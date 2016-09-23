@@ -17,17 +17,19 @@ DEPENDS += "adreno200"
 DEPENDS += "display-hal"
 DEPENDS += "system-media"
 DEPENDS += "av-frameworks"
+DEPENDS += "lib32-mm-video-noship"
 
 PACKAGES = "${PN}"
 
 EXTRA_OEMAKE += " BOARD_USES_ADRENO=false"
 EXTRA_OEMAKE += " VDEC_ENABLE=false"
+EXTRA_OEMAKE += " TARGETS_THAT_SUPPORT_PQ='msm8996 msmcobalt msm8953'"
 
 CFLAGS += "-Dstrlcpy=g_strlcpy"
 CFLAGS += "-Dstrlcat=g_strlcat"
 CFLAGS += "-I${STAGING_INCDIR}/cutils/"
 CFLAGS += "-I${STAGING_INCDIR}/adreno/"
-CFLAGS += "-I${STAGING_INCDIR}/adreno/"
+CFLAGS += "-I${STAGING_INCDIR}/libgpustats/"
 CFLAGS += "-I${STAGING_INCDIR}/ui/"
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
@@ -55,6 +57,7 @@ LDFLAGS += "-llog"
 LDFLAGS += "-lbase"
 LDFLAGS += "-lutils"
 LDFLAGS += "-lbinder"
+LDFLAGS += "-lgpustats"
 
 export TARGET_LIBRARY_SUPPRESS_LIST="libgui libbinder"
 
