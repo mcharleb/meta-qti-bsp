@@ -31,4 +31,5 @@ INITSCRIPT_PARAMS = "remove"
 INITSCRIPT_PARAMS_apq8009 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8053 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8017 = "start 98 5 . stop 2 0 1 6 ."
+INITSCRIPT_PARAMS_apq8096 = "start 98 5 . stop 2 0 1 6 ."
 
