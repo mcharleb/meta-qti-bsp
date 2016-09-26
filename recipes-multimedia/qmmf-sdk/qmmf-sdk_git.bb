@@ -15,6 +15,7 @@ DEPENDS += "glib-2.0"
 DEPENDS += "av-frameworks"
 DEPENDS += "gtest"
 DEPENDS += "media"
+DEPENDS += "cairo"
 
 CFLAGS += "-I${STAGING_INCDIR}"
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
