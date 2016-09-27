@@ -40,8 +40,11 @@ EXTRA_OECONF += "BOARD_SUPPORTS_SOUND_TRIGGER=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_PM_SUPPORT=false"
 
 do_install_append() {
-   install -d ${D}${sysconfdir}
-   install -m 0755 ${WORKDIR}/${TARGET}/* ${D}${sysconfdir}/
+   if [ -d "${WORKDIR}/${TARGET}" ] && [ $(ls -1  ${WORKDIR}/${TARGET} | wc -l) -ne 0 ]; then
+      install -d ${D}${sysconfdir}
+      install -m 0755 ${WORKDIR}/${TARGET}/* ${D}${sysconfdir}/
+   fi
+
    #Userspace expects hal name to be audio.primary.default
    cd  ${D}/${libdir}/ && ln -s audio_primary_default.so audio.primary.default.so
 }
