@@ -39,7 +39,7 @@ IMAGE_INSTALL += "dnsmasq"
 DEPENDS += "gdb-cross-aarch64"
 #IMAGE_INSTALL += "gdbserver"
 #IMAGE_INSTALL += "gdb"
-IMAGE_INSTALL += "glapp"
+#IMAGE_INSTALL += "glapp"
 IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "hostap-daemon-qcacld"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
