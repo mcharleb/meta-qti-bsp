@@ -135,10 +135,9 @@ esac
 
 cd /
 
-# The below change is only applicable to APQ 8017 LE.
-# Create a Symbolic Link for WCNSS_qcom_wlan_nv.bin which is stored at /persist partition.
-# The symlink creation code will be moved to apq8017-persiste.inc file, once the IMAGE_ROOTFS points
-# to machine-image not to apq8017-persist-image.
+# Create a Symbolic Links for WCNSS_qcom_wlan_nv.bin and WCNSS_wlan_dictionary.dat firmware files
+# which are stored at /persist partition.
 ln -s /persist/WCNSS_qcom_wlan_nv.bin /lib/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
+ln -s /persist/WCNSS_wlan_dictionary.dat /lib/firmware/wlan/prima/WCNSS_wlan_dictionary.dat
 
 exit 0
