@@ -103,6 +103,18 @@ IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
+# 32-bit packages
+IMAGE_INSTALL += "lib32-live555-qti"
+IMAGE_INSTALL += "lib32-qmmf-support"
+IMAGE_INSTALL += "lib32-qmmf-webserver"
+IMAGE_INSTALL += "lib32-media"
+IMAGE_INSTALL += "lib32-camera"
+IMAGE_INSTALL += "lib32-tinyalsa"
+IMAGE_INSTALL += "lib32-audiohal"
+IMAGE_INSTALL += "lib32-encoders"
+IMAGE_INSTALL += "lib32-gtest"
+IMAGE_INSTALL += "lib32-qmmf-sdk"
+
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
 do_makesystem() {
