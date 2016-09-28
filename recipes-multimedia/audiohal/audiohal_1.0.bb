@@ -47,6 +47,6 @@ do_install_append() {
 }
 
 FILES_${PN}-dbg  = "${libdir}/.debug/*"
-FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${sysconfdir}/* ${libdir}/pkgconfig/*"
+FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${sysconfdir}/* ${libdir}/pkgconfig/* ${bindir}/*"
 FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
 INSANE_SKIP_${PN} = "dev-so"
