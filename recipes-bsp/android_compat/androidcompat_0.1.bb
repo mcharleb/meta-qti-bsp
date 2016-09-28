@@ -17,8 +17,6 @@ S = "${WORKDIR}/android_compat"
 
 PROVIDES += "virtual/androidcompat"
 
-PACKAGES = "${PN} andorid_compat"
-
 EXTRA_OECONF = " --with-core-includes=${WORKSPACE}/system/core/include --with-glib"
 CFLAGS += "-I${STAGING_INCDIR}/cutils"
 LDFLAGS += "-lcutils"

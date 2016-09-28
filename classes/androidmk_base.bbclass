@@ -58,10 +58,19 @@ do_compile() {
 }
 
 FILES_${PN} = " \
-     ${includedir}/* \
+     /system/* \
      ${libdir}/* \
      ${bindir}/* \
      "
+FILES_${PN}-dev = " \
+     ${includedir}/* \
+     "
+FILES_${PN}-dbg = " \
+    ${libdir}/.debug/* \
+    ${bindir}/.debug/* \
+    ${sbindir}/.debug/* \
+    ${libdir}/${PN}/.debug/* \
+    "
 
 do_install () {
     # usual env for androidmk
