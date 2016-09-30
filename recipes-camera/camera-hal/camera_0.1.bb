@@ -8,7 +8,6 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://camera/lib"
-SRC_URI   += "file://mm_camera_interface.patch"
 
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/lib"
