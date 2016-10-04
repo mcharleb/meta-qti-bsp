@@ -5,9 +5,9 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/BSD;md5=377548
 PR = "r7"
 
 FILESPATH =+ "${WORKSPACE}:"
-SRC_URI = "file://init_mss/"
+SRC_URI = "file://mdm-ss-mgr/init_mss/"
 
-S = "${WORKDIR}/init_mss/"
+S = "${WORKDIR}/mdm-ss-mgr/init_mss/"
 
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8009', '--enable-indefinite-sleep', '', d)}"
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8017', '--enable-indefinite-sleep', '', d)}"
