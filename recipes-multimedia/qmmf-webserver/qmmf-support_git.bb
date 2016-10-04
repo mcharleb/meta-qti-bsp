@@ -17,6 +17,8 @@ DEPENDS += "live555-qti"
 DEPENDS += "qmmf-sdk"
 DEPENDS += "mm-mux"
 DEPENDS += "libav"
+DEPENDS += "vam-lib"
+DEPENDS += "vam-test"
 
 TARGET_CFLAGS += "-I${STAGING_INCDIR} -I${STAGING_INCDIR}/recorder/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include -I${STAGING_INCDIR}/mm-mux"
