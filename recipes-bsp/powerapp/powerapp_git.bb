@@ -25,7 +25,7 @@ do_install() {
         install -m 0755 ${S}/reboot -D ${D}${sysconfdir}/init.d/reboot
         install -m 0755 ${S}/reboot-bootloader -D ${D}/sbin/reboot-bootloader
         install -m 0755 ${S}/reboot-recovery -D ${D}/sbin/reboot-recovery
-        install -m 0755 ${S}/reboot-cookie -D ${D}${sysconfdir}/reboot-cookie
+        install -m 0755 ${S}/reboot-cookie -D ${D}${userfsdatadir}/reboot-cookie
         install -m 0755 ${S}/reset_reboot_cookie -D ${D}${sysconfdir}/init.d/reset_reboot_cookie
         install -m 0755 ${S}/shutdown -D ${D}${sysconfdir}/init.d/shutdown
         install -m 0755 ${S}/start_power_config -D ${D}${sysconfdir}/init.d/power_config
