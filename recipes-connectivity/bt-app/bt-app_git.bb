@@ -13,7 +13,9 @@ S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 DEPENDS += "libhardware glib-2.0"
 
-CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION"
+CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING "
+CFLAGS_append = " -DUSE_ANDROID_LOGGING "
+LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \

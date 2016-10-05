@@ -17,7 +17,8 @@ S = "${WORKDIR}/system/bt/"
 FILES_${PN} += "${libdir}"
 INSANE_SKIP_${PN} = "dev-so"
 
-CFLAGS_append = " -DHCI_USE_MCT"
+CFLAGS_append = " -DHCI_USE_MCT -DUSE_ANDROID_LOGGING "
+LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
                 --with-zlib \
