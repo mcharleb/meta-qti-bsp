@@ -103,6 +103,20 @@ case $linksNeeded in
             ;;
       esac
 
+      case `ls cpe_9335.mdt 2>/dev/null` in
+         cpe_9335.mdt)
+            for imgfile in cpe_*
+            do
+               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+            done
+            ;;
+        *)
+            # trying to log here but nothing will be logged since it is
+            # early in the boot process. Is there a way to log this message?
+            echo "PIL no cpe_9335 image found"
+            ;;
+      esac
+
       case `ls wcnss.mdt 2>/dev/null` in
          wcnss.mdt)
             for imgfile in wcnss*
