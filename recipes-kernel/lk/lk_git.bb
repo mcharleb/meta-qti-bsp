@@ -21,6 +21,7 @@ BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_mdmcalifornium = "mdm9640"
+MY_TARGET_sdxhedgehog = "mdm9640"
 MY_TARGET_apq8009  = "msm8909"
 MY_TARGET_apq8096  = "msm8996"
 MY_TARGET_mdm9607  = "mdm9607"
