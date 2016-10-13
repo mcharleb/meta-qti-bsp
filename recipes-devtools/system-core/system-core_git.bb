@@ -59,20 +59,18 @@ do_install_append_apq8096() {
 do_install_append_apq8017(){
    install -m 0755 ${S}/debuggerd/start_debuggerd64 -D ${D}${sysconfdir}/init.d/init_debuggerd
 }
-pkg_postinst_${PN} () {
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-        # remove all rc.d-links potentially created from alternatives
-        update-rc.d $OPT -f init_debuggerd remove
-        update-rc.d $OPT init_debuggerd start 31 S .
-}
 
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
 INITSCRIPT_NAME_${PN}-usb = "usb"
-INITSCRIPT_PARAMS_${PN}-usb = "start 30 S ."
+INITSCRIPT_PARAMS_${PN}-usb = "start 30 5 ."
+
+INITSCRIPT_PACKAGES =+ "${PN}-debuggerd"
+INITSCRIPT_NAME_${PN}-debuggerd = "init_debuggerd"
+INITSCRIPT_PARAMS_${PN}-debuggerd = "start 31 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-logd"
 INITSCRIPT_NAME_${PN}-logd = "logd"
-INITSCRIPT_PARAMS_${PN}-logd = "start 10 S ."
+INITSCRIPT_PARAMS_${PN}-logd = "start 10 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_qcom_post_boot"
@@ -96,6 +94,10 @@ PACKAGES =+ "${PN}-logd-dbg ${PN}-logd"
 FILES_${PN}-logd-dbg  = "${base_sbindir}/.debug/logd"
 FILES_${PN}-logd      = "${sysconfdir}/init.d/logd ${base_sbindir}/logd"
 
+PACKAGES =+ "${PN}-debuggerd-dbg ${PN}-debuggerd"
+FILES_${PN}-debuggerd-dbg  = "${base_sbindir}/.debug/debuggerd ${base_sbindir}/.debug/debuggerd64 "
+FILES_${PN}-debuggerd      = "${sysconfdir}/init.d/init_debuggerd ${base_sbindir}/debuggerd ${base_sbindir}/debuggerd64"
+
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
-FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* ${sysconfdir}/init.d/* "
+FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* "
 FILES_${PN}-dev  = "${libdir}/*.so ${libdir}/*.la ${includedir}*"
