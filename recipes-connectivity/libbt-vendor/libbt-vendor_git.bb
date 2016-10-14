@@ -16,6 +16,9 @@ SRC_URI = "file://hardware/qcom/bt/libbt-vendor/"
 
 S = "${WORKDIR}/hardware/qcom/bt/libbt-vendor/"
 
+CFLAGS_append = " -DUSE_ANDROID_LOGGING "
+LDFLAGS_append = " -llog "
+
 EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-glib \
