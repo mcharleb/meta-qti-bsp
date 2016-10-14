@@ -3,8 +3,9 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|msm8909|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
+
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
 # Default image type is zImage, change here if needed.
@@ -25,21 +26,6 @@ KERNEL_IMAGETYPE_FOR_MAKE = ""
 DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-
-# To be moved to machine specific conf
-# Provide a config baseline for things so the kernel will build...
-KERNEL_DEFCONFIG          = "mdm_defconfig"
-KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
-KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
-KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
-KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
-KERNEL_DEFCONFIG_apq8009-perf  = "msm8909-perf_defconfig"
-KERNEL_DEFCONFIG_apq8017  = "msm8937_defconfig"
-KERNEL_DEFCONFIG_apq8017-perf  = "msm8937-perf_defconfig"
-KERNEL_DEFCONFIG_apq8053-perf  = "msmcortex-perf_defconfig"
-KERNEL_DEFCONFIG_msm8909w  = "msm8909w_defconfig"
-KERNEL_DEFCONFIG_msm8909 = "msm8909_defconfig"
-KERNEL_DEFCONFIG_sdxhedgehog = "sdx_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -65,7 +51,7 @@ RDEPENDS_kernel-base = ""
 FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
 
 do_configure () {
-    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_DEFCONFIG}
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${MACHINE_KERNEL_DEFCONFIG}
 }
 
 do_shared_workdir () {
@@ -186,12 +172,11 @@ do_deploy () {
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-    cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${cmdparams}" \
+        --cmdline "${MACHINE_KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
         --ramdisk_offset 0x0 \
