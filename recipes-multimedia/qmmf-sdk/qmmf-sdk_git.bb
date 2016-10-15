@@ -78,3 +78,11 @@ FILES_${PN}-libqmmf_audio_client-dev    = "${libdir}/libqmmf_audio_client.so ${l
 FILES_${PN}-libqmmf_audio_service-dbg    = "${libdir}/.debug/libqmmf_audio_service.*"
 FILES_${PN}-libqmmf_audio_service        = "${libdir}/libqmmf_audio_service.so.*"
 FILES_${PN}-libqmmf_audio_service-dev    = "${libdir}/libqmmf_audio_service.so ${libdir}/libqmmf_audio_service.la ${includedir}"
+
+FILES_${PN}-libqmmf_player_client-dbg    = "${libdir}/.debug/libqmmf_player_client.*"
+FILES_${PN}-libqmmf_player_client        = "${libdir}/libqmmf_player_client.so.*"
+FILES_${PN}-libqmmf_player_client-dev    = "${libdir}/libqmmf_player_client.so ${libdir}/libqmmf_player_client.la ${includedir}"
+
+FILES_${PN}-libqmmf_player_service-dbg    = "${libdir}/.debug/libqmmf_player_service.*"
+FILES_${PN}-libqmmf_player_service        = "${libdir}/libqmmf_player_service.so.*"
+FILES_${PN}-libqmmf_player_service-dev    = "${libdir}/libqmmf_player_service.so ${libdir}/libqmmf_player_service.la ${includedir}"
