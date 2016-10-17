@@ -16,6 +16,7 @@ SRC_URI += "\
             file://syslog-startup.conf \
             file://busybox_klogd.patch;patchdir=.. \
             file://iio.sh \
+            file://0001-Support-MTP-function.patch \
 "
 
 prefix = ""
