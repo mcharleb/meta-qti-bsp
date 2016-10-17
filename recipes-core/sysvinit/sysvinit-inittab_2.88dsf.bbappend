@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 
 SRC_URI += "\
-           file://inittab \
+           file://${BASEMACHINE}/inittab \
 "
 
 SERIAL_CONSOLE = "115200 console"
@@ -10,7 +10,7 @@ SYSVINIT_ENABLED_GETTYS = ""
 
 do_install() {
     install -d ${D}${sysconfdir}
-    install -m 0644 ${WORKDIR}/inittab ${D}${sysconfdir}/inittab
+    install -m 0644 ${WORKDIR}/${BASEMACHINE}/inittab ${D}${sysconfdir}/inittab
     if [ ! -z "${SERIAL_CONSOLE}" ]; then
         echo "S:2345:respawn:${base_sbindir}/getty -L ttyHSL0 ${SERIAL_CONSOLE}" >> ${D}${sysconfdir}/inittab
     fi
