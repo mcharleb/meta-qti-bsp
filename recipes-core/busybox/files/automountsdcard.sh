@@ -1,6 +1,6 @@
 #! /bin/sh
 
-destdir=/media/card
+destdir=/mnt/sdcard/
 
 umount_partition()
 {
@@ -11,6 +11,9 @@ umount_partition()
 
 mount_partition()
 {
+        if [ ! -d "${destdir}" ]; then
+            mkdir "${destdir}"
+        fi
         if ! mount -t auto "/dev/$1" "${destdir}"; then
                 # failed to mount
                 exit 1
