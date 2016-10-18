@@ -103,6 +103,8 @@ IMAGE_INSTALL += "lib32-libbt-vendor"
 IMAGE_INSTALL += "lib32-fluoride"
 IMAGE_INSTALL += "lib32-bt-property"
 IMAGE_INSTALL += "lib32-bt-app"
+IMAGE_INSTALL += "display-hal"
+IMAGE_INSTALL += "lib32-display-hal"
 
 #32-bit packages
 IMAGE_INSTALL += "lib32-live555-qti"
