@@ -18,6 +18,12 @@ rmts:2345:respawn:/sbin/rmt_storage
 tftp:2345:respawn:/sbin/tftp_server
 scrb:2345:respawn:/sbin/fs-scrub-daemon
 
+node:2345:wait:mknod -m 660 /dev/media0 c 251 0
+
+qcam:2345:respawn:/system/bin/mm-qcamera-daemon
+qmfs:2345:respawn:/usr/bin/qmmf-server
+qmfw:2345:respawn:/usr/bin/qmmf-webserver
+
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
 #

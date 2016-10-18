@@ -1,4 +1,4 @@
-inherit autotools pkgconfig update-rc.d
+inherit autotools pkgconfig
 
 DESCRIPTION = "QMMF SDK"
 LICENSE = "BSD"
@@ -25,27 +25,14 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-sdk"
-SRC_URI  += "file://qmmf-server.sh"
 
 S = "${WORKDIR}/qmmf-sdk"
-
-INITSCRIPT_NAME = "qmmf-server.sh"
-INITSCRIPT_PARAMS = "start 25 S 2 3 4 5 S . stop 75 0 1 6 ."
-
-do_install_append() {
-    install -m 0755 ${WORKDIR}/qmmf-server.sh -D ${D}/${sysconfdir}/init.d/qmmf-server.sh
-}
-
-pkg_postinst_${PN} () {
-  update-alternatives --install ${sysconfdir}/init.d/qmmf-server.sh qmmf-server.sh qmmf-server 60
-        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
-}
 
 do_package_qa () {
 }
 
 FILES_${PN}-qmmf-server-dbg = "${bindir}/.debug/qmmf-server"
-FILES_${PN}-qmmf-server     = "${bindir}/qmmf-server ${sysconfdir}/init.d/qmmf-server.sh"
+FILES_${PN}-qmmf-server     = "${bindir}/qmmf-server"
 
 FILES_${PN}-libqmmf_recorder_client-dbg    = "${libdir}/.debug/libqmmf_recorder_client.*"
 FILES_${PN}-libqmmf_recorder_client        = "${libdir}/libqmmf_recorder_client.so.*"
