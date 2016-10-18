@@ -16,7 +16,6 @@ DEPENDS += "av-frameworks"
 DEPENDS += "live555-qti"
 DEPENDS += "qmmf-sdk"
 DEPENDS += "mm-mux"
-DEPENDS += "libav"
 DEPENDS += "vam-lib"
 DEPENDS += "vam-test"
 
