@@ -1,0 +1,46 @@
+From 684191434a0085a5eac5510668e897ce4b06c0dd Mon Sep 17 00:00:00 2001
+From: Hareesh Gautham <hgautham@codeaurora.org>
+Date: Wed, 23 Nov 2016 07:28:25 +0530
+Subject: [PATCH 1/1] systemd: Disable unused mount points
+
+---
+ src/core/mount-setup.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/core/mount-setup.c b/src/core/mount-setup.c
+index 1782d40..f20eecc 100644
+--- a/src/core/mount-setup.c
++++ b/src/core/mount-setup.c
+@@ -75,8 +75,8 @@ static const MountPoint mount_table[] = {
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+         { "devtmpfs",    "/dev",                      "devtmpfs",   "mode=755",                MS_NOSUID|MS_STRICTATIME,
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+-        { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+-          NULL,          MNT_NONE                   },
++//      { "securityfs",  "/sys/kernel/security",      "securityfs", NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
++//        NULL,          MNT_NONE                   },
+ #ifdef HAVE_SMACK
+         { "smackfs",     "/sys/fs/smackfs",           "smackfs",    "smackfsdef=*",            MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           mac_smack_use, MNT_FATAL                  },
+@@ -99,14 +99,14 @@ static const MountPoint mount_table[] = {
+           NULL,          MNT_IN_CONTAINER           },
+         { "cgroup",      "/sys/fs/cgroup/systemd",    "cgroup",     "none,name=systemd",       MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           NULL,          MNT_FATAL|MNT_IN_CONTAINER },
+-        { "pstore",      "/sys/fs/pstore",            "pstore",     NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+-          NULL,          MNT_NONE                   },
++//      { "pstore",      "/sys/fs/pstore",            "pstore",     NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
++//        NULL,          MNT_NONE                   },
+ #ifdef ENABLE_EFI
+         { "efivarfs",    "/sys/firmware/efi/efivars", "efivarfs",   NULL,                      MS_NOSUID|MS_NOEXEC|MS_NODEV,
+           is_efi_boot,   MNT_NONE                   },
+ #endif
+-        { "kdbusfs",    "/sys/fs/kdbus",             "kdbusfs",    NULL, MS_NOSUID|MS_NOEXEC|MS_NODEV,
+-          is_kdbus_wanted,       MNT_IN_CONTAINER },
++//      { "kdbusfs",    "/sys/fs/kdbus",             "kdbusfs",    NULL, MS_NOSUID|MS_NOEXEC|MS_NODEV,
++//        is_kdbus_wanted,       MNT_IN_CONTAINER },
+ };
+ 
+ /* These are API file systems that might be mounted by other software,
+-- 
+1.9.1
+

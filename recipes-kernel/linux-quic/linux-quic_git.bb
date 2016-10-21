@@ -50,6 +50,20 @@ RDEPENDS_kernel-base = ""
 # Put the zImage in the kernel-dev pkg
 FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
 
+# Additional defconfigs for systemd
+do_defconfig_patch () {
+cat >> ${S}/arch/${ARCH}/configs/${MACHINE_KERNEL_DEFCONFIG} <<KERNEL_EXTRACONFIGS
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_FHANDLE=y
+KERNEL_EXTRACONFIGS
+}
+
+do_patch_append () {
+    if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
+        bb.build.exec_func('do_defconfig_patch',d)
+}
+
 do_configure () {
     oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${MACHINE_KERNEL_DEFCONFIG}
 }
