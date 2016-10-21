@@ -101,6 +101,7 @@ IMAGE_INSTALL += "bt-app"
 IMAGE_INSTALL += "bt-property"
 IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
+IMAGE_INSTALL += "display-hal-linux"
 
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
