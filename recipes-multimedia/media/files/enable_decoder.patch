@@ -1,65 +1,17 @@
-From 176d457c637761fdd5c060a0d8cea8fe5b397eea Mon Sep 17 00:00:00 2001
-From: Srinu Gorle <sgorle@codeaurora.org>
-Date: Wed, 21 Sep 2016 17:15:48 +0530
-Subject: [PATCH] meta-qti-bsp: realigning media patch
-
-realigning media patch
-
-Change-Id: I56cdf17a89c9ab6c00ccb84cad1afffcb0178c73
----
- Android.mk                                                | 2 +-
- mm-video-v4l2/vidc/common/Android.mk                      | 2 ++
- mm-video-v4l2/vidc/vdec/Android.mk                        | 2 ++
- mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp         | 9 +++++++++
- mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp | 4 ++++
- 5 files changed, 18 insertions(+), 1 deletion(-)
-
 diff --git a/Android.mk b/Android.mk
-index 2e7f2c4..d566733 100644
+index 2e7f2c4..457e487 100644
 --- a/Android.mk
 +++ b/Android.mk
-@@ -3,7 +3,7 @@ QCOM_MEDIA_ROOT := $(call my-dir)
+@@ -3,7 +3,6 @@ QCOM_MEDIA_ROOT := $(call my-dir)
  #Compile these for all targets under QCOM_BOARD_PLATFORMS list.
  ifeq ($(call is-board-platform-in-list, $(QCOM_BOARD_PLATFORMS)),true)
  include $(QCOM_MEDIA_ROOT)/mm-core/Android.mk
 -include $(QCOM_MEDIA_ROOT)/libstagefrighthw/Android.mk
-+-include $(QCOM_MEDIA_ROOT)/libstagefrighthw/Android.mk
  endif
  
  ifeq ($(call is-board-platform-in-list, $(MSM_VIDC_TARGET_LIST)),true)
-diff --git a/mm-video-v4l2/vidc/common/Android.mk b/mm-video-v4l2/vidc/common/Android.mk
-index e37746f..968ba79 100644
---- a/mm-video-v4l2/vidc/common/Android.mk
-+++ b/mm-video-v4l2/vidc/common/Android.mk
-@@ -36,7 +36,9 @@ LOCAL_PRELINK_MODULE      := false
- LOCAL_SHARED_LIBRARIES    := liblog libutils libcutils libdl
- 
- LOCAL_SRC_FILES   := src/extra_data_handler.cpp
-+ifeq ($(BOARD_USES_ADRENO), true)
- LOCAL_SRC_FILES   += src/vidc_color_converter.cpp
-+endif
- 
- LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
- 
-diff --git a/mm-video-v4l2/vidc/vdec/Android.mk b/mm-video-v4l2/vidc/vdec/Android.mk
-index dcd8954..d0e847a 100644
---- a/mm-video-v4l2/vidc/vdec/Android.mk
-+++ b/mm-video-v4l2/vidc/vdec/Android.mk
-@@ -1,3 +1,4 @@
-+ifeq ($(VDEC_ENABLE), true)
- LOCAL_PATH := $(call my-dir)
- include $(CLEAR_VARS)
- 
-@@ -151,6 +152,7 @@ LOCAL_SRC_FILES               += src/omx_swvdec_utils.cpp
- include $(BUILD_SHARED_LIBRARY)
- endif
- endif
-+endif
- 
- # ---------------------------------------------------------------------------------
- #                END
 diff --git a/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp b/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
-index 6c087ff..e918922 100644
+index f5f1f7c..7a7a674 100644
 --- a/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
 +++ b/mm-video-v4l2/vidc/venc/src/omx_video_encoder.cpp
 @@ -93,6 +93,10 @@ void omx_venc::perf_control::send_hint_to_mpctl(bool state)
@@ -100,7 +52,7 @@ index 6c087ff..e918922 100644
  }
  
 diff --git a/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp b/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
-index b2a00cd..8bdfd9e 100644
+index d19afac..bd98dff 100644
 --- a/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
 +++ b/mm-video-v4l2/vidc/venc/src/video_encoder_device_v4l2.cpp
 @@ -55,8 +55,12 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -116,6 +68,3 @@ index b2a00cd..8bdfd9e 100644
  #define ROUND(__sz, __align) (((__sz) + ((__align>>1))) & (~(__align-1)))
  #define MAX_PROFILE_PARAMS 6
  #define MPEG4_SP_START 0
--- 
-1.9.1
-

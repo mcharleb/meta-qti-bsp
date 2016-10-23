@@ -8,7 +8,7 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/media/"
-SRC_URI += "file://0001-media-build-omx-encoder-component-for-linux.patch"
+SRC_URI += "file://enable_decoder.patch"
 
 SRCREV = "${AUTOREV}"
 S      = "${WORKDIR}/hardware/qcom/media"
@@ -21,7 +21,7 @@ DEPENDS += "lib32-mm-video-noship"
 
 PACKAGES = "${PN}"
 
-EXTRA_OEMAKE += " BOARD_USES_ADRENO=false"
+EXTRA_OEMAKE += " BOARD_USES_ADRENO=true"
 EXTRA_OEMAKE += " VDEC_ENABLE=false"
 EXTRA_OEMAKE += " TARGETS_THAT_SUPPORT_PQ='msm8996 msmcobalt msm8953'"
 
