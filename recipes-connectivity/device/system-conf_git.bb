@@ -20,6 +20,7 @@ BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
 
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdm9607', '--enable-target-mdm9607=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmcalifornium', '--enable-target-mdmcalifornium=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8096', '--enable-target-apq8096=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8053', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-wlan=yes', '', d)}"
