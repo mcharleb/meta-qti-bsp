@@ -3,7 +3,6 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|msm8909|apq8096|apq8053|apq8017|msm8909w)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
@@ -11,15 +10,11 @@ EXTRA_KERNEL_CMD_PARAMS ?= ""
 KERNEL_IMAGETYPE = ""
 # Where built kernel lies in the kernel tree
 zImage_VAR="zImage"
-zImage_VAR_apq8053="Image.gz-dtb"
-zImage_VAR_apq8096="Image.gz-dtb"
-zImage_VAR_apq8009="zImage-dtb"
-zImage_VAR_msm8909w="zImage-dtb"
-zImage_VAR_apq8017="Image.gz-dtb"
+zImage_VAR="Image.gz-dtb"
+
 
 KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
-#KERNEL_IMAGEDEST = "boot"
-KERNEL_IMAGEDEST_apq8096 = "boot"
+KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 DEPENDS_append_aarch64 = " libgcc"
@@ -28,17 +23,7 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 
 # To be moved to machine specific conf
 # Provide a config baseline for things so the kernel will build...
-KERNEL_DEFCONFIG          = "mdm_defconfig"
-KERNEL_DEFCONFIG_mdm9607  = "mdm9607_defconfig"
-KERNEL_DEFCONFIG_apq8096  = "msm_defconfig"
-KERNEL_DEFCONFIG_apq8053  = "msmcortex_defconfig"
-KERNEL_DEFCONFIG_apq8009  = "msm8909_defconfig"
-KERNEL_DEFCONFIG_apq8009-perf  = "msm8909-perf_defconfig"
-KERNEL_DEFCONFIG_apq8017  = "msm8937_defconfig"
-KERNEL_DEFCONFIG_apq8017-perf  = "msm8937-perf_defconfig"
-KERNEL_DEFCONFIG_apq8053-perf  = "msmcortex-perf_defconfig"
-KERNEL_DEFCONFIG_msm8909w  = "msm8909w_defconfig"
-KERNEL_DEFCONFIG_msm8909 = "msm8909_defconfig"
+KERNEL_DEFCONFIG = "msmcortex_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -47,16 +32,15 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
-SRC_URI   +=  "file://0001-Revert-msm-cpp-Add-support-pagefault-handler-in-CPP.patch"
 
-SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
-S         =  "${WORKDIR}/kernel/msm-3.18"
+SRC_DIR   =  "${WORKSPACE}/kernel/msm-4.4"
+S         =  "${WORKDIR}/kernel/msm-4.4"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
 PV = "git-${GITVER}"
 PR = "r5"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
-DEPENDS_apq8096 += "mkbootimg-native dtc-native"
+DEPENDS += "mkbootimg-native dtc-native"
 PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
@@ -149,31 +133,11 @@ do_install_append() {
     oe_runmake_call -C ${STAGING_KERNEL_DIR} ARCH=${ARCH} CC="${KERNEL_CC}" LD="${KERNEL_LD}" headers_install O=${STAGING_KERNEL_BUILDDIR}
 }
 
-nand_boot_flag = "${@base_contains('DISTRO_FEATURES', 'nand-boot', '1', '0', d)}"
-
 
 do_deploy_prepend() {
 
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
         mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
-    fi
-    if [ ${nand_boot_flag} == "1" ]; then
-        dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
-
-        # Create separate images with dtb appended to zImage for all targets.
-        for d in ${dtb_files}; do
-            #Strip qcom from the result if its present.
-            targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
-            #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
-            qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
-            if [ ${qcom_check} == "qcom" ]; then
-                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-                ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-            else
-                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
-                ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
-            fi
-        done
     fi
 }
 
@@ -185,7 +149,7 @@ do_deploy () {
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-    cmdparams='noinitrd  rw console=ttyHSL0,115200,n8 androidboot.hardware=qcom ehci-hcd.park=3 msm_rtb.filter=0x37 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
+	cmdparams='root=/dev/ram boot_cpus=0-7 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 sched_enable_hmp=1 sched_enable_power_aware=1 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
@@ -193,7 +157,8 @@ do_deploy () {
         --cmdline "${cmdparams}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
-        --ramdisk_offset 0x0 \
+        --ramdisk_offset 0x2000000 \
+        --tags-addr 0x1e00000 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
