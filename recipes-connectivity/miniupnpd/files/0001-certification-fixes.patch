@@ -267,13 +267,16 @@ diff --git a/linux/miniupnpd.init.d.script b/linux/miniupnpd.init.d.script
 index ee6e47b..b29c249 100755
 --- a/linux/miniupnpd.init.d.script
 +++ b/linux/miniupnpd.init.d.script
-@@ -18,33 +18,18 @@ set -e
+@@ -16,35 +16,20 @@
+ set -e
+
  MINIUPNPD=/usr/sbin/miniupnpd
- ARGS='-f /etc/miniupnpd/miniupnpd.conf'
- 
+-ARGS='-f /etc/miniupnpd/miniupnpd.conf'
+-
 -IPTABLES_CREATE=/etc/miniupnpd/iptables_init.sh
 -IPTABLES_REMOVE=/etc/miniupnpd/iptables_removeall.sh
--
++ARGS='-f /data/miniupnpd/miniupnpd.conf'
+
  test -f $MINIUPNPD || exit 0
  
 -. /lib/lsb/init-functions
@@ -301,6 +304,7 @@ index ee6e47b..b29c249 100755
  	;;
    status)
  	status_of_proc /usr/sbin/miniupnpd miniupnpd
+
 diff --git a/miniupnpd.c b/miniupnpd.c
 index f785b01..4875de3 100755
 --- a/miniupnpd.c

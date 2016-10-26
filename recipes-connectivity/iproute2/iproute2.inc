@@ -29,7 +29,7 @@ INSANE_SKIP_${PN} = "dev-so"
 
 FILES_${PN} += "${libdir}/tc"
 FILES_${PN}-dbg += "${libdir}/tc/.debug"
-
+FILES_${PN} += "${userfsdatadir}/*"
 ALTERNATIVE_${PN} = "ip"
 ALTERNATIVE_TARGET[ip] = "${base_sbindir}/ip.${BPN}"
 ALTERNATIVE_LINK_NAME[ip] = "${base_sbindir}/ip"
