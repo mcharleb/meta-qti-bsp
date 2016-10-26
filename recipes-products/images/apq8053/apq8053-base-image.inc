@@ -121,6 +121,9 @@ IMAGE_INSTALL += "lib32-gtest"
 IMAGE_INSTALL += "lib32-qmmf-sdk"
 IMAGE_INSTALL += "lib32-cairo"
 
+IMAGE_INSTALL += "libpagemap"
+IMAGE_INSTALL += "procrank"
+
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below packages are open source packages that depend on proprietary packages
