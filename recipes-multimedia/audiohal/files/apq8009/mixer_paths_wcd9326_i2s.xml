@@ -1523,11 +1523,12 @@
 
     <path name="wsa-speaker-mono">
         <ctl name="SLIM RX0 MUX" value="AIF1_PB" />
-        <ctl name="SLIM_0_RX Channels" value="One" />
+        <ctl name="MI2S_RX Channels" value="One" />
         <ctl name="RX INT7_1 MIX1 INP0" value="RX0" />
         <ctl name="SpkrLeft COMP Switch" value="1" />
         <ctl name="SpkrLeft BOOST Switch" value="1" />
         <ctl name="SpkrLeft SWR DAC_Port Switch" value="1" />
+        <ctl name="RX INT7 VBAT SPKRL VBAT Enable" value="1" />
     </path>
 
 
