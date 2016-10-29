@@ -1,6 +1,6 @@
 # Rootfs creation.
 require mdm-bootimg.inc
-DEPENDS_append += "lk"
+
 # The OE-Core minimal boot image files.
 IMAGE_FSTYPES += "ubifs ubi"
 

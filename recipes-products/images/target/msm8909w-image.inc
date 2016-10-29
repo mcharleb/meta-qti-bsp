@@ -1,7 +1,6 @@
 # Rootfs creation.
 require mdm-bootimg.inc
-DEPENDS_append_aarch64 += "lib32-lk"
-DEPENDS_append_arm += "lk"
+
 # The OE-Core minimal boot image files.
 #IMAGE_FSTYPES = "ext4"
 
