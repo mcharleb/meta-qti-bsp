@@ -500,6 +500,10 @@ CONFIG_NEED_AP_MLME=y
 # Enable compiling libwpa_client as a dynamic library
 CONFIG_BUILD_WPA_CLIENT_SO=y
 
+# Enable P2P in wpa_supplicant
+CONFIG_P2P=y
+CONFIG_AP=y
+
 # Enable QMI EAP PROXY
 CONFIG_EAP_PROXY=qmi
 CONFIG_EAP_PROXY_DUAL_SIM := true
