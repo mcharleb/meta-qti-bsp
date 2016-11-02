@@ -1,5 +1,5 @@
 # The mkbootimg production process.
-require mdm-recovery-bootimg.inc
+require ../mdm-recovery-bootimg.inc
 
 DEPENDS += "bzip2 fsconfig-native"
 

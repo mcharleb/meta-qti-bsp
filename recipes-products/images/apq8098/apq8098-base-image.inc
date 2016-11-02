@@ -1,9 +1,8 @@
 # Rootfs creation.
-require mdm-bootimg.inc
-DEPENDS_append_aarch64 += "lib32-lk"
-DEPENDS_append_arm += "lk"
+
+DEPENDS_append += "edk2"
 # The OE-Core minimal boot image files.
-#IMAGE_FSTYPES = "ext4"
+IMAGE_FSTYPES = "ext4"
 
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -13,7 +12,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 #IMAGE_INSTALL += "alsa-intf"
 IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
-IMAGE_INSTALL += "tinycompress"
+#IMAGE_INSTALL += "tinycompress"
 
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
@@ -24,7 +23,7 @@ IMAGE_INSTALL += "tinycompress"
 #IMAGE_INSTALL += "pimd"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-IMAGE_INSTALL += "bluez5"
+#IMAGE_INSTALL += "bluez5"
 #IMAGE_INSTALL += "bridge-utils"
 #IMAGE_INSTALL += "compat-wireless-ath6kl"
 #IMAGE_INSTALL += "conntrack-tools"
@@ -37,16 +36,17 @@ IMAGE_INSTALL += "dnsmasq"
 #IMAGE_INSTALL += "e2fsprogs-mke2fs"
 #IMAGE_INSTALL += "ebtables"
 #IMAGE_INSTALL += "ethtool"
-DEPENDS += "gdb-cross-arm"
+DEPENDS += "gdb-cross-aarch64"
 #IMAGE_INSTALL += "gdbserver"
 #IMAGE_INSTALL += "gdb"
+#IMAGE_INSTALL += "glapp"
 IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "hostap-daemon-qcacld"
 # FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
-IMAGE_INSTALL += "init-audio"
+#IMAGE_INSTALL += "init-audio"
 #IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "init-mss"
 #IMAGE_INSTALL += "iptables"
@@ -84,30 +84,19 @@ IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
+IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
-#IMAGE_INSTALL += "system-core-liblog"
-#IMAGE_INSTALL += "system-core-libcutils"
+IMAGE_INSTALL += "liblog"
+IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "system-conf"
 IMAGE_INSTALL += "tcpdump"
 IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan"
-IMAGE_INSTALL += "wcnss"
-IMAGE_INSTALL += "wlan-opensource"
+#IMAGE_INSTALL += "wcnss"
+#IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
-#IMAGE_INSTALL += "icu"
-#IMAGE_INSTALL += "qt4-embedded"
-#IMAGE_INSTALL += "directfb"
-#IMAGE_INSTALL += "directfb-examples"
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
-
-# Below packages are open source packages that depend on proprietary packages
-
-#QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
-#IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
-
-#DATA_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/data')}"
-#IMAGE_INSTALL += "${@base_conditional('DATA_DIR_PRESENT', 'True', 'miniupnpd', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
