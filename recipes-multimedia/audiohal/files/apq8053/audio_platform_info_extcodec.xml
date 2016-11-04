@@ -47,6 +47,9 @@
         <usecase name="USECASE_VOICEMMODE1_CALL" type="out" id="35"/>
         <usecase name="USECASE_VOICEMMODE2_CALL" type="in" id="36"/>
         <usecase name="USECASE_VOICEMMODE2_CALL" type="out" id="36"/>
+        <usecase name="USECASE_AUDIO_RECORD_COMPRESS2" type="in" id="37"/>
+        <usecase name="USECASE_AUDIO_RECORD_COMPRESS3" type="in" id="38"/>
+        <usecase name="USECASE_AUDIO_RECORD_COMPRESS4" type="in" id="39"/>
     </pcm_ids>
     <config_params>
         <param key="native_audio_mode" value="src"/>
