@@ -3,7 +3,7 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|msm8909|apq8096|apq8053|apq8017|msm8909w)"
+COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|msm8909|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
@@ -39,6 +39,7 @@ KERNEL_DEFCONFIG_apq8017-perf  = "msm8937-perf_defconfig"
 KERNEL_DEFCONFIG_apq8053-perf  = "msmcortex-perf_defconfig"
 KERNEL_DEFCONFIG_msm8909w  = "msm8909w_defconfig"
 KERNEL_DEFCONFIG_msm8909 = "msm8909_defconfig"
+KERNEL_DEFCONFIG_sdxhedgehog = "sdx_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
