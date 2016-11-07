@@ -20,10 +20,15 @@ do_install() {
     mkdir -p ${D}/lib/firmware/wlan/prima
     cp -pP ${WORKSPACE}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
 }
-
+do_install_append() {
+   install -d ${D}/lib/firmware/wlan/prima
+   ln -s /persist/WCNSS_qcom_wlan_nv.bin ${D}/lib/firmware/wlan/prima/WCNSS_qcom_wlan_nv.bin
+   ln -s /persist/WCNSS_wlan_dictionary.dat ${D}/lib/firmware/wlan/prima/WCNSS_wlan_dictionary.dat
+}
 INITSCRIPT_NAME = "set_wcnss_mode"
 INITSCRIPT_PARAMS = "start 60 2 3 4 5 . stop 20 0 1 6 ."
 
 FILES_${PN} = "/lib/firmware/*"
 FILES_${PN} += "/etc/*"
+FILES_${PN} += "/lib/firmware/wlan/prima/*"
 
