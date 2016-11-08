@@ -20,6 +20,8 @@ DEPENDS = "glib-2.0 tinycompress tinyalsa expat system-media libhardware acdbloa
 EXTRA_OEMAKE = "DEFAULT_INCLUDES= CPPFLAGS="-I. -I${STAGING_KERNEL_BUILDDIR}/usr/include -I${STAGING_INCDIR}/surround_sound_3mic -I${STAGING_INCDIR}/sound_trigger""
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF += "--with-glib"
+
+EXTRA_OECONF += "BOARD_SUPPORTS_QAHW=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_HDMI_EDID=false"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_FM_POWER_OPT=false"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_USBAUDIO=false"
