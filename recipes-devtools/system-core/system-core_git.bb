@@ -28,7 +28,7 @@ CPPFLAGS_append_apq8096 += " -DTARGET_IS_64_BIT"
 COMPOSITION         = "9025"
 COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
-COMPOSITION_apq8096 = "901D"
+COMPOSITION_apq8096 = "9039"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
