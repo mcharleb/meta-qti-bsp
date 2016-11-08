@@ -46,8 +46,5 @@ z6:6:respawn:/sbin/sulogin
 #runs reboot daemon
 #rb:5:respawn:/sbin/reboot-daemon
 
-# Clean up any session file from a previous boot before starting mbimd
-# m1:5:wait:rm -f /var/run/qbi_session_active
-# m2:5:respawn:/usr/bin/mbimd
-m3:5:respawn:/usr/bin/diagrebootapp
+m1:5:respawn:/usr/bin/diagrebootapp
 
