@@ -3,7 +3,9 @@ inherit kernel
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
+
+COMPATIBLE_MACHINE = "(apq8098)"
+
 EXTRA_KERNEL_CMD_PARAMS ?= ""
 
 # Default image type is zImage, change here if needed.
@@ -12,7 +14,6 @@ KERNEL_IMAGETYPE = ""
 zImage_VAR="zImage"
 zImage_VAR="Image.gz-dtb"
 
-
 KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
 KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGETYPE_FOR_MAKE = ""
@@ -20,10 +21,6 @@ KERNEL_IMAGETYPE_FOR_MAKE = ""
 DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
-
-# To be moved to machine specific conf
-# Provide a config baseline for things so the kernel will build...
-KERNEL_DEFCONFIG = "msmcortex_defconfig"
 
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
@@ -48,7 +45,7 @@ RDEPENDS_kernel-base = ""
 FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
 
 do_configure () {
-    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_DEFCONFIG}
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${MACHINE_KERNEL_DEFCONFIG}
 }
 
 do_shared_workdir () {
@@ -149,12 +146,11 @@ do_deploy () {
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
-	cmdparams='root=/dev/ram boot_cpus=0-7 rw rootwait console=ttyMSM0,115200,n8 no_console_suspend=1 androidboot.hardware=qcom androidboot.console=ttyMSM0 sched_enable_hmp=1 sched_enable_power_aware=1 lpm_levels.sleep_disabled=1 ${EXTRA_KERNEL_CMD_PARAMS}'
 
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${cmdparams}" \
+        --cmdline "${MACHINE_KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
         --ramdisk_offset 0x2000000 \
