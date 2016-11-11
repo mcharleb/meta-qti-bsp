@@ -4,12 +4,20 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD high latency driver"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-# mdmcalifornium/sdxhedgehog: modulename = wlan_sdio.ko     chip name - qca9377
-# others        : modulename = wlan.ko          chip name -
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', 'mdmcalifornium', 'wlan_sdio', 'wlan', d)}"
-WLAN_MODULE_NAME = "${@base_conditional('BASEMACHINE', 'sdxhedgehog', 'wlan_sdio', 'wlan', d)}"
-CHIP_NAME = "${@base_conditional('BASEMACHINE', 'mdmcalifornium', 'qca9377', '', d)}"
-CHIP_NAME = "${@base_conditional('BASEMACHINE', 'sdxhedgehog', 'qca9377', '', d)}"
+# Targets - mdmcalifornium and sdxhedgehog: modulename = wlan_sdio.ko, chip name - qca9377
+# Other targets : modulename = wlan.ko, chip name -
+
+python __anonymous () {
+     if d.getVar('BASEMACHINE', True) == 'mdmcalifornium':
+         d.setVar('WLAN_MODULE_NAME', 'wlan_sdio')
+         d.setVar('CHIP_NAME', 'qca9377')
+     elif d.getVar('BASEMACHINE', True) == 'sdxhedgehog':
+         d.setVar('WLAN_MODULE_NAME', 'wlan_sdio')
+         d.setVar('CHIP_NAME', 'qca9377')
+     else:
+         d.setVar('WLAN_MODULE_NAME', 'wlan')
+         d.setVar('CHIP_NAME', '')
+}
 
 FILES_${PN}     += "${base_libdir}/firmware/wlan/*"
 FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko"
