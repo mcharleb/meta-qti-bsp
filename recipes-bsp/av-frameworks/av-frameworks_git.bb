@@ -16,5 +16,10 @@ SRC_URI   = "file://frameworks/av/"
 S = "${WORKDIR}/frameworks/av"
 
 FILES_${PN}-dbg    = "${libdir}/.debug/libcamera_client.*"
-FILES_${PN}        = "${libdir}/libcamera_client.so.* ${libdir}/pkgconfig/*"
+FILES_${PN}        = "${libdir}/libcamera_client.so.* ${libdir}/pkgconfig/* ${bindir}/mtpserver"
 FILES_${PN}-dev    = "${libdir}/libcamera_client.so ${libdir}/libcamera_client.la ${includedir}"
+
+
+do_configure_append() {
+    install -m 0644 ${WORKSPACE}/kernel/msm-3.18/include/uapi/linux/usb/f_mtp.h ${STAGING_INCDIR}/linux/usb/
+}
