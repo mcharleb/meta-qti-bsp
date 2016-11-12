@@ -11,8 +11,10 @@ SRC_URI = "file://mdm-init/"
 
 # Update for each machine
 S = "${WORKDIR}/mdm-init/"
-
-FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/*"
+do_install_append(){
+   install -m 0755 ${S}/wlan/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+}
+FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/* ${sysconfdir}/init.d/* "
 
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
@@ -27,7 +29,7 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'drone', '--enable-drone-wlan=yes', '', d)}"
 EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'drone', '--enable-pronto-wlan=yes', '', d)}"
 
-INITSCRIPT_NAME   = "wlan"
+INITSCRIPT_NAME   = "wlan_daemon"
 INITSCRIPT_PARAMS = "remove"
 INITSCRIPT_PARAMS_apq8009 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8053 = "start 98 5 . stop 2 0 1 6 ."
