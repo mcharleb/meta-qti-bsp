@@ -16,3 +16,8 @@ IMAGE_INSTALL += "wlan-services"
 IMAGE_INSTALL += "libcap"
 IMAGE_INSTALL += "attr"
 IMAGE_INSTALL += "iputils"
+
+IMAGE_INSTALL += "lib32-libbt-vendor"
+IMAGE_INSTALL += "lib32-fluoride"
+IMAGE_INSTALL += "lib32-bt-property"
+IMAGE_INSTALL += "lib32-bt-app"
