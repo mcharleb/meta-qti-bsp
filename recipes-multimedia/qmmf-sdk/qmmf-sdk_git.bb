@@ -16,8 +16,13 @@ DEPENDS += "av-frameworks"
 DEPENDS += "gtest"
 DEPENDS += "media"
 DEPENDS += "cairo"
+DEPENDS += "mm-parser"
+DEPENDS += "mm-osal"
 
 CFLAGS += "-I${STAGING_INCDIR}"
+CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
+CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include"
+
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
 EXTRA_OECONF += " --with-mm-core=${WORKSPACE}/hardware/qcom/media/mm-core/inc"
 EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
