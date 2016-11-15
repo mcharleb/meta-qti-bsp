@@ -1,5 +1,5 @@
 # List of packages installed onto the root file system as specified by the user.
-require ${MACHINE}/${MACHINE}-${PRODUCT}-image.inc
+require ${BASEMACHINE}/${MACHINE}-base-image.inc
 
 require mdm-bootimg.inc
 
