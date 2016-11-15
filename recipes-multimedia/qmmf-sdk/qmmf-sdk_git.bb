@@ -58,6 +58,10 @@ FILES_${PN}-libcodec_adaptor-dbg    = "${libdir}/.debug/libcodec_adaptor.*"
 FILES_${PN}-libcodec_adaptor        = "${libdir}/libcodec_adaptor.so.*"
 FILES_${PN}-libcodec_adaptor-dev    = "${libdir}/libcodec_adaptor.so ${libdir}/libcodec_adaptor.la ${includedir}"
 
+FILES_${PN}-libav_codec-dbg    = "${libdir}/.debug/libav_codec.*"
+FILES_${PN}-libav_codec        = "${libdir}/libav_codec.so.*"
+FILES_${PN}-libav_codec-dev    = "${libdir}/libav_codec.so ${libdir}/libav_codec.la ${includedir}"
+
 FILES_${PN}-libqmmf_audio_client-dbg    = "${libdir}/.debug/libqmmf_audio_client.*"
 FILES_${PN}-libqmmf_audio_client        = "${libdir}/libqmmf_audio_client.so.*"
 FILES_${PN}-libqmmf_audio_client-dev    = "${libdir}/libqmmf_audio_client.so ${libdir}/libqmmf_audio_client.la ${includedir}"
