@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5
 DEPENDS = "virtual/kernel"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r4-${KERNEL_VERSION}"
+PR = "r4_${KERNEL_VERSION}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://external/compat-wireless/drivers/net/ethernet/atheros/alx/ \

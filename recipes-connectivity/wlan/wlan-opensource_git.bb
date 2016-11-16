@@ -7,7 +7,7 @@ LICENSE = "BSD"
 
 FILES_${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r2-${KERNEL_VERSION}"
+PR = "r2_${KERNEL_VERSION}"
 
 DEPENDS = "virtual/kernel wireless-tools"
 

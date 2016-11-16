@@ -10,7 +10,7 @@ PROVIDES_NAME   = "kernel-module-wlan"
 RPROVIDES_${PN} += "${PROVIDES_NAME}"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r8-${KERNEL_VERSION}"
+PR = "r8_${KERNEL_VERSION}"
 
 # This DEPENDS is to serialize kernel module builds
 DEPENDS = "rtsp-alg"

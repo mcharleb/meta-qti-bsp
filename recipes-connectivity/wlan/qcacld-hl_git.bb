@@ -27,7 +27,7 @@ FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE
 RPROVIDES_${PN} += "${@'kernel-module-${WLAN_MODULE_NAME}'.replace('_', '-')}"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r0-${KERNEL_VERSION}"
+PR = "r0_${KERNEL_VERSION}"
 
 #This DEPENDS is to serialize kernel module builds
 DEPENDS = "rtsp-alg"
