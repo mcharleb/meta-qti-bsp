@@ -29,8 +29,18 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
+FindAndMountEXT4 () {
+   partition=$1
+   dir=$2
+   mmc_block_device=/dev/block/bootdevice/by-name/$partition
+   mkdir -p $dir
+   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
+}
+
 mount /data
 mount /firmware
 mount /mnt/persist
+
+FindAndMountEXT4 dsp /dsp
 
 exit 0
