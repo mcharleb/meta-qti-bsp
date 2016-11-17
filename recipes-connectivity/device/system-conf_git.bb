@@ -12,7 +12,7 @@ SRC_URI = "file://mdm-init/"
 # Update for each machine
 S = "${WORKDIR}/mdm-init/"
 do_install_append(){
-   install -m 0755 ${S}/wlan/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+   install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
 }
 FILES_${PN} += "${base_libdir}/firmware/wlan/qca_cld/* ${sysconfdir}/init.d/* "
 
