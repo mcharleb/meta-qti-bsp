@@ -18,6 +18,7 @@ rmts:2345:respawn:/sbin/rmt_storage
 tftp:2345:respawn:/sbin/tftp_server
 scrb:2345:respawn:/sbin/fs-scrub-daemon
 
+node:2345:wait:mknod -m 660 /dev/media0 c 251 0
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
 #
@@ -40,8 +41,5 @@ z6:6:respawn:/sbin/sulogin
 #runs reboot daemon
 #rb:5:respawn:/sbin/reboot-daemon
 
-# Clean up any session file from a previous boot before starting mbimd
-m1:5:wait:rm -f /var/run/qbi_session_active
-m2:5:respawn:/usr/bin/mbimd
-m3:5:respawn:/usr/bin/diagrebootapp
+m1:5:respawn:/usr/bin/diagrebootapp
 

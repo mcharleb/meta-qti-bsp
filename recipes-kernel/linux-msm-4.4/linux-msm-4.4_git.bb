@@ -153,8 +153,7 @@ do_deploy () {
         --cmdline "${MACHINE_KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
         --base ${MACHINE_KERNEL_BASE} \
-        --ramdisk_offset 0x2000000 \
-        --tags-addr 0x1e00000 \
+        --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
