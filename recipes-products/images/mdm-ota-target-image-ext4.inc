@@ -70,16 +70,19 @@ echo recovery_api_version=3 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.tx
 echo blocksize=131072 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #boot_size: Size of boot partition from partition.xml
-echo boot_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+echo boot_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #recovery_size : Size of recovery partition from partition.xml
-echo recovery_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+echo recovery_size=0x00F00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #system_size : Size of system partition from partition.xml
 echo system_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #userdate_size : Size of data partition from partition.xml
 echo userdata_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
+
+#cache_size : Size of data partition from partition.xml
+echo cache_size=0x00A00000 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
 
 #mkyaffs2_extra_flags : -c $(BOARD_KERNEL_PAGESIZE) -s $(BOARD_KERNEL_SPARESIZE)
 echo mkyaffs2_extra_flags=-c 4096 -s 16 >> ${OTA_TARGET_IMAGE_ROOTFS_EXT4}/META/misc_info.txt
