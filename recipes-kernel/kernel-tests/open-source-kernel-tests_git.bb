@@ -17,7 +17,7 @@ DEPENDS_append_mdm9635 = " qcacld-ll rtsp-alg"
 DEPENDS_append_mdm9640 = " qcacld-ll rtsp-alg"
 #DEPENDS_append_mdmcalifornium = " qcacld-ll rtsp-alg"
 
-PR = "r6-${MACHINE}"
+PR = "r6_${MACHINE}"
 
 CFLAGS_pn-${PN} = ""
 CPPFLAGS_pn-${PN} = ""
