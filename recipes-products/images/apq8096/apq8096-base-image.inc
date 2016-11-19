@@ -90,6 +90,8 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "system-core-adbd"
 IMAGE_INSTALL += "system-core-logd"
 IMAGE_INSTALL += "system-core-usb"
+IMAGE_INSTALL += "system-core-debuggerd"
+
 IMAGE_INSTALL += "liblog"
 IMAGE_INSTALL += "libcutils"
 IMAGE_INSTALL += "system-conf"

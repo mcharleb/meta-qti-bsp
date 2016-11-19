@@ -30,9 +30,12 @@ EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'drone', '--enable-drone-wla
 EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'drone', '--enable-pronto-wlan=yes', '', d)}"
 
 INITSCRIPT_NAME   = "wlan_daemon"
-INITSCRIPT_PARAMS = "remove"
 INITSCRIPT_PARAMS_apq8009 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8053 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8017 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8096 = "start 98 5 . stop 2 0 1 6 ."
 
+pkg_postinst_${PN} () {
+        [ -n "$D" ] && OPT="-r $D" || OPT="-s"
+        update-rc.d $OPT -f wlan_daemon remove
+}
