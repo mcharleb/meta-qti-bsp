@@ -1,103 +1,74 @@
-inherit androidmk deploy
-
-SUMMARY = "Multimedia libraries and SDK"
-SECTION = "multimedia"
-LICENSE = "BSD"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
-${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+inherit autotools pkgconfig qlicense
+DESCRIPTION = "media"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://hardware/qcom/media/"
-SRC_URI += "file://enable_decoder.patch"
 
-SRCREV = "${AUTOREV}"
-S      = "${WORKDIR}/hardware/qcom/media"
+S = "${WORKDIR}/hardware/qcom/media"
 
-DEPENDS += "adreno200"
+DEPENDS = "adreno200"
 DEPENDS += "display-hal"
 DEPENDS += "system-media"
 DEPENDS += "av-frameworks"
+DEPENDS += "glib-2.0"
 DEPENDS += "lib32-mm-video-noship"
 
-PACKAGES = "${PN}"
+#re-use non-perf settings
+BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
-EXTRA_OEMAKE += " BOARD_USES_ADRENO=true"
-EXTRA_OEMAKE += " VDEC_ENABLE=false"
-EXTRA_OEMAKE += " TARGETS_THAT_SUPPORT_PQ='msm8996 msmcobalt msm8953'"
+# setting video flags
+IS_ION = "yes"
+MEDIA_EXTN_SUPPORTED = "no"
 
-CFLAGS += "-Dstrlcpy=g_strlcpy"
-CFLAGS += "-Dstrlcat=g_strlcat"
-CFLAGS += "-I${STAGING_INCDIR}/cutils/"
-CFLAGS += "-I${STAGING_INCDIR}/adreno/"
-CFLAGS += "-I${STAGING_INCDIR}/libgpustats/"
-CFLAGS += "-I${STAGING_INCDIR}/ui/"
-CFLAGS += "-I${STAGING_INCDIR}"
-CFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
-CFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"
-CFLAGS += "-I${STAGING_KERNEL_DIR}/usr/include"
-CFLAGS += "-I${STAGING_INCDIR}/libgralloc/"
-CFLAGS += "-I${STAGING_INCDIR}/utils/"
-CFLAGS += "-I${STAGING_INCDIR}/binder/"
+IS_MSM8610 = '${@bb.utils.contains_any('BASEMACHINE', ["apq8010", "msm8610", "msm8010"], "yes", "", d)}'
+IS_MSM8953 = '${@bb.utils.contains_any('BASEMACHINE', ["apq8053", "msm8953", "msm8053"], "yes", "", d)}'
+IS_MSM8996 = '${@bb.utils.contains_any('BASEMACHINE', ["apq8096", "msm8996", "msm8096"], "yes", "", d)}'
+IS_MASTER_SIDE_CP = '${@bb.utils.contains_any('BASEMACHINE', ["apq8096", "msm8996"], "yes", "", d)}'
+UBWC_SUPPORTED = '${@bb.utils.contains_any('BASEMACHINE', ["msm8996", "msmcobalt", "apq8096"], "yes", "", d)}'
+PQ_SUPPORTED = '${@bb.utils.contains_any('BASEMACHINE', ["msm8996", "msm8953", "apq8096", "apq8053"], "yes", "", d)}'
+IS_MSM8226 = '${@bb.utils.contains_any('BASEMACHINE', ["msm8226", "msm8916", "msm8909", "apq8026", "apq8016", "apq8009"], "yes", "", d)}'
+MM-VIDEO = '${@bb.utils.contains_any('BASEMACHINE', ["apq8096", "apq8053", "apq8010"], "yes", "", d)}'
 
-CFLAGS += "-include stdint.h"
-CFLAGS += "-Dstrlcpy=g_strlcpy"
-CFLAGS += "-Dstrlcat=g_strlcat"
-CFLAGS += "-std=c++11"
+# configure features
+EXTRA_OECONF_append =" --enable-use-glib="yes""
+EXTRA_OECONF_append =" --enable-target-uses-ion=${IS_ION}"
+EXTRA_OECONF_append =" --enable-build-mm-video=${MM-VIDEO}"
+EXTRA_OECONF_append =" --enable-target-msm8953=${IS_MSM8953}"
+EXTRA_OECONF_append =" --enable-target-msm8996=${IS_MSM8996}"
+EXTRA_OECONF_append =" --enable-target-msm8610=${IS_MSM8610}"
+EXTRA_OECONF_append =" --enable-is-ubwc-supported=${UBWC_SUPPORTED}"
+EXTRA_OECONF_append =" --enable-targets-that-support-pq=${PQ_SUPPORTED}"
+EXTRA_OECONF_append =" --enable-targets-that-use-flag-msm8226=${IS_MSM8226}"
+EXTRA_OECONF_append =" --enable-master-side-cp-target-list=${IS_MASTER_SIDE_CP}"
+EXTRA_OECONF_append =" --enable-target-uses-media-extensions=${MEDIA_EXTN_SUPPORTED}"
 
-CFLAGS += "-include glib.h"
-CFLAGS += "-include glibconfig.h"
-CFLAGS += "-include sys/ioctl.h"
+# configure headers
+EXTRA_OECONF_append ="--with-glib"
+EXTRA_OECONF_append =" --with-ui-headers=${STAGING_INCDIR}/ui/"
+EXTRA_OECONF_append =" --with-android-headers=${STAGING_INCDIR}/"
+#EXTRA_OECONF_append =" --with-utils-headers=${STAGING_INCDIR}/utils/"
+#EXTRA_OECONF_append =" --with-cutils-headers=${STAGING_INCDIR}/cutils/"
+EXTRA_OECONF_append =" --with-glib-headers=${STAGING_INCDIR}/glib-2.0/"
+EXTRA_OECONF_append =" --with-binder-headers=${STAGING_INCDIR}/binder/"
+EXTRA_OECONF_append =" --with-adreno-headers=${STAGING_INCDIR}/adreno/"
+EXTRA_OECONF_append =" --with-glib-lib-dir=${STAGING_LIBDIR}/glib-2.0/include"
+EXTRA_OECONF_append =" --with-gralloc-headers=${STAGING_INCDIR}/libgralloc/"
+EXTRA_OECONF_append =" --with-qdutils-headers=${STAGING_INCDIR}/libqdutils/"
+EXTRA_OECONF_append =" --with-libgpustats-headers=${STAGING_INCDIR}/libgpustats/"
+EXTRA_OECONF_append =" --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
+EXTRA_OECONF_append =" --with-display-headers=${STAGING_INCDIR}/qcom/display"
 
-CFLAGS += "-DPTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP"
-CFLAGS += "-DVENC_PERF_NO_SUPPORT"
-
-LDFLAGS += "-lcutils"
-LDFLAGS += "-lglib-2.0"
-LDFLAGS += "-llog"
-LDFLAGS += "-lbase"
-LDFLAGS += "-lutils"
-LDFLAGS += "-lbinder"
-LDFLAGS += "-lgpustats"
-
-export TARGET_LIBRARY_SUPPRESS_LIST="libgui libbinder"
-
-do_fixup_before_compile () {
-    #
-    # replace "$(TOP)/hardware/qcom/media/" in mk files
-    find ${S}/ -type f -name "*.mk" -exec sed -i 's/\$(TOP)\/hardware\/qcom\/media\//\$(QCOM_MEDIA_ROOT)\//g' {} +
-
-    #
-    # replace "hardware/qcom/media/" in mk files
-    find ${S}/ -type f -name "*.mk" -exec sed -i 's/hardware\/qcom\/media\//\$(QCOM_MEDIA_ROOT)\//g' {} +
-
-    #
-    # comment out all the occurrences of "-D_VQZIP_" in mk files
-    find ${S}/ -type f -name "*.mk" -exec sed -i 's/libmm-venc-def\ +=\ -D_VQZIP_/\#libmm-venc-def\ +=\ -D_VQZIP_/g' {} +
-
-    # Donot build the libstagefrighthw OMXPlugin
-    rm -f ${S}/libstagefrighthw/Android.mk
-
-    #
-    # replace $(TARGET_OUT_HEADERS)/adreno with $(TARGET_SYSROOT)/usr/include/adreno
-    find ${S}/ -type f -name "*.mk" -exec sed -i 's/$(TARGET_OUT_HEADERS)\/adreno/$(TARGET_SYSROOT)\/usr\/include\/adreno/g' {} +
-}
-addtask fixup_before_compile after do_patch before do_configure
-
-do_compile() {
-    # Current support is limited to 32-bit build
-    #
-    if [ "${MLPREFIX}" == "lib32-" ]; then
-        androidmk_setenv
-        oe_runmake -f ${LA_COMPAT_DIR}/build/core/main.mk BUILD_MODULES_IN_PATHS=${S} \
-            all_modules SHOW_COMMANDS=true || die "make failed"
-    else
-        die "not supported"
-    fi
-}
+FILES_${PN}-dbg  = "${libdir}/.debug/*"
+FILES_${PN}      = "${libdir}/*.so ${libdir}/*.so.* ${libdir}/*.so.*.*.* ${sysconfdir}/* ${bindir}/* ${libdir}/pkgconfig/*"
+FILES_${PN}-dev  = "${libdir}/*.la ${includedir}"
 
 do_install_append() {
-        install -d ${D}${includedir}
-        install -m 0644 ${S}/mm-core/inc/*.h -D ${D}${includedir}/mm-core/
-        install -m 0644 ${S}/mm-video-v4l2/vidc/venc/inc/omx_video_common.h -D ${D}${includedir}/mm-video-v4l2/vidc/venc/inc/omx_video_common.h
-        install -m 0644 ${S}/libstagefrighthw/QComOMXMetadata.h	-D ${D}${includedir}/libstagefrighthw/QComOMXMetadata.h
+    oe_runmake DESTDIR="${D}/" LIBVER="${LV}" install
+    mkdir -p ${STAGING_INCDIR}/mm-core
+	mkdir -p ${STAGING_INCDIR}/libstagefrighthw
+	install -m 0644 ${S}/mm-core/inc/*.h ${STAGING_INCDIR}/mm-core
+    install -m 0644 ${S}/libstagefrighthw/*.h ${STAGING_INCDIR}/libstagefrighthw
 }
+
+INSANE_SKIP_${PN} += "dev-so"
+EXCLUDE_FROM_SHLIBS = "1"
