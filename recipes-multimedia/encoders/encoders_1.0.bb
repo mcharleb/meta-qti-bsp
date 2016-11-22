@@ -1,6 +1,10 @@
 inherit autotools qcommon
 
 DESCRIPTION = "encoders"
+LICENSE = "BSD"
+LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
+${LICENSE};md5=3775480a712fc46a69647678acb234cb"
+
 PR = "r0"
 
 #re-use non-perf settings
