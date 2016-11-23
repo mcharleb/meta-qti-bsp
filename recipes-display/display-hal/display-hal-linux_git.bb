@@ -23,6 +23,7 @@ CPPFLAGS += "-DPAGE_SIZE=4096"
 CPPFLAGS += "-I${WORKSPACE}/display/display-hal/libqdutils"
 CPPFLAGS += "-I${WORKSPACE}/display/display-hal/libqservice"
 CPPFLAGS += "-I${WORKSPACE}/display/display-hal/sdm/include"
+CPPFLAGS += "-I${WORKSPACE}/display/display-hal/include"
 CPPFLAGS += "-I${WORKSPACE}/display/display-hal/libgralloc"
 CPPFLAGS += "-I${WORKSPACE}/system/core/include"
 
