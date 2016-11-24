@@ -28,7 +28,7 @@ CPPFLAGS_append_apq8096 += " -DTARGET_IS_64_BIT"
 COMPOSITION         = "9025"
 COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
-COMPOSITION_apq8096 = "9039"
+COMPOSITION_apq8096 = "901D"
 COMPOSITION_sdxhedgehog = "901D"
 
 do_install_append() {
