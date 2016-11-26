@@ -17,9 +17,6 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://bootable/bootloader/lk"
 S         =  "${WORKDIR}/bootable/lk"
 
-BASEMACHINE        = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
-MY_TARGET          = "${BASEMACHINE}"
 MY_TARGET_mdmcalifornium = "mdm9640"
 MY_TARGET_sdxhedgehog = "mdm9640"
 MY_TARGET_apq8009  = "msm8909"
@@ -29,6 +26,7 @@ MY_TARGET_apq8096  = "msm8996"
 MY_TARGET_mdm9607  = "mdm9607"
 MY_TARGET_apq8053  = "msm8953"
 MY_TARGET_apq8017  = "msm8952"
+MY_TARGET         ?= "${BASEMACHINE}"
 
 BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsboot', 'appsboot', d)}"
 

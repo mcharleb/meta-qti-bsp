@@ -22,12 +22,8 @@ LDFLAGS_append = " -llog "
 EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-glib \
+                --enable-target=${BASEMACHINE} \
                "
-
-#re-use non-perf settings
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
-EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 
 do_install_append () {
     install -d ${D}${sysconfdir}/bluetooth

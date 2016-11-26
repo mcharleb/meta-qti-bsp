@@ -7,9 +7,6 @@ ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
 PR = "r0"
 
-#re-use non-perf settings
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
 SRC_DIR = "${WORKSPACE}/hardware/qcom/audio/mm-audio/"
 
 S = "${WORKDIR}/hardware/qcom/audio/mm-audio/"
