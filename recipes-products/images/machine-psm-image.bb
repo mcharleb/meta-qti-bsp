@@ -1,5 +1,5 @@
-# List of FOSS packages installed onto the root file system as specified by the user.
-include ${MACHINE}-${PRODUCT}-image.inc
+# List of packages installed onto the root file system as specified by the user.
+include ${BASEMACHINE}/${MACHINE}-psm-image.inc
 
 include machine-image.bb
 

@@ -1,0 +1,7 @@
+BASEMACHINE ??= ""
+
+# Add BASEMACHINE to machine overrides
+MACHINEOVERRIDES =. "${@['', '${BASEMACHINE}:']['${BASEMACHINE}' != '']}"
+
+# Define BASEMACHINE_ARCH
+BASEMACHINE_ARCH =  "${@['${MACHINE_ARCH}', '${BASEMACHINE}']['${BASEMACHINE}' != '']}"
