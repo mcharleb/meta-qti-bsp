@@ -36,12 +36,6 @@ do_install () {
 
     install -d ${FIRMWARE_PATH}
     install -m 0644 ${S}/firmware_bin/WCNSS_cfg.dat ${FIRMWARE_PATH}/
-    # if 64 bit then we need to install the config file into /lib/ instead of
-    # /lib64/ since the software doesn't look in that location
-    if [ ${SITEINFO_BITS}  = 64 ]; then
-        install -m 0644 ${S}/firmware_bin/WCNSS_qcom_cfg.ini ${FIRMWARE_PATH}/
-    fi
-
     install -d ${D}${includedir}/qcacld/
     install -m 0644 ${S}/CORE/SVC/external/wlan_nlink_common.h ${D}${includedir}/qcacld/
 }
