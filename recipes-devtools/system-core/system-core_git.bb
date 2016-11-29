@@ -63,15 +63,15 @@ do_install_append_apq8017(){
 
 INITSCRIPT_PACKAGES =+ "${PN}-usb"
 INITSCRIPT_NAME_${PN}-usb = "usb"
-INITSCRIPT_PARAMS_${PN}-usb = "start 30 5 ."
+INITSCRIPT_PARAMS_${PN}-usb = "start 30 2 3 4 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-debuggerd"
 INITSCRIPT_NAME_${PN}-debuggerd = "init_debuggerd"
-INITSCRIPT_PARAMS_${PN}-debuggerd = "start 31 5 ."
+INITSCRIPT_PARAMS_${PN}-debuggerd = "start 31 2 3 4 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-logd"
 INITSCRIPT_NAME_${PN}-logd = "logd"
-INITSCRIPT_PARAMS_${PN}-logd = "start 10 5 ."
+INITSCRIPT_PARAMS_${PN}-logd = "start 10  2 3 4 5 ."
 
 INITSCRIPT_PACKAGES =+ "${PN}-post-boot"
 INITSCRIPT_NAME_${PN}-post-boot = "init_qcom_post_boot"
