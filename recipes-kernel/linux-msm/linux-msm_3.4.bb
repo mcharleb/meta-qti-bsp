@@ -1,6 +1,3 @@
-#re-use non-perf settings
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
 include linux-${BASEMACHINE}.inc
 
 inherit linux-kernel-base localgit

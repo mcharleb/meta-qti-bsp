@@ -23,17 +23,10 @@ S = "${WORKDIR}/mm-video-oss"
 
 LV = "1.0.0"
 
-#re-use non-perf settings
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
-EXTRA_OECONF_append = "--with-libhardware-headers=${WORKSPACE}/hardware/libhardware "
-EXTRA_OECONF_append = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include "
+EXTRA_OECONF_append = " --with-libhardware-headers=${WORKSPACE}/hardware/libhardware "
+EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include "
 EXTRA_OECONF_append = " --with-common-includes=${STAGING_INCDIR}"
-EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8655', ' --enable-target-msm7630=yes', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8960', ' --enable-target-msm8960=yes', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8974', ' --enable-target-msm8974=yes', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8610', ' --enable-target-msm8610=yes', '', d)}"
-EXTRA_OECONF_append = "${@base_conditional('BASEMACHINE', 'msm8226', ' --enable-target-msm8226=yes', '', d)}"
+EXTRA_OECONF_append = " --enable-target-${BASEMACHINE}=yes"
 
 CPPFLAGS += "-I${STAGING_INCDIR}/glib-2.0"
 CPPFLAGS += "-I${STAGING_LIBDIR}/glib-2.0/include"

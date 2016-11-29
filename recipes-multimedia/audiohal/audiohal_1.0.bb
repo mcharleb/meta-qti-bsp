@@ -6,11 +6,9 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 ${LICENSE};md5=3775480a712fc46a69647678acb234cb"
 
-TARGET = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
-
 FILESPATH =+ "${WORKSPACE}/:"
 SRC_URI  = "file://hardware/qcom/audio/"
-SRC_URI += "file://${TARGET}/"
+SRC_URI += "file://${BASEMACHINE}/"
 
 S = "${WORKDIR}/hardware/qcom/audio/"
 PR = "r0"
@@ -48,9 +46,9 @@ EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_MULTI_RECORD=true"
 EXTRA_OECONF += "AUDIO_FEATURE_ENABLED_PROXY_DEVICE=true"
 
 do_install_append() {
-   if [ -d "${WORKDIR}/${TARGET}" ] && [ $(ls -1  ${WORKDIR}/${TARGET} | wc -l) -ne 0 ]; then
+   if [ -d "${WORKDIR}/${BASEMACHINE}" ] && [ $(ls -1  ${WORKDIR}/${BASEMACHINE} | wc -l) -ne 0 ]; then
       install -d ${D}${sysconfdir}
-      install -m 0755 ${WORKDIR}/${TARGET}/* ${D}${sysconfdir}/
+      install -m 0755 ${WORKDIR}/${BASEMACHINE}/* ${D}${sysconfdir}/
    fi
 
    #Userspace expects hal name to be audio.primary.default
