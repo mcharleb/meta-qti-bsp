@@ -30,6 +30,7 @@ COMPOSITION_apq8009 = "9091"
 COMPOSITION_apq8053 = "901D"
 COMPOSITION_apq8096 = "901D"
 COMPOSITION_sdxhedgehog = "901D"
+COMPOSITION_apq8098 = "901D"
 
 do_install_append() {
    install -m 0755 ${S}/adb/start_adbd -D ${D}${sysconfdir}/init.d/adbd
