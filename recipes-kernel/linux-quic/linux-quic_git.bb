@@ -31,6 +31,8 @@ KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
+KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${MACHINE_KERNEL_PERF_DEFCONFIG}', '${MACHINE_KERNEL_DEFCONFIG}', d)}"
+
 #PACKAGE_ARCH = "${MACHINE_ARCH}"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
@@ -52,7 +54,7 @@ FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
 
 # Additional defconfigs for systemd
 do_defconfig_patch () {
-cat >> ${S}/arch/${ARCH}/configs/${MACHINE_KERNEL_DEFCONFIG} <<KERNEL_EXTRACONFIGS
+cat >> ${S}/arch/${ARCH}/configs/${KERNEL_CONFIG} <<KERNEL_EXTRACONFIGS
 CONFIG_DEVTMPFS=y
 CONFIG_DEVTMPFS_MOUNT=y
 CONFIG_FHANDLE=y
@@ -65,7 +67,7 @@ do_patch_append () {
 }
 
 do_configure () {
-    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${MACHINE_KERNEL_DEFCONFIG}
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_CONFIG}
 }
 
 do_shared_workdir () {
