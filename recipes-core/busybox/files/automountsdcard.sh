@@ -5,7 +5,7 @@ destdir=/mnt/sdcard/
 umount_partition()
 {
         if grep -qs "^/dev/$1 " /proc/mounts ; then
-                umount "${destdir}";
+                umount -lf "${destdir}";
         fi
 }
 
