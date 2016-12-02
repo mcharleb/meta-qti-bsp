@@ -18,9 +18,11 @@ DEPENDS += "qmmf-sdk"
 DEPENDS += "mm-mux"
 DEPENDS += "vam-lib"
 DEPENDS += "vam-test"
+DEPENDS += "mm-video-noship"
 
 TARGET_CFLAGS += "-I${STAGING_INCDIR} -I${STAGING_INCDIR}/recorder/"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include -I${STAGING_INCDIR}/mm-mux"
+TARGET_CFLAGS += "-I ${STAGING_INCDIR}/libnl3"
 EXTRA_OECONF += " --with-camerahal=${WORKSPACE}/camera/lib/QCamera2/HAL3"
 EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 

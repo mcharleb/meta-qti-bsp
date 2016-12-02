@@ -10,7 +10,7 @@ SRC_URI += "file://0001-live555-Update-fps-and-bank-size-value.patch"
 SRC_URI += "file://0002-live555-Decrease-RTP-buffer-size.patch"
 SRC_URI += "file://0003-live555-Avoid-instabilities-in-MPEG2TransportStreamF.patch"
 SRC_URI += "file://0004-live555-Add-support-for-metadata-streaming.patch"
-
+SRC_URI += "file://0001-live555-Add-support-for-server-port-reuse.patch"
 # commit d9e97d7953d531a243a8372870bdb6c7a9bb80cb
 SRCREV = "d9e97d7953d531a243a8372870bdb6c7a9bb80cb"
 
