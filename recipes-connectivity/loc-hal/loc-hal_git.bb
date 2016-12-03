@@ -18,6 +18,12 @@ EXTRA_OECONF = "--with-libhardware-includes=${STAGING_INCDIR} \
 
 CPPFLAGS += "-I${WORKSPACE}/base/include"
 
+PACKAGES = "${PN}"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
+FILES_${PN} = "${libdir}/* ${sysconfdir}"
+# The loc-hal package contains symlinks that trip up insane
+INSANE_SKIP_${PN} = "dev-so"
+
 do_install_append() {
    install -m 0644 -D ${S}/etc/gps.conf ${D}${sysconfdir}/gps.conf
 }
