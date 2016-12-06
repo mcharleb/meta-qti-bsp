@@ -11,7 +11,7 @@ SRC_URI = "file://qcom-opensource/bt/bt-app/"
 
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
-DEPENDS += "libhardware glib-2.0 btobex"
+DEPENDS += "libhardware gen-gatt glib-2.0 btobex"
 
 CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
@@ -22,6 +22,7 @@ EXTRA_OECONF = " \
                 --with-glib \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-btobex \
+                --with-gengatt \
                "
 
 do_install_append() {
