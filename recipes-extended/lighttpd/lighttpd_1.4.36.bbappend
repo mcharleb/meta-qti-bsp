@@ -6,6 +6,7 @@ SRC_URI += "\
     file://lighttpd.user \
     file://openssl.cnf \
     file://lighttpd.service \
+    file://mod_cgi_unpatch.patch \
 "
 DEPENDS += " openssl"
 RDEPENDS_${PN} += " \
@@ -21,7 +22,14 @@ EXTRA_OECONF += " \
              --with-openssl-libs=${STAGING_LIBDIR} \
 "
 do_install_append() {
-    install -m 0755 ${WORKDIR}/openssl.cnf ${D}${sysconfdir}
-    install -m 0770 ${WORKDIR}/lighttpd.user ${D}/www/lighttpd.user
-    rm -rf ${D}/www/logs ${D}/www/var
+   install -d ${D}${userfsdatadir}
+   install -d ${D}${userfsdatadir}/www
+   install -m 0755 ${WORKDIR}/openssl.cnf ${D}${userfsdatadir}
+   install -m 0770 ${WORKDIR}/lighttpd.user ${D}${userfsdatadir}/www/lighttpd.user
+   rm -rf ${D}${sysconfdir}/lighttpd.conf
+   install -m 0755 ${WORKDIR}/lighttpd.conf ${D}${userfsdatadir}
+   rm -rf ${D}/www/logs ${D}/www/var
 }
+FILES_${PN} += "${userfsdatadir}/lighttpd.conf"
+FILES_${PN} += "${userfsdatadir}/openssl.cnf"
+FILES_${PN} += "${userfsdatadir}/www/*"

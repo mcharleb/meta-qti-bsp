@@ -18,6 +18,7 @@ SRC_URI = "\
     file://0001-initial-notify.patch \
     file://0001-chunked-data.patch \
     file://0001-search-criteria.patch \
+    file://init.patch \
 "
 
 SRC_URI[md5sum] = "879027192c89e5376cdd2ae2d1aa33b4"
@@ -27,7 +28,9 @@ do_install_append () {
     sed -i s:#network_interface=eth0:network_interface=bridge0,ppp0:g minidlna.conf
     sed -i s:"#friendly_name=My DLNA Server":"friendly_name=9x35 MobileAP DLNA":g minidlna.conf
     install -d ${D}${sysconfdir}
-    install --mode=0644 -b ${WORKDIR}/${PN}-${PV}/${PN}.conf ${D}${sysconfdir}    
+    install -d ${D}${userfsdatadir}
+    install -m 644  ${WORKDIR}/${PN}-${PV}/${PN}.conf ${D}${userfsdatadir}
     install -d ${D}${sysconfdir}/init.d/
     install ${WORKDIR}/${PN}-${PV}/linux/${PN}.init.d.script ${D}${sysconfdir}/init.d/minidlna
 }
+FILES_${PN} += "${userfsdatadir}/minidlna.conf"

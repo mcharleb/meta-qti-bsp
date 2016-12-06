@@ -23,3 +23,9 @@ EXTRA_OECONF = " \
 SRC_URI[md5sum] = "c88819d19a69bbe7c1d3572944f813c4"
 SRC_URI[sha256sum] = "27c30690a23670f62a128fd1ec918274de5974e7166a5259f2eeecf9f3f31e4a"
 
+do_install_append() {
+  install -d ${D}${userfsdatadir}/
+  install -m 644 ${WORKDIR}/image/etc/tinyproxy.conf ${D}${userfsdatadir}/
+  rm -rf ${sysconfdir}/tinyproxy.conf
+}
+FILES_${PN} += "${userfsdatadir}/tinyproxy.conf"
