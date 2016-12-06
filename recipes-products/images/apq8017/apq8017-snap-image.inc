@@ -1,2 +1,2 @@
-require ${MACHINE}-base-image.inc
+require apq8017-base-image.inc
 

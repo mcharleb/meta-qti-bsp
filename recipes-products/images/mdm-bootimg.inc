@@ -11,8 +11,18 @@ DEPENDS = " \
              mtd-utils-native \
 "
 
+IMAGE_LINGUAS = ""
+
 # Image output types
 IMAGE_FSTYPES = "tar.gz ${INITRAMFS_FSTYPES}"
+
+# Use busybox as login manager
+IMAGE_LOGIN_MANAGER = "busybox-static"
+
+# Include minimum init and init scripts
+IMAGE_DEV_MANAGER = "busybox-static-mdev"
+IMAGE_INIT_MANAGER = "sysvinit sysvinit-pidof"
+IMAGE_INITSCRIPTS = ""
 
 IMAGE_PREPROCESS_COMMAND_prepend = " gen_buildprop;"
 
