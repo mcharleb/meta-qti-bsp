@@ -15,8 +15,7 @@ MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
 
 SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
-#Enable for NAND based targets only
-DISTRO_FEATURES += "nand-boot"
+DISTRO ?= "mdm"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 

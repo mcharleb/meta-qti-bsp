@@ -15,8 +15,8 @@ MACHINE_DISPLAY_HEIGHT_PIXELS ?= "640"
 
 SERIAL_CONSOLE ?= "115200 ttyHSL0"
 
-#Enable emmc boot
-DISTRO_FEATURES += "emmc-boot"
+DISTRO ?="msm"
+
 DISTRO_FEATURES += "persist-image"
 
 MACHINE_FEATURES += "kernel26 keyboard"
