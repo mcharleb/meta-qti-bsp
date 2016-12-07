@@ -1,5 +1,5 @@
-# List of FOSS packages installed onto the root file system as specified by the user.
-include target/${MACHINE}-recovery-image.inc
+# List of packages installed onto the root file system as specified by the user.
+include ${BASEMACHINE}/${BASEMACHINE}-recovery-image.inc
 
 IMAGE_LINGUAS = ""
 

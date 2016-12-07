@@ -1,7 +1,6 @@
 # List of packages installed onto the root file system as specified by the user.
-include ${BASEMACHINE}/${MACHINE}-psm-image.inc
+include ${BASEMACHINE}/${BASEMACHINE}-psm-image.inc
 
-include machine-image.bb
+require mdm-bootimg.inc
 
-# Call function makesystem to generate sparse ext4 image
-addtask makesystem after do_rootfs before do_build
+inherit core-image

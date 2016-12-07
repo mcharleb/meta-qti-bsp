@@ -1,7 +1,7 @@
 #Include the drone settings
 
 # Get base product settings
-require ${MACHINE}-base-image.inc
+require apq8096-base-image.inc
 
 #IMAGE_INSTALL += "q6-admin-adsp"
 IMAGE_INSTALL += "q6-admin-slpi"
