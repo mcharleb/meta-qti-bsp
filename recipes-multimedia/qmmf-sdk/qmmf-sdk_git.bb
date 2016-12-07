@@ -22,6 +22,7 @@ DEPENDS += "mm-osal"
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
 CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include"
+TARGET_CFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
 EXTRA_OECONF += " --with-mm-core=${WORKSPACE}/hardware/qcom/media/mm-core/inc"
