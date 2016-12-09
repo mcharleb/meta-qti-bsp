@@ -2,3 +2,4 @@
 
 allow init_t self:process execstack;
 allow init_t self:process execmem;
+dev_relabelto_irsc_util(kernel_t)

@@ -37,6 +37,7 @@ type bootlogd_exec_t;
 init_daemon_domain(bootlogd_t, bootlogd_exec_t)
 #02putty.log
 #============= bootlogd_t ==============
+init_getattr_initctl(bootlogd_t);
 allow bootlogd_t device_t:chr_file getattr;
 allow bootlogd_t device_t:file { read write getattr };
 dev_getattr_all_chr_files(bootlogd_t)
