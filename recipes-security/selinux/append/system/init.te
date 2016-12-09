@@ -1,0 +1,4 @@
+# Appended to modules/system/init.te in meta-selinux
+
+allow init_t self:process execstack;
+allow init_t self:process execmem;
