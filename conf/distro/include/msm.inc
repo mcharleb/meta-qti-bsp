@@ -34,6 +34,8 @@ PACKAGE_SNAP_LIB_SYMLINKS = "1"
 #for packages that don't create proper symlinks
 PACKAGE_SNAP_LIB_SYMLINKS_pn-adreno200 = "0"
 PACKAGE_SNAP_LIB_SYMLINKS_pn-location-geofence = "0"
+PACKAGE_SNAP_LIB_SYMLINKS_pn-izat-core = "0"
+PACKAGE_SNAP_LIB_SYMLINKS_pn-loc-hal = "0"
 PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-core-oss = "0"
 PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-video-oss = "0"
 PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-core-prop = "0"

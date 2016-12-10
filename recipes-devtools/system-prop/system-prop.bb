@@ -17,9 +17,9 @@ do_compile() {
 }
 
 do_install() {
-    install -d ${D}
-    install ${S}/build.prop ${D}/build.prop
+    install -d ${D}${userfsdatadir}
+    install ${S}/build.prop ${D}${userfsdatadir}/build.prop
 }
 
 PACKAGES = "${PN}"
-FILES_${PN} += "/build.prop"
+FILES_${PN} += "${userfsdatadir}/build.prop"
