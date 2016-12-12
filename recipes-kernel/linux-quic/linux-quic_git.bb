@@ -6,22 +6,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
 
-EXTRA_KERNEL_CMD_PARAMS ?= ""
+# Default image type is zImage, change it in machine conf if needed.
+KERNEL_IMAGETYPE ?= "zImage"
 
-# Default image type is zImage, change here if needed.
-KERNEL_IMAGETYPE = ""
-# Where built kernel lies in the kernel tree
-zImage_VAR="zImage"
-zImage_VAR_apq8053="Image.gz-dtb"
-zImage_VAR_apq8096="Image.gz-dtb"
-zImage_VAR_apq8009="zImage-dtb"
-zImage_VAR_msm8909w="zImage-dtb"
-zImage_VAR_apq8017="Image.gz-dtb"
+# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
+# to kernel.bbclass. We override the variable as msm kernel can't
+# support alternate image builds
+python __anonymous () {
+  if d.getVar("KERNEL_IMAGETYPE", True):
+      d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
+}
 
-KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
-#KERNEL_IMAGEDEST = "boot"
 KERNEL_IMAGEDEST_apq8096 = "boot"
-KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
@@ -31,9 +27,10 @@ KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
-KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${MACHINE_KERNEL_PERF_DEFCONFIG}', '${MACHINE_KERNEL_DEFCONFIG}', d)}"
+KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_DEFCONFIG}', '${KERNEL_DEFCONFIG}', d)}"
 
-#PACKAGE_ARCH = "${MACHINE_ARCH}"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
 SRC_URI   +=  "file://0001-Revert-msm-cpp-Add-support-pagefault-handler-in-CPP.patch"
@@ -41,8 +38,8 @@ SRC_URI   +=  "file://0001-Revert-msm-cpp-Add-support-pagefault-handler-in-CPP.p
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
-PV = "git-${GITVER}"
-PR = "r5"
+PV = "git"
+PR = "r5-${GITVER}"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS_apq8096 += "mkbootimg-native dtc-native"
@@ -50,7 +47,7 @@ PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
 # Put the zImage in the kernel-dev pkg
-FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
+FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
 
 # Additional defconfigs for systemd
 do_defconfig_patch () {
@@ -143,7 +140,7 @@ do_shared_workdir () {
 
         # Make vmlinux available as soon as possible
         install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
         install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
         install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
 }
@@ -154,26 +151,25 @@ do_install_append() {
 
 nand_boot_flag = "${@base_contains('DISTRO_FEATURES', 'nand-boot', '1', '0', d)}"
 
-
 do_deploy_prepend() {
 
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
-        mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+        mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
     fi
     if [ ${nand_boot_flag} == "1" ]; then
-        dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${MACHINE_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
+        dtb_files=`find ${B}/arch/${ARCH}/boot/dts -iname *${KERNEL_DTS_NAME}*.dtb | awk -Fdts/ '{print $NF}' | awk -F[.][d] '{print $1}'`
 
         # Create separate images with dtb appended to zImage for all targets.
         for d in ${dtb_files}; do
             #Strip qcom from the result if its present.
-            targets=`echo ${d#${MACHINE_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
+            targets=`echo ${d#${KERNEL_DTS_NAME}-}| awk '{split($0,a, "/");print a[2]}'`
             #If dtb are stored inside qcom then we need to search for them inside qcom, else inside dts.
             qcom_check=`echo ${d}| awk '{split($0,a, "/");print a[1]}'`
             if [ ${qcom_check} == "qcom" ]; then
-                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+                cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/qcom/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
                 ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/qcom/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
             else
-                cat ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${zImage_VAR}-${KERNEL_VERSION}-${targets}
+                cat ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} ${B}/arch/${ARCH}/boot/dts/${d}.dtb > ${B}/arch/${ARCH}/boot/dts/dtb-${KERNEL_IMAGETYPE}-${KERNEL_VERSION}-${targets}
                 ${STAGING_BINDIR_NATIVE}/dtbtool ${B}/arch/${ARCH}/boot/dts/ -s ${PAGE_SIZE} -o ${D}/${KERNEL_IMAGEDEST}/masterDTB -p ${B}/scripts/dtc/ -v
             fi
         done
@@ -184,17 +180,17 @@ do_deploy () {
 
     extra_mkbootimg_params=""
     if [ ${nand_boot_flag} == "1" ]; then
-        extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET}'
+        extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
 
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${MACHINE_KERNEL_CMD_PARAMS}" \
+        --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
-        --base ${MACHINE_KERNEL_BASE} \
+        --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
