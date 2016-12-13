@@ -11,18 +11,17 @@ si::sysinit:/etc/init.d/rcS
 # What to do in single-user mode.
 ~~:S:wait:/sbin/sulogin
 
-#Set the storage daemons to respawn
 # NOTE: These entries should be above the rc
 #       run level entries with wait below.
-rmts:2345:respawn:/sbin/rmt_storage
-tftp:2345:respawn:/sbin/tftp_server
-scrb:2345:respawn:/sbin/fs-scrub-daemon
 
 node:2345:wait:mknod -m 660 /dev/media0 c 251 0
 
 qcam:2345:respawn:/system/bin/mm-qcamera-daemon
 qmfs:2345:respawn:/usr/bin/qmmf-server
 qmfw:2345:respawn:/usr/bin/qmmf-webserver
+
+#Set the storage daemons to respawn
+rmts:2345:respawn:/sbin/rmt_storage
 
 # /etc/init.d executes the S and K scripts upon change
 # of runlevel.
