@@ -12,7 +12,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 #IMAGE_INSTALL += "alsa-intf"
 IMAGE_INSTALL += "alsa-lib"
 IMAGE_INSTALL += "alsa-utils"
-#IMAGE_INSTALL += "tinycompress"
+IMAGE_INSTALL += "tinycompress"
 
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
@@ -46,7 +46,7 @@ IMAGE_INSTALL += "glib-2.0"
 # bbappend-s to things there or come up with a new task set that involves this recipe's
 # work.
 #IMAGE_INSTALL += "initscripts-msm"
-#IMAGE_INSTALL += "init-audio"
+IMAGE_INSTALL += "init-audio"
 #IMAGE_INSTALL += "iproute2"
 #IMAGE_INSTALL += "init-mss"
 #IMAGE_INSTALL += "iptables"
@@ -97,6 +97,11 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+
+# 32-bit packages
+IMAGE_INSTALL += "lib32-tinyalsa"
+IMAGE_INSTALL += "lib32-audiohal"
+
 #IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
