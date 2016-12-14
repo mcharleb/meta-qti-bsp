@@ -25,7 +25,9 @@ EXTRA_OECONF = "--with-common-includes="${WORKSPACE}/hardware/libhardware/includ
                 --enable-target=${BASEMACHINE} \
                "
 
+FILES_${PN} += "${userfsdatadir}/misc/bluetooth/*"
+
 do_install_append () {
-    install -d ${D}${sysconfdir}/bluetooth
-    install -m 755 ${S}init.msm.bt.sh ${D}${sysconfdir}/bluetooth
+    install -d ${D}${userfsdatadir}/misc/bluetooth
+    install -m 755 ${S}init.msm.bt.sh ${D}${userfsdatadir}/misc/bluetooth/
 }
