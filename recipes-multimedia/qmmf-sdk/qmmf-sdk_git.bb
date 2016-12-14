@@ -18,6 +18,7 @@ DEPENDS += "media"
 DEPENDS += "cairo"
 DEPENDS += "mm-parser"
 DEPENDS += "mm-osal"
+DEPENDS += "audiohal"
 
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
