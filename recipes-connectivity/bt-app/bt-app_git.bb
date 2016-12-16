@@ -13,7 +13,7 @@ S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 DEPENDS += "libhardware gen-gatt glib-2.0 btobex"
 
-CPPFLAGS_append = " -DBT_AUDIO_HAL_INTEGRATION -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
+CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
@@ -24,6 +24,7 @@ EXTRA_OECONF = " \
                 --with-btobex \
                 --with-gengatt \
                "
+EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 
 do_install_append() {
         install -d ${D}${sysconfdir}/bluetooth/
