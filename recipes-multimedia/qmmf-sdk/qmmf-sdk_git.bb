@@ -32,14 +32,24 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-sdk"
+SRC_URI  += "file://qmmf-server.service"
 
 S = "${WORKDIR}/qmmf-sdk"
 
-do_package_qa () {
+do_install_append () {
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}/etc/systemd/system/
+        install -m 0644 ${WORKDIR}/qmmf-server.service -D ${D}/etc/systemd/system/qmmf-server.service
+        install -d ${D}/etc/systemd/system/multi-user.target.wants/
+        # enable the service for multi-user.target
+        ln -sf /etc/systemd/qmmf-server.service \
+           ${D}/etc/systemd/system/multi-user.target.wants/qmmf-server.service
+    fi
 }
 
 FILES_${PN}-qmmf-server-dbg = "${bindir}/.debug/qmmf-server"
 FILES_${PN}-qmmf-server     = "${bindir}/qmmf-server"
+FILES_${PN}-qmmf-server    += "/etc/systemd/system/"
 
 FILES_${PN}-libqmmf_recorder_client-dbg    = "${libdir}/.debug/libqmmf_recorder_client.*"
 FILES_${PN}-libqmmf_recorder_client        = "${libdir}/libqmmf_recorder_client.so.*"
@@ -84,3 +94,5 @@ FILES_${PN}-libqmmf_player_client-dev    = "${libdir}/libqmmf_player_client.so $
 FILES_${PN}-libqmmf_player_service-dbg    = "${libdir}/.debug/libqmmf_player_service.*"
 FILES_${PN}-libqmmf_player_service        = "${libdir}/libqmmf_player_service.so.*"
 FILES_${PN}-libqmmf_player_service-dev    = "${libdir}/libqmmf_player_service.so ${libdir}/libqmmf_player_service.la ${includedir}"
+
+INSANE_SKIP_${PN} += "build-deps dev-deps file-rdeps"

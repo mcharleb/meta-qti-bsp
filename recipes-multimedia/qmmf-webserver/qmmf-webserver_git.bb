@@ -11,6 +11,7 @@ DEPENDS += "qmmf-support"
 
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-webserver"
+SRC_URI  += "file://qmmf-webserver.service"
 SRC_URI  += "file://0001-qmmf-webserver-update-http-library-path.patch"
 S = "${WORKDIR}/qmmf-webserver"
 
@@ -25,6 +26,18 @@ do_compile() {
 do_install() {
   install -d "${D}/${bindir}"
   install -m 0755 "${S}/qmmf-webserver" "${D}/${bindir}"
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+      install -d ${D}/etc/systemd/system/
+      install -m 0644 ${WORKDIR}/qmmf-webserver.service -D ${D}/etc/systemd/system/qmmf-webserver.service
+      install -d ${D}/etc/systemd/system/multi-user.target.wants/
+      # enable the service for multi-user.target
+      ln -sf /etc/systemd/qmmf-webserver.service \
+          ${D}/etc/systemd/system/multi-user.target.wants/qmmf-webserver.service
+  fi
 }
 
 FILES_${PN} = "${bindir}/qmmf-webserver"
+FILES_${PN} += "/etc/systemd/system/"
+
+# Avoid QA Issue: No GNU_HASH in the elf binary
+INSANE_SKIP_${PN} = "ldflags"
