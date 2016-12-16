@@ -36,4 +36,6 @@ type thermal-engine_t;
 type thermal-engine_exec_t;
 
 init_daemon_domain(thermal-engine_t, thermal-engine_exec_t)
-
+allow thermal-engine_t self:capability sys_nice;
+allow thermal-engine_t self:unix_dgram_socket create;
+dev_read_sysfs(thermal-engine_t)

@@ -43,3 +43,4 @@ allow bootlogd_t device_t:file { read write getattr };
 dev_getattr_all_chr_files(bootlogd_t)
 dev_getattr_all_blk_files(bootlogd_t)
 fs_list_tmpfs(bootlogd_t)
+term_dontaudit_use_ptmx(bootlogd_t)
