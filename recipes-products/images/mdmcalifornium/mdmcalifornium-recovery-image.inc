@@ -1,7 +1,7 @@
 # The mkbootimg production process.
 require ../mdm-recovery-bootimg.inc
 
-DEPENDS += "bzip2 fsconfig-native applypatch-native"
+DEPENDS += "bzip2 fsconfig-native applypatch-native bsdiff-native"
 
 # Image output types
 IMAGE_FSTYPES += "ubi"
