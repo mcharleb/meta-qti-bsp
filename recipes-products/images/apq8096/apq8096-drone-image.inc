@@ -3,7 +3,7 @@
 # Get base product settings
 require apq8096-base-image.inc
 
-#IMAGE_INSTALL += "q6-admin-adsp"
+IMAGE_INSTALL += "q6-admin-adsp"
 IMAGE_INSTALL += "q6-admin-slpi"
 IMAGE_INSTALL += "lib32-live555-qti"
 IMAGE_INSTALL += "lib32-media"
