@@ -6,17 +6,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
 COMPATIBLE_MACHINE = "(apq8098)"
 
-EXTRA_KERNEL_CMD_PARAMS ?= ""
+# Default image type is zImage, change it in machine conf if needed.
+KERNEL_IMAGETYPE ?= "zImage"
 
-# Default image type is zImage, change here if needed.
-KERNEL_IMAGETYPE = ""
-# Where built kernel lies in the kernel tree
-zImage_VAR="zImage"
-zImage_VAR="Image.gz-dtb"
+# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
+# to kernel.bbclass. We override the variable as msm kernel can't
+# support alternate image builds
+python __anonymous () {
+  if d.getVar("KERNEL_IMAGETYPE", True):
+      d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
+}
 
-KERNEL_OUTPUT = "arch/${ARCH}/boot/${zImage_VAR}"
 KERNEL_IMAGEDEST = "boot"
-KERNEL_IMAGETYPE_FOR_MAKE = ""
 
 DEPENDS_append_aarch64 = " libgcc"
 KERNEL_CC_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
@@ -26,15 +27,18 @@ KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
 
-#PACKAGE_ARCH = "${MACHINE_ARCH}"
+KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_DEFCONFIG}', '${KERNEL_DEFCONFIG}', d)}"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
 
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-4.4"
 S         =  "${WORKDIR}/kernel/msm-4.4"
 GITVER    =  "${@base_get_metadata_git_revision('${SRC_DIR}',d)}"
-PV = "git-${GITVER}"
-PR = "r5"
+PV = "git"
+PR = "r5-${GITVER}"
 
 DEPENDS += "dtbtool-native mkbootimg-native"
 DEPENDS += "mkbootimg-native dtc-native"
@@ -42,10 +46,10 @@ PACKAGES = "kernel kernel-base kernel-vmlinux kernel-dev kernel-modules"
 RDEPENDS_kernel-base = ""
 
 # Put the zImage in the kernel-dev pkg
-FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}"
+FILES_kernel-dev += "/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}"
 
 do_configure () {
-    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${MACHINE_KERNEL_DEFCONFIG}
+    oe_runmake_call -C ${S} ARCH=${ARCH} ${KERNEL_EXTRA_ARGS} ${KERNEL_CONFIG}
 }
 
 do_shared_workdir () {
@@ -121,7 +125,7 @@ do_shared_workdir () {
 
         # Make vmlinux available as soon as possible
         install -d ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}
-        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+        install -m 0644 ${KERNEL_OUTPUT} ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
         install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION}
         install -m 0644 vmlinux ${STAGING_DIR_TARGET}/${KERNEL_IMAGEDEST}/vmlinux
 }
@@ -134,7 +138,7 @@ do_install_append() {
 do_deploy_prepend() {
 
     if [ -f ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ]; then
-        mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION}
+        mv ${D}/${KERNEL_IMAGEDEST}/-${KERNEL_VERSION} ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION}
     fi
 }
 
@@ -142,17 +146,17 @@ do_deploy () {
 
     extra_mkbootimg_params=""
     if [ ${nand_boot_flag} == "1" ]; then
-        extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${MACHINE_KERNEL_TAGS_OFFSET}'
+        extra_mkbootimg_params='--dt ${D}/${KERNEL_IMAGEDEST}/masterDTB --tags-addr ${KERNEL_TAGS_OFFSET}'
     fi
 
     mkdir -p ${DEPLOY_DIR_IMAGE}
 
     # Make bootimage
-    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${zImage_VAR}-${KERNEL_VERSION} \
+    ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${MACHINE_KERNEL_CMD_PARAMS}" \
+        --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
-        --base ${MACHINE_KERNEL_BASE} \
+        --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }

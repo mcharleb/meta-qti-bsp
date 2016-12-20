@@ -16,7 +16,7 @@ EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8096', '--enable-indefinit
 
 
 INITSCRIPT_NAME = "init_sys_mss"
-INITSCRIPT_PARAMS = "start 38 S ."
+INITSCRIPT_PARAMS = "start 38 2 3 4 5 ."
 
 do_install() {
     install -m 0755 ${S}/init_mss -D ${D}/sbin/init_mss

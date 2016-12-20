@@ -1,8 +1,8 @@
 DEPENDS += "virtual/kernel"
 
-LA_COMPAT_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/android_compat"
-LA_OUT_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/${MLPREFIX}android_compat_build_artifacts"
-LA_TARGET_PRODUCT ?= "${MACHINE_SOC_NAME}"
+LA_COMPAT_DIR ?= "${TMPDIR}/work-shared/${BASEMACHINE}/android_compat"
+LA_OUT_DIR ?= "${TMPDIR}/work-shared/${BASEMACHINE}/${MLPREFIX}android_compat_build_artifacts"
+LA_TARGET_PRODUCT ?= "${SOC_FAMILY}"
 LA_OUT_TARGET_INTERMEDIATES = "${LA_OUT_DIR}/target/product/${LA_TARGET_PRODUCT}/obj"
 
 # androidmk installs only stripped binaries and shared libraries. the below 
