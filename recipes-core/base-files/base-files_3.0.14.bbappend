@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 DEPENDS = "base-passwd"
 
 SRC_URI += "file://fstab"
+SRC_URI_append_mdm9607 +="file://${BASEMACHINE}/fstab"
 
 dirs755 += "/media/cf /media/net /media/ram \
             /media/union /media/realroot /media/hdd \
