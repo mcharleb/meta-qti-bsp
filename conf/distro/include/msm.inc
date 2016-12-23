@@ -16,7 +16,7 @@ INHERIT += "recipe_sanity"
 # TOOLCHAIN
 PREFERRED_VERSION_autoconf = "2.68"
 ARM_INSTRUCTION_SET       ?= "arm"
-FULL_OPTIMIZATION          = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer"
+FULL_OPTIMIZATION          = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize "
 
 # NLS
 USE_NLS = "no"
