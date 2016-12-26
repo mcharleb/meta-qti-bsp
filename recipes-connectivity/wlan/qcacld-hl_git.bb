@@ -19,12 +19,13 @@ python __anonymous () {
          d.setVar('CHIP_NAME', '')
 }
 
-FILES_${PN}     += "${base_libdir}/firmware/wlan/*"
+FILES_${PN}     += "lib/firmware/wlan/*"
 FILES_${PN}     += "${base_libdir}/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko"
 # The inherit of module.bbclass will automatically name module packages with
 # kernel-module-" prefix as required by the oe-core build environment. Also it
 # replaces '_' with '-' in the module name.
 RPROVIDES_${PN} += "${@'kernel-module-${WLAN_MODULE_NAME}'.replace('_', '-')}"
+PROVIDES_NAME   = "kernel-module-${WLAN_MODULE_NAME}"
 
 do_unpack[deptask] = "do_populate_sysroot"
 PR = "r0_${KERNEL_VERSION}"
@@ -39,7 +40,7 @@ S = "${WORKDIR}/wlan/qcacld-2.0/"
 
 # Append the chip name to firmware installation path
 CHIP_NAME_APPEND = "${@base_conditional('CHIP_NAME', '', '', '/${CHIP_NAME}', d)}"
-FIRMWARE_PATH = "${D}${base_libdir}/firmware/wlan/qca_cld${CHIP_NAME_APPEND}"
+FIRMWARE_PATH = "${D}/lib/firmware/wlan/qca_cld${CHIP_NAME_APPEND}"
 
 # Explicitly disable LL to enable HL as current WLAN driver is not having
 # simultaneous support of HL and LL.
@@ -62,7 +63,11 @@ do_install () {
 
 do_module_signing() {
     if [ -f ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ]; then
-	${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/${base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko
+        if [ ${BASEMACHINE} == "apq8017" ]; then
+            ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PROVIDES_NAME}/lib/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko
+        else
+            ${STAGING_KERNEL_DIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/signing_key.priv ${STAGING_KERNEL_BUILDDIR}/signing_key.x509 ${PKGDEST}/${PN}/lib/modules/${KERNEL_VERSION}/extra/${WLAN_MODULE_NAME}.ko
+        fi
     fi
 }
 
