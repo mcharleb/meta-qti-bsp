@@ -11,7 +11,13 @@ SRC_URI = "file://qcom-opensource/bt/bt-app/"
 
 S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
-DEPENDS += "libhardware gen-gatt glib-2.0 btobex"
+def get_depends():
+    if "$(BASEMACHINE)" == "mdm9607":
+        return  "libhardware gen-gatt glib-2.0 btobex"
+    else:
+        return   "libhardware gen-gatt glib-2.0 btobex audiohal"
+
+DEPENDS  += "${@get_depends()}"
 
 CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
