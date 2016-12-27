@@ -7,3 +7,5 @@ inherit autotools-brokensep pkgconfig
 FILESPATH        =+ "${WORKSPACE}:"
 
 SRC_URI          = "file://${@d.getVar('SRC_DIR', True).replace('${WORKSPACE}/', '')}"
+
+PACKAGE_ARCH    ?= "${BASEMACHINE_ARCH}"

@@ -1,7 +1,7 @@
 # The mkbootimg production process.
 require ../mdm-recovery-bootimg.inc
 
-DEPENDS += "bzip2 fsconfig-native applypatch-native"
+DEPENDS += "bzip2 fsconfig-native applypatch-native bsdiff-native"
 
 # The OE-Core minimal boot image files.
 IMAGE_INSTALL += "packagegroup-core-boot"

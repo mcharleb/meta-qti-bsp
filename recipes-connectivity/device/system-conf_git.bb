@@ -38,6 +38,8 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdm9607', '--enable-target-
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'mdmcalifornium', '--enable-target-mdmcalifornium=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8096', '--enable-target-apq8096=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-target-apq8009=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-target-apq8017=yes', '', d)}"
+
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8053', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-wlan=yes', '', d)}"
@@ -45,6 +47,8 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8017', '--enable-pronto-
 # Enable drone-wlan in place of pronto-wlan for Drones
 EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'drone', '--enable-pronto-wlan=yes', '', d)}"
 EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'drone', '--enable-drone-wlan=yes', '', d)}"
+EXTRA_OECONF_remove = "${@base_conditional('BASEPRODUCT', 'snap', '--enable-pronto-wlan=yes', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'snap', '--enable-snap-wlan=yes', '', d)}"
 
 INITSCRIPT_NAME   = "wlan_daemon"
 INITSCRIPT_PARAMS = "remove"

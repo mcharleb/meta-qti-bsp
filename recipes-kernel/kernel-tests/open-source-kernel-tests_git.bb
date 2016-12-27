@@ -34,6 +34,7 @@ EXTRA_OECONF = "--prefix=/kernel-tests \
                 --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 
 EXTRA_OECONF_append_apq8053 = "	--with-kflags="ARCH=arm64""
+EXTRA_OECONF_append_apq8096 = "	--with-kflags="ARCH=arm64""
 
 EXTRA_OECONF_append_mdmcalifornium = " --disable-memory_prof"
 EXTRA_OECONF_append_mdmcalifornium += " --disable-bam_dmux_loopback"
@@ -47,6 +48,10 @@ EXTRA_OECONF_append_apq8053 = " --disable-glink"
 EXTRA_OECONF_append_apq8053 += " --disable-ip_accelerator"
 EXTRA_OECONF_append_apq8053 += " --disable-swp"
 EXTRA_OECONF_append_apq8053 += " --disable-coresight"
+EXTRA_OECONF_append_apq8096 = " --disable-glink"
+EXTRA_OECONF_append_apq8096 += " --disable-ip_accelerator"
+EXTRA_OECONF_append_apq8096 += " --disable-swp"
+EXTRA_OECONF_append_apq8096 += " --disable-coresight"
 
 FILES_${PN}-dbg = "/kernel-tests/*/.debug/*"
 FILES_${PN} = "/kernel-tests/*"

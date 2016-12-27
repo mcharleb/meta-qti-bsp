@@ -115,6 +115,31 @@ case $linksNeeded in
             ;;
       esac
 
+      case `ls *.bin 2>/dev/null` in
+         *.bin)
+            for imgfile in *.bin
+            do
+               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+            done
+            ;;
+         *)
+            echo "PIL no cnss image found"
+            ;;
+      esac
+
+      case `ls *.tlv 2>/dev/null` in
+         *.tlv)
+            for imgfile in *.tlv
+            do
+               ln -s /firmware/image/$imgfile /lib/firmware/$imgfile 2>/dev/null
+            done
+            ;;
+         *)
+            echo "PIL no cnss image found"
+            ;;
+      esac
+
+
       case `ls mba.mdt 2>/dev/null` in
          mba.mdt)
             for imgfile in mba*
