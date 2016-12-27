@@ -21,12 +21,15 @@ INSANE_SKIP_${PN} = "dev-so"
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
+BASEPRODUCT = "${@d.getVar('PRODUCT', False)}"
+
 EXTRA_OECONF = " \
                 --with-zlib \
                 --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
                 --with-lib-path=${STAGING_LIBDIR} \
+                --enable-target=${BASEMACHINE} \
+                --enable-rome=${BASEPRODUCT} \
                "
-EXTRA_OECONF += "--enable-target=${BASEMACHINE}"
 
 do_install_append() {
 
