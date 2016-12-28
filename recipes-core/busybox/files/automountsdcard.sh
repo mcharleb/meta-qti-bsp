@@ -44,16 +44,16 @@ create_symlink()
 
 case "${ACTION}" in
 add|"")
-        result=`check_if_boot_dev $MDEV`
+        result=`check_if_boot_dev $1`
         if [ $result -eq 1 ]; then
-                 create_symlink $MDEV &
+                 create_symlink $1 &
         else
-                 umount_partition ${MDEV}
-                 mount_partition ${MDEV}
+                 umount_partition ${1}
+                 mount_partition ${1}
         fi
         ;;
 remove)
-        umount_partition ${MDEV}
+        umount_partition ${1}
         ;;
 esac
 
