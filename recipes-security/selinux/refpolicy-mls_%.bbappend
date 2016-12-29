@@ -1,5 +1,9 @@
 FILESEXTRAPATHS_append := "${THISDIR}:${THISDIR}/files:"
-SRC_URI += "file://Remove-MLS-constraints.patch \
+
+SRCREV_refpolicy := "RELEASE_2_20161023"
+SRCREV_refpolicy-contrib = "RELEASE_2_20161023"
+
+SRC_URI += "file://Remove-MLS-constraints.patch \ 
             file://0001-add-monolithic-policy.patch \
             file://0001-Remove-mls-relabelto.patch \
             file://policy/ \
