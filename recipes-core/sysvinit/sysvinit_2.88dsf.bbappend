@@ -1,5 +1,4 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
-BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
 
 SRC_URI += "\
            file://Enable-ffbm.patch \
