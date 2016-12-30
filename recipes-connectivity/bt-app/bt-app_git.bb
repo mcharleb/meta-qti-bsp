@@ -13,9 +13,9 @@ S = "${WORKDIR}/qcom-opensource/bt/bt-app/"
 
 def get_depends():
     if "$(BASEMACHINE)" == "mdm9607":
-        return  "libhardware gen-gatt glib-2.0 btobex"
+        return  "btvendorhal gen-gatt glib-2.0 btobex"
     else:
-        return   "libhardware gen-gatt glib-2.0 btobex audiohal"
+        return   "btvendorhal gen-gatt glib-2.0 btobex audiohal"
 
 DEPENDS  += "${@get_depends()}"
 
@@ -24,7 +24,7 @@ CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
 EXTRA_OECONF = " \
-                --with-common-includes="${WORKSPACE}/hardware/libhardware/include" \
+                --with-common-includes="${WORKSPACE}/vendor/qcom/opensource/bluetooth/hal/include/" \
                 --with-glib \
                 --with-lib-path=${STAGING_LIBDIR} \
                 --with-btobex \
