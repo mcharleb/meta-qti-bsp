@@ -8,24 +8,22 @@ PR = "r3"
 FILESPATH =+ "${WORKSPACE}:"
 # Provide a baseline
 SRC_URI = "file://mdm-init/"
+SRC_URI += "file://wlan.service"
 
 # Update for each machine
 S = "${WORKDIR}/mdm-init/"
 
-do_install_append_apq8009(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8053(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8017(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
-}
-
-do_install_append_apq8096(){
-  install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+do_install_append_msm(){
+  if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+      install -d ${D}/etc/systemd/system/
+      install -m 0644 ${WORKDIR}/wlan.service -D ${D}/etc/systemd/system/wlan.service
+      install -d ${D}/etc/systemd/system/multi-user.target.wants/
+      # enable the service for multi-user.target
+      ln -sf /etc/systemd/wlan.service \
+         ${D}/etc/systemd/system/multi-user.target.wants/wlan.service
+  else
+      install -m 0755 ${S}/wlan_daemon -D ${D}${sysconfdir}/init.d/wlan_daemon
+  fi
 }
 
 FILES_${PN} += "${userfsdatadir}/misc/wifi/*"
