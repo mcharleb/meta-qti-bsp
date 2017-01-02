@@ -7,11 +7,11 @@ SRC_URI = "file://hardware/qcom/media/"
 S = "${WORKDIR}/hardware/qcom/media"
 
 DEPENDS = "adreno200"
-DEPENDS += "display-hal"
 DEPENDS += "system-media"
 DEPENDS += "av-frameworks"
 DEPENDS += "glib-2.0"
-DEPENDS += "lib32-mm-video-noship"
+
+DEPENDS += "${@ '' if d.getVar('IS_APQ8009') else 'display-hal mm-video-noship'}"
 
 #re-use non-perf settings
 BASEMACHINE = "${@d.getVar('MACHINE', True).replace('-perf', '')}"
@@ -28,6 +28,7 @@ UBWC_SUPPORTED = '${@bb.utils.contains_any('BASEMACHINE', ["msm8996", "msmcobalt
 PQ_SUPPORTED = '${@bb.utils.contains_any('BASEMACHINE', ["msm8996", "msm8953", "apq8096", "apq8053"], "yes", "", d)}'
 IS_MSM8226 = '${@bb.utils.contains_any('BASEMACHINE', ["msm8226", "msm8916", "msm8909", "apq8026", "apq8016", "apq8009"], "yes", "", d)}'
 MM-VIDEO = '${@bb.utils.contains_any('BASEMACHINE', ["apq8096", "apq8053", "apq8010"], "yes", "", d)}'
+IS_APQ8009 = '${@bb.utils.contains_any('BASEMACHINE', ["msm8909", "apq8009"], "yes", "", d)}'
 
 # configure features
 EXTRA_OECONF_append =" --enable-use-glib="yes""
@@ -35,6 +36,7 @@ EXTRA_OECONF_append =" --enable-target-uses-ion=${IS_ION}"
 EXTRA_OECONF_append =" --enable-build-mm-video=${MM-VIDEO}"
 EXTRA_OECONF_append =" --enable-target-msm8953=${IS_MSM8953}"
 EXTRA_OECONF_append =" --enable-target-msm8996=${IS_MSM8996}"
+EXTRA_OECONF_append =" --enable-target-msm8909=${IS_APQ8009}"
 EXTRA_OECONF_append =" --enable-target-msm8610=${IS_MSM8610}"
 EXTRA_OECONF_append =" --enable-is-ubwc-supported=${UBWC_SUPPORTED}"
 EXTRA_OECONF_append =" --enable-targets-that-support-pq=${PQ_SUPPORTED}"

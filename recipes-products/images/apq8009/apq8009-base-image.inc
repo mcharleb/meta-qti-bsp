@@ -13,6 +13,7 @@ IMAGE_INSTALL += "tinycompress"
 
 # AUDIO HAL
 IMAGE_INSTALL += "audiohal"
+IMAGE_INSTALL += "encoders"
 
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
