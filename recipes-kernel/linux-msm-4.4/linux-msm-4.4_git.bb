@@ -9,10 +9,23 @@ COMPATIBLE_MACHINE = "(apq8098)"
 # Default image type is zImage, change it in machine conf if needed.
 KERNEL_IMAGETYPE ?= "zImage"
 
-# Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
-# to kernel.bbclass. We override the variable as msm kernel can't
-# support alternate image builds
 python __anonymous () {
+  if bb.utils.contains('DISTRO_FEATURES', 'qti-perf', True, False, d):
+      imgtype = d.getVar("KERNEL_PERF_IMAGETYPE", True)
+      if imgtype:
+          d.setVar("KERNEL_IMAGETYPE", d.getVar("KERNEL_PERF_IMAGETYPE", True))
+      perfconf = d.getVar("KERNEL_PERF_DEFCONFIG", True)
+      if perfconf:
+          d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_PERF_DEFCONFIG", True))
+      perfcmd = d.getVar("KERNEL_PERF_CMD_PARAMS", True)
+      if perfcmd:
+          d.setVar("KERNEL_CMD_PARAMS", d.getVar("KERNEL_PERF_CMD_PARAMS", True))
+  else:
+      d.setVar("KERNEL_CONFIG", d.getVar("KERNEL_DEFCONFIG", True))
+
+  # Override KERNEL_IMAGETYPE_FOR_MAKE variable, which is internal
+  # to kernel.bbclass. We override the variable as msm kernel can't
+  # support alternate image builds
   if d.getVar("KERNEL_IMAGETYPE", True):
       d.setVar("KERNEL_IMAGETYPE_FOR_MAKE", "")
 }
@@ -26,10 +39,6 @@ KERNEL_LD_append_aarch64 = " ${TOOLCHAIN_OPTIONS}"
 KERNEL_PRIORITY           = "9001"
 # Add V=1 to KERNEL_EXTRA_ARGS for verbose
 KERNEL_EXTRA_ARGS        += "O=${B}"
-
-KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_DEFCONFIG}', '${KERNEL_DEFCONFIG}', d)}"
-
-CMD_PARAMS = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_CMD_PARAMS}', '${KERNEL_CMD_PARAMS}', d)}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -156,7 +165,7 @@ do_deploy () {
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${CMD_PARAMS}" \
+        --cmdline "${KERNEL_CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
