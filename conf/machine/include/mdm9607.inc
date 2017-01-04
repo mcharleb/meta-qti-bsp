@@ -1,6 +1,9 @@
 BASEMACHINE ?= "mdm9607"
 require conf/machine/include/basemachine.inc
 
+SOC_FAMILY ?= "mdm9x07"
+include conf/machine/include/soc-family.inc
+
 # Uncomment the following line to enable the hard floating point abi. Note that
 # this breaks some binary libraries and 3D (neither of which ship with
 # meta-yocto). For maximum compatibility, leave this disabled.

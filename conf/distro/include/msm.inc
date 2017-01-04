@@ -27,29 +27,8 @@ USE_NLS_gcc-cross = "no"
 # Disable binary locale generation
 ENABLE_BINARY_LOCALE_GENERATION = "0"
 
-# Don't install useless symlinks to libraries
-PACKAGE_SNAP_LIB_SYMLINKS = "1"
-
 #Allow library symlinks to exist alongside soname files
-#for packages that don't create proper symlinks
-PACKAGE_SNAP_LIB_SYMLINKS_pn-adreno200 = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-location-geofence = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-izat-core = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-loc-hal = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-core-oss = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-video-oss = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-core-prop = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-core-noship = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-video-prop = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-camera = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-camera-lib = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-mm-still = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-camera-hal = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-sudo = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-securemsm-noship = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-libtbm-msm = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-perf-libs = "0"
-PACKAGE_SNAP_LIB_SYMLINKS_pn-libdri2 = "0"
+PACKAGE_SNAP_LIB_SYMLINKS = "0"
 
 # Don't install ldconfig and associated gubbins
 USE_LDCONFIG = "0"

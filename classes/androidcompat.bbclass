@@ -1,4 +1,4 @@
-LA_COMPAT_DIR = "${TMPDIR}/work-shared/${MACHINE}/android_compat"
+LA_COMPAT_DIR = "${TMPDIR}/work-shared/${BASEMACHINE}/android_compat"
 
 S = "${LA_COMPAT_DIR}"
 
