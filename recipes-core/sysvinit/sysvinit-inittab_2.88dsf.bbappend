@@ -13,7 +13,7 @@ do_install() {
     install -d ${D}${sysconfdir}
     install -m 0644 ${WORKDIR}/${BASEMACHINE}/inittab ${D}${sysconfdir}/inittab
     if [ ! -z "${SERIAL_CONSOLE}" ]; then
-        echo "S:2345:respawn:${base_sbindir}/getty -L ${TERMINAL} ${SERIAL_CONSOLE}" >> ${D}${sysconfdir}/inittab
+        echo "S:023456:respawn:${base_sbindir}/getty -L ${TERMINAL} ${SERIAL_CONSOLE}" >> ${D}${sysconfdir}/inittab
     fi
 
     idx=0
