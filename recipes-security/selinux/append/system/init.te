@@ -3,3 +3,5 @@
 allow init_t self:process execstack;
 allow init_t self:process execmem;
 dev_relabelto_irsc_util(kernel_t)
+allow initrc_t self:binder set_context_mgr;
+allow initrc_t self:system module_load;
