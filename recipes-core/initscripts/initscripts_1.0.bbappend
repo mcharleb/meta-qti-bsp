@@ -15,4 +15,5 @@ do_install_append() {
 
         install -m 0755 ${WORKDIR}/set_core_pattern.sh  ${D}${sysconfdir}/init.d
         update-rc.d -r ${D} set_core_pattern.sh start 01 S 2 3 4 5 S .
+        echo "test ! -x /sbin/restorecon || /sbin/restorecon -F /tmp" >> ${D}${sysconfdir}/init.d/populate-volatile.sh
 }
