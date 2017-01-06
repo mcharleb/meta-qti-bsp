@@ -40,4 +40,8 @@ do_install_append() {
         if [ -f ${S}conf/bt_app.conf ]; then
            install -m 0660 ${S}conf/bt_app.conf ${D}${userfsdatadir}/misc/bluetooth/
         fi
+
+        if [ -f ${S}conf/ext_to_mimetype.conf ]; then
+           install -m 0660 ${S}conf/ext_to_mimetype.conf ${D}${userfsdatadir}/misc/bluetooth/
+        fi
 }
