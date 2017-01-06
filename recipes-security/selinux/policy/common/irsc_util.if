@@ -27,8 +27,21 @@
 
 ## <summary>irsc_util daemon</summary>
 
-#######################################
+########################################
 ## <summary>
-##      irsc_util daemon interface
+##      relabelto irsc_util daemon interface.
 ## </summary>
+## <param name="domain">
+##      <summary>
+##      irsc_util daemon interface
+##      </summary>
+## </param>
 #
+interface(`dev_relabelto_irsc_util',`
+        gen_require(`
+                type irsc_util_t;
+        ')
+
+        allow $1 irsc_util_t:file relabelto;
+')
+

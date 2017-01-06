@@ -47,4 +47,4 @@ allow init_t irsc_util_t:file relabelto;
 allow initrc_t irsc_util_t:file { execute execute_no_trans };
 #03putty.log for adbd
 allow initrc_t self:process { execstack execmem };
-
+fs_associate(irsc_util_t);
