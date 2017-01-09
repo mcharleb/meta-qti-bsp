@@ -5,3 +5,5 @@ do_install_append () {
         sed -i -e 's:#PasswordAuthentication yes:PasswordAuthentication yes:' ${WORKDIR}/sshd_config ${D}${sysconfdir}/ssh/sshd_config
     fi
 }
+
+RDEPENDS_${PN} += "${PN}-sftp"
