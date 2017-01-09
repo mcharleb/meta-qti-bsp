@@ -8,10 +8,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-intf"
 
-# AUDIO HAL
 IMAGE_INSTALL += "audiohal"
-IMAGE_INSTALL += "audiohal-test"
-
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"
 IMAGE_INSTALL += "avahi-daemon"
