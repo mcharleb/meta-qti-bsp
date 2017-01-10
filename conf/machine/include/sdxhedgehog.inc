@@ -22,18 +22,18 @@ DISTRO ?= "mdm"
 
 MACHINE_FEATURES += "kernel26 keyboard"
 
-PAGE_SIZE ?= '2048'
+PAGE_SIZE ?= '4096'
 
 # Max supported inodes
 EXTRA_IMAGECMD ?= "-N 2048"
 
 #UBINIZE Args
-UBINIZE_ARGS ?= "-m 2048 -p 128KiB -s 2048"
+UBINIZE_ARGS ?= "-m 4096 -p 256KiB -s 4096"
 #MKUBIFS Args
-MKUBIFS_ARGS ?= "-m 2048 -e 126976 -c 1073 -F"
+MKUBIFS_ARGS ?= "-m 4096 -e 253952 -c 2146 -F"
 #Volume sizes
 SYSTEM_VOLUME_SIZE ?= "90MiB"
-CACHE_VOLUME_SIZE ?= "5MiB"
+CACHE_VOLUME_SIZE ?= "70MiB"
 
 # Sizes for EXT4 (in bytes)
 SYSTEM_SIZE_EXT4 ?= "90000000"
