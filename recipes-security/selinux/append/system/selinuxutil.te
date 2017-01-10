@@ -1,0 +1,3 @@
+ # Appended to modules/system/selinuxutil.te in meta-selinux
+
+    allow setfiles_t device_t:file { read write };

@@ -1,4 +1,3 @@
-#!/bin/sh
 # Copyright (c) 2016, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,42 +24,27 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+policy_module(irsc_util, 1.0)
+
+########################################
 #
-# find_partitions        init.d script to dynamically find partitions
+# Declarations
 #
 
+type irsc_util_t;
+type irsc_util_exec_t;
 
-timestamp()
-{
-    seconds="$(date +%s)"
-}
+init_daemon_domain(irsc_util_t, irsc_util_exec_t)
 
-RESTORECON()
-{
-    timestamp
-    echo "$seconds $2 start" > /dev/console
-    context_check="$(matchpathcon -V $2)"
-    if test "${context_check#*verified}" == "$context_check"
-    then
-        # Only do a restorecon if necessary
-        /sbin/restorecon $1 $2
-    fi
-    timestamp
-    echo "$seconds $2 end" > /dev/console
-}
-FindAndMountEXT4 () {
-   partition=$1
-   dir=$2
-   mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
-}
+allow init_t file_type:{ file lnk_file } relabelto;
 
-FindAndMountEXT4 userdata /data
-FindAndMountEXT4 dsp /dsp
-FindAndMountEXT4 persist /persist
-
-/sbin/restorecon -RF /persist
-/sbin/restorecon -RF /data
-
-exit 0
+#02putty.log
+##============= init_t ==============
+allow init_t irsc_util_t:file relabelto;
+#
+##============= initrc_t ==============
+allow initrc_t irsc_util_t:file { execute execute_no_trans };
+#03putty.log for adbd
+allow initrc_t self:process { execstack execmem };
+fs_associate(irsc_util_t);

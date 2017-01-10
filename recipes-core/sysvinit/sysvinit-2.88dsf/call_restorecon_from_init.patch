@@ -1,0 +1,11 @@
+diff -ur a/src/init.c b/src/init.c
+--- a/src/init.c	2016-10-14 11:37:17.470937304 -0700
++++ b/src/init.c	2016-10-14 11:42:05.441750703 -0700
+@@ -2867,6 +2867,7 @@
+ 	if (getenv("SELINUX_INIT") == NULL) {
+ 		if (is_selinux_enabled() != 1) {
+ 			if (selinux_init_load_policy(&enforce) == 0) {
++				system("restorecon -RF /");
+ 				putenv("SELINUX_INIT=YES");
+ 				execv(myname, argv);
+ 			} else {

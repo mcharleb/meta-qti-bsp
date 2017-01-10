@@ -7,6 +7,12 @@ IMAGE_FSTYPES = "ext4"
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
+IMAGE_INSTALL += "packagegroup-core-selinux"
+IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "refpolicy-mls"
+IMAGE_INSTALL += "start-scripts-find-partitions"
+IMAGE_INSTALL += "start-scripts-misc-daemon"
+IMAGE_INSTALL += "selinux-labelall"
 
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "alsa-intf"
