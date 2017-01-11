@@ -25,6 +25,7 @@ EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8009', ' LE_PROPERTIES_E
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8053', ' LE_PROPERTIES_ENABLED=true', '', d)}"
 
 EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8096', ' LE_PROPERTIES_ENABLED=true', '', d)}"
+EXTRA_OECONF += "${@base_conditional('BASEMACHINE', 'apq8098', ' LE_PROPERTIES_ENABLED=true', '', d)}"
 
 FILES_${PN}-dbg    = "${libdir}/.debug/libcutils.*"
 FILES_${PN}        = "${libdir}/libcutils.so.* ${libdir}/pkgconfig/*"
