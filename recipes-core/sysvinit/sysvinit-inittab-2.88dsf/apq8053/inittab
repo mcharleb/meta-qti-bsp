@@ -13,6 +13,8 @@ si::sysinit:/etc/init.d/rcS
 
 # NOTE: These entries should be above the rc
 #       run level entries with wait below.
+dvsk:2345:wait:mkdir -p -m 777 /dev/socket
+lprp:2345:respawn:/sbin/leprop-service
 
 node:2345:wait:mknod -m 660 /dev/media0 c 251 0
 

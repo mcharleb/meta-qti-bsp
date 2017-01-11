@@ -66,6 +66,9 @@ do_install_append() {
       install -m 0644 ${S}/debuggerd/init_debuggerd.service -D ${D}${systemd_unitdir}/system/init_debuggerd.service
       ln -sf ${systemd_unitdir}/system/init_debuggerd.service \
           ${D}${systemd_unitdir}/system/multi-user.target.wants/init_debuggerd.service
+      install -m 0644 ${S}/leproperties/leprop.service -D ${D}${systemd_unitdir}/system/leprop.service
+      ln -sf ${systemd_unitdir}/system/leprop.service \
+          ${D}${systemd_unitdir}/system/multi-user.target.wants/leprop.service
    fi
 }
 
@@ -125,6 +128,11 @@ PACKAGES =+ "${PN}-debuggerd-dbg ${PN}-debuggerd"
 FILES_${PN}-debuggerd-dbg  = "${base_sbindir}/.debug/debuggerd ${base_sbindir}/.debug/debuggerd64 "
 FILES_${PN}-debuggerd      = "${sysconfdir}/init.d/init_debuggerd ${base_sbindir}/debuggerd ${base_sbindir}/debuggerd64"
 FILES_${PN}-debuggerd     += "${systemd_unitdir}/system/init_debuggerd.service ${systemd_unitdir}/system/multi-user.target.wants/init_debuggerd.service"
+
+PACKAGES =+ "${PN}-leprop-dbg ${PN}-leprop"
+FILES_${PN}-leprop-dbg  = "${base_sbindir}/.debug/leprop-service ${bindir}/.debug/getprop ${bindir}/.debug/setprop"
+FILES_${PN}-leprop      = "${base_sbindir}/leprop-service ${bindir}/getprop ${bindir}/setprop"
+FILES_${PN}-leprop     += "${systemd_unitdir}/system/leprop.service ${systemd_unitdir}/system/multi-user.target.wants/leprop.service"
 
 FILES_${PN}-dbg  = "${bindir}/.debug/* ${libdir}/.debug/*"
 FILES_${PN}      = "${bindir}/* ${libdir}/pkgconfig/* ${libdir}/*.so.* "
