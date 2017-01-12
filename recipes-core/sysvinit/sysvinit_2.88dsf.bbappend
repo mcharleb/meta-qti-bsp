@@ -3,7 +3,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
 SRC_URI += "\
            file://Enable-ffbm.patch \
            file://init-setrlimit-to-enable-coredump.patch \
-           file://call_restorecon_from_init.patch \
 "
 SRC_URI_append += "${@base_contains('DISTRO_FEATURES','ro-rootfs','file://ro/rcS-default','file://rcS-default',d)}"
 
