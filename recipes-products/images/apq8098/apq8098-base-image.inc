@@ -96,6 +96,11 @@ IMAGE_INSTALL += "wireless-tools"
 #IMAGE_INSTALL += "wlan-opensource"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
 IMAGE_INSTALL += "wpa-supplicant-qcacld"
+IMAGE_INSTALL += "wayland"
+IMAGE_INSTALL += "pixman"
+IMAGE_INSTALL += "weston"
+IMAGE_INSTALL += "libinput"
+IMAGE_INSTALL += "libdrm"
 
 # 32-bit packages
 IMAGE_INSTALL += "lib32-tinyalsa"
