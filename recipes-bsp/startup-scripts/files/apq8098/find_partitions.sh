@@ -37,10 +37,16 @@ FindAndMountEXT4 () {
    mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
 }
 
-mount /data
-mount /firmware
-mount /mnt/persist
-
+FindAndMountVFAT () {
+   partition=$1
+   dir=$2
+   mmc_block_device=/dev/block/bootdevice/by-name/$partition
+   mkdir -p $dir
+   mount -t vfat $mmc_block_device $dir
+}
+FindAndMountEXT4 userdata /data
+FindAndMountVFAT modem   /firmware
+FindAndMountEXT4 persist /persist
 FindAndMountEXT4 dsp /dsp
 
 exit 0
