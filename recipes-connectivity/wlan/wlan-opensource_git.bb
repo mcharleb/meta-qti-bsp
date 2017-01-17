@@ -1,4 +1,4 @@
-inherit module
+inherit module qperf
 
 DESCRIPTION = "Qualcomm Atheros WLAN Host Driver Module"
 SECTION = "kernel/modules"
@@ -7,7 +7,7 @@ LICENSE = "BSD"
 
 FILES_${PN}     += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/extra/wlan.ko"
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r2_${KERNEL_VERSION}"
+PR = "r2"
 
 DEPENDS = "virtual/kernel wireless-tools"
 

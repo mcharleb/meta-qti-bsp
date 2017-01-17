@@ -1,4 +1,4 @@
-inherit autotools-brokensep module
+inherit autotools-brokensep module qperf
 
 DESCRIPTION = "Qualcomm Atheros WLAN CLD low latency driver"
 LICENSE = "ISC"
@@ -10,7 +10,7 @@ PROVIDES_NAME   = "kernel-module-wlan"
 RPROVIDES_${PN} += "${PROVIDES_NAME}"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r8_${KERNEL_VERSION}"
+PR = "r8"
 
 # This DEPENDS is to serialize kernel module builds
 DEPENDS = "rtsp-alg"

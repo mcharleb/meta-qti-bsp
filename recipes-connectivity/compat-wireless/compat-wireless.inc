@@ -1,4 +1,4 @@
-inherit autotools module
+inherit autotools module qperf
 
 DESCRIPTION = "Linux Wireless compatibility package"
 HOMEPAGE = "http://wireless.kernel.org/en/users/Download"
