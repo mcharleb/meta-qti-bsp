@@ -19,7 +19,7 @@ def get_depends():
 
 DEPENDS  += "${@get_depends()}"
 
-CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX "
+CPPFLAGS_append = " -DUSE_ANDROID_LOGGING -DUSE_BT_OBEX -DUSE_LIBHW_AOSP"
 CFLAGS_append = " -DUSE_ANDROID_LOGGING "
 LDFLAGS_append = " -llog "
 
