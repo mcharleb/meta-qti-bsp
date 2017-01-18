@@ -29,6 +29,8 @@ KERNEL_EXTRA_ARGS        += "O=${B}"
 
 KERNEL_CONFIG = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_DEFCONFIG}', '${KERNEL_DEFCONFIG}', d)}"
 
+CMD_PARAMS = "${@bb.utils.contains('DISTRO_FEATURES', 'qti-perf', '${KERNEL_PERF_CMD_PARAMS}', '${KERNEL_CMD_PARAMS}', d)}"
+
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILESPATH =+ "${WORKSPACE}:"
@@ -195,7 +197,7 @@ do_deploy () {
     # Make bootimage
     ${STAGING_BINDIR_NATIVE}/mkbootimg --kernel ${D}/${KERNEL_IMAGEDEST}/${KERNEL_IMAGETYPE}-${KERNEL_VERSION} \
         --ramdisk /dev/null \
-        --cmdline "${KERNEL_CMD_PARAMS}" \
+        --cmdline "${CMD_PARAMS}" \
         --pagesize ${PAGE_SIZE} \
         --base ${KERNEL_BASE} \
         --ramdisk_offset 0x0 \
