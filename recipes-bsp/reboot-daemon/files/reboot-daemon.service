@@ -1,0 +1,11 @@
+[Unit]
+SourcePath=/sbin/reboot-daemon
+Description= reboot-daemon service
+
+[Service]
+Type=forking
+Restart=always
+ExecStart=/sbin/reboot-daemon
+
+[Install]
+WantedBy=multi-user.target
