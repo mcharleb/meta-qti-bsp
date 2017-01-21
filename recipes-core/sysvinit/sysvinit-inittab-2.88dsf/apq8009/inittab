@@ -11,9 +11,12 @@ si::sysinit:/etc/init.d/rcS
 # What to do in single-user mode.
 ~~:S:wait:/sbin/sulogin
 
-#Set the storage daemons to respawn
 # NOTE: These entries should be above the rc
 #       run level entries with wait below.
+dvsk:2345:wait:mkdir -p -m 777 /dev/socket
+lprp:2345:respawn:/sbin/leprop-service
+
+#Set the storage daemons to respawn
 rmts:2345:respawn:/sbin/rmt_storage
 scrb:2345:respawn:/sbin/fs-scrub-daemon
 

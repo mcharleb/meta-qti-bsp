@@ -19,10 +19,12 @@ DEPENDS += "cairo"
 DEPENDS += "mm-parser"
 DEPENDS += "mm-osal"
 DEPENDS += "audiohal"
+DEPENDS += "fastcv-noship"
 
 CFLAGS += "-I${STAGING_INCDIR}"
 CFLAGS += "-I${STAGING_INCDIR}/mm-parser/include"
 CFLAGS += "-I${STAGING_INCDIR}/mm-osal/include"
+CFLAGS += "-I${STAGING_INCDIR}/fastcv"
 TARGET_CFLAGS += "-I${STAGING_INCDIR}/qcom/display"
 
 EXTRA_OECONF += " --with-gralloc-library=${WORKSPACE}/display/display-hal"
