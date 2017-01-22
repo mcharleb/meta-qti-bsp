@@ -17,6 +17,8 @@ S = "${WORKDIR}/bootable/${PN}/"
 EXTRA_OECONF = "--with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include \
                 --with-core-headers=${STAGING_INCDIR}"
 
+SYSTEMD_SUPPORT = "${@base_contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}"
+
 PARALLEL_MAKE = ""
 INITSCRIPT_NAME = "recovery"
 INITSCRIPT_PARAMS = "start 27 5 . stop 80 0 1 6 ."
@@ -27,12 +29,18 @@ FILES_${PN} += "/tmp"
 FILES_${PN} += "/res"
 FILES_${PN} += "/data"
 do_install_append() {
-        install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}${sysconfdir}/fstab
         install -d ${D}/cache/
         install -d ${D}/tmp/
         install -d ${D}/res/
         install -d ${D}/data/
         install -d ${D}/system/
-        install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
         install -m 0755 ${S}/start_recovery -D ${D}${sysconfdir}/init.d/recovery
+
+        if [ "${SYSTEMD_SUPPORT}" == "systemd" ]; then
+              install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/fstab -D ${D}${sysconfdir}/fstab
+              install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/recovery/files/fstab -D ${D}/res/recovery_volume_config
+        else
+              install -m  0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}${sysconfdir}/fstab
+              install -m 0755 ${WORKSPACE}/poky/meta-qti-bsp/recipes-bsp/base-files-recovery/fstab -D ${D}/res/recovery_volume_config
+        fi
 }
