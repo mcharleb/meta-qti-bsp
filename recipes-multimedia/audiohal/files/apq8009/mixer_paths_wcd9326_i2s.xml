@@ -1580,6 +1580,14 @@
         <path name="dmic1" />
     </path>
 
+    <path name="unprocessed-handset-mic">
+        <path name="handset-mic" />
+    </path>
+
+    <path name="unprocessed-mic">
+        <path name="unprocessed-handset-mic" />
+    </path>
+
     <path name="headphones">
         <ctl name="SLIM RX0 MUX" value="AIF1_PB" />
         <ctl name="SLIM RX1 MUX" value="AIF1_PB" />

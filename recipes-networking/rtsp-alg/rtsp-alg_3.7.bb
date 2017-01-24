@@ -1,10 +1,10 @@
-inherit autotools-brokensep module
+inherit autotools-brokensep module qperf
 DESCRIPTION = "RSTP ALG"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://nf_nat_rtsp.c;beginline=2;endline=30;md5=1d494e4d4253d1fcdcbfe334f8a4cd0a"
 
 do_unpack[deptask] = "do_populate_sysroot"
-PR = "r6_${KERNEL_VERSION}"
+PR = "r6"
 
 # This DEPENDS is to serialize kernel module builds
 DEPENDS = "alx virtual/kernel"

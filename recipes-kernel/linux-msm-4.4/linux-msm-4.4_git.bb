@@ -1,4 +1,4 @@
-inherit kernel
+inherit kernel qperf
 
 DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
