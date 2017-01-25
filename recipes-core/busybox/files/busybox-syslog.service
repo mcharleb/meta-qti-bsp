@@ -1,0 +1,9 @@
+[Unit]
+Description=System Logging Service
+
+[Service]
+ExecStart=/etc/init.d/syslog start
+ExecStop=/etc/init.d/syslog stop
+
+[Install]
+WantedBy=multi-user.target
