@@ -32,7 +32,7 @@ EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
 EXTRA_OECONF_append_msmcobalt =" --enable-is-ubwc-supported="yes""
 
 # configure headers
-EXTRA_OECONF_append ="--with-glib"
+EXTRA_OECONF_append =" --with-glib"
 EXTRA_OECONF_append =" --with-ui-headers=${STAGING_INCDIR}/ui/"
 EXTRA_OECONF_append =" --with-android-headers=${STAGING_INCDIR}/"
 #EXTRA_OECONF_append =" --with-utils-headers=${STAGING_INCDIR}/utils/"
