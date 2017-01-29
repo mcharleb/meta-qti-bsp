@@ -14,6 +14,7 @@ SRC_URI += "\
             file://mdev.cfg \
             file://base.cfg \
             file://syslog-startup.conf \
+            file://busybox-syslog.service \
             file://busybox_klogd.patch;patchdir=.. \
             file://iio.sh \
             file://0001-Support-MTP-function.patch \
@@ -29,6 +30,12 @@ do_install_append() {
         install -d ${D}${sysconfdir}/udev/scripts/
         install -m 0755 ${WORKDIR}/automountsdcard.sh \
             ${D}${sysconfdir}/udev/scripts/automountsdcard.sh
+        install -d ${D}${systemd_unitdir}/system/
+        install -m 0644 ${WORKDIR}/busybox-syslog.service -D ${D}${systemd_unitdir}/system/busybox-syslog.service
+        install -d ${D}${systemd_unitdir}/system/multi-user.target.wants/
+        # enable the service for multi-user.target
+        ln -sf ${systemd_unitdir}/system/busybox-syslog.service \
+           ${D}${systemd_unitdir}/system/multi-user.target.wants/busybox-syslog.service
     else
         install -d ${D}${sysconfdir}/mdev
         install -m 0755 ${WORKDIR}/automountsdcard.sh ${D}${sysconfdir}/mdev/
