@@ -30,13 +30,15 @@ MY_TARGET         ?= "${BASEMACHINE}"
 
 BOOTLOADER_NAME = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', 'emmc_appsboot', 'appsboot', d)}"
 
+emmc_bootloader = "${@base_contains('DISTRO_FEATURES', 'emmc-boot', '1', '0', d)}"
+
 LIBGCC = "${STAGING_LIBDIR}/${TARGET_SYS}/4.9.3/libgcc.a"
 
 DISPLAY_SCREEN = "${@base_conditional('PRODUCT', 'drone', '0', '1', d)}"
 
 EXTRA_OEMAKE = "${MY_TARGET} TOOLCHAIN_PREFIX='${TARGET_PREFIX}'  LIBGCC='${LIBGCC}' DISPLAY_SCREEN=${DISPLAY_SCREEN}"
 
-EXTRA_OEMAKE_append_emmc-boot = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=1"
+EXTRA_OEMAKE_append = " VERIFIED_BOOT=0 DEFAULT_UNLOCK=true EMMC_BOOT=${emmc_bootloader} APPEND_CMDLINE=${emmc_bootloader}"
 
 do_install() {
         install -d ${D}/boot
