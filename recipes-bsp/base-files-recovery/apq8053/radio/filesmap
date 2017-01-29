@@ -1,5 +1,4 @@
-#!/bin/sh
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,43 +24,38 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# find_partitions        init.d script to dynamically find partitions
-#
 
+# filename              partition
 
-timestamp()
-{
-    seconds="$(date +%s)"
-}
+NON-HLOS.ubi            modem
+NON-HLOS.bin            /dev/block/bootdevice/by-name/modem
 
-RESTORECON()
-{
-    timestamp
-    echo "$seconds $2 start" > /dev/console
-    context_check="$(matchpathcon -V $2)"
-    if test "${context_check#*verified}" == "$context_check"
-    then
-        # Only do a restorecon if necessary
-        /sbin/restorecon $1 $2
-    fi
-    timestamp
-    echo "$seconds $2 end" > /dev/console
-}
-FindAndMountEXT4 () {
-   partition=$1
-   dir=$2
-   mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
-}
+sbl1.mbn                sbl
+tz.mbn                  tz
+rpm.mbn                 rpm
+appsboot.mbn            aboot
 
-FindAndMountEXT4 userdata /data
-FindAndMountEXT4 dsp /dsp
-FindAndMountEXT4 persist /persist
-FindAndMountEXT4 cache  /cache
+# filename + .bak       backup partition
 
-/sbin/restorecon -RF /persist
-/sbin/restorecon -RF /data
+#sbl1.mbn.bak            sbl1bak
+#tz.mbn.bak              tzbak
+#rpm.mbn.bak             rpmbak
+#appsboot.mbn.bak        abootbak
 
-exit 0
+# For multiple file firmware images that differ from *.mbn and *.bin
+# you can specify filename.* to direct all files to the same location.
+# For example for modem.mdt, modem.b00, modem.b01,... modem.bxx files
+# writting 'modem.*   location' will direct all files to 'location'.
+# If still some files need to go to different location give the full
+# file name also, for example 'modem.b01   other_location'
+
+# filename              location
+
+mba.*                   /firmware/image
+modem.*                 /firmware/image
+bdwlan30.bin            /firmware/image
+nvm_tlv_3.0.bin         /firmware/image
+otp30.bin               /firmware/image
+qwlan30.bin             /firmware/image
+rampatch_tlv_3.0.tlv    /firmware/image
+utf30.bin               /firmware/image
