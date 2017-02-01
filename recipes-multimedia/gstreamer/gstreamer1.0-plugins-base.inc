@@ -9,7 +9,7 @@ SRC_URI_append = "\
 
 LICENSE = "GPLv2+ & LGPLv2+"
 
-DEPENDS += "iso-codes util-linux zlib gstreamer-core-patch"
+DEPENDS += "iso-codes util-linux zlib"
 
 inherit gettext
 
@@ -46,6 +46,7 @@ CACHED_CONFIGUREVARS_append_x86 = " ac_cv_header_emmintrin_h=no ac_cv_header_xmm
 
 FILES_${MLPREFIX}libgsttag-1.0 += "${datadir}/gst-plugins-base/1.0/license-translations.dict"
 do_fetch[depends] = " gstreamer-core-patch:do_fetch"
+do_fetch[depends] = " gstreamer-qti-patch:do_fetch"
 do_compile_prepend() {
         export GIR_EXTRA_LIBS_PATH="${B}/gst-libs/gst/tag/.libs:${B}/gst-libs/gst/video/.libs:${B}/gst-libs/gst/audio/.libs:${B}/gst-libs/gst/rtp/.libs"
 }
