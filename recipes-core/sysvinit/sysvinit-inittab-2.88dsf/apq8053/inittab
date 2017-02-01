@@ -19,6 +19,7 @@ lprp:2345:respawn:/sbin/leprop-service
 node:2345:wait:mknod -m 660 /dev/media0 c 251 0
 
 qcam:2345:respawn:/system/bin/mm-qcamera-daemon
+srvm:2345:respawn:/usr/bin/servicemanager
 qmfs:2345:respawn:/usr/bin/qmmf-server
 qmfw:2345:respawn:/usr/bin/qmmf-webserver
 

@@ -16,6 +16,8 @@ si::sysinit:/etc/init.d/rcS
 dvsk:2345:wait:mkdir -p -m 777 /dev/socket
 lprp:2345:respawn:/sbin/leprop-service
 
+srvm:2345:respawn:/usr/bin/servicemanager
+
 #Set the storage daemons to respawn
 rmts:2345:respawn:/sbin/rmt_storage
 scrb:2345:respawn:/sbin/fs-scrub-daemon
