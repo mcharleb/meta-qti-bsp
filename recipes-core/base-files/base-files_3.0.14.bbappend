@@ -7,7 +7,8 @@ dirs755 += "/media/cf /media/net /media/ram \
             /media/mmc1"
 
 dirs755_append_apq8009 += "/firmware /persist /cache"
-
+dirs755_append_apq8053 +="/persist /cache /dsp "
+#TODO Enabling systemd we need to add /firmware in dirs_755 list.
 do_install_append(){
     install -m 755 -o diag -g diag -d ${D}/media
     install -m 755 -o diag -g diag -d ${D}/mnt/sdcard
