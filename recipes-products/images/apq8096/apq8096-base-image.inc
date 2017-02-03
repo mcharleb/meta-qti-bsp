@@ -8,6 +8,15 @@ IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
 IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
+# utils and scripts needed for SELinux
+IMAGE_INSTALL += "packagegroup-core-selinux"
+IMAGE_INSTALL += "selinux-config"
+IMAGE_INSTALL += "start-scripts-firmware-links"
+IMAGE_INSTALL += "refpolicy-mls"
+IMAGE_INSTALL += "start-scripts-find-partitions"
+IMAGE_INSTALL += "start-scripts-misc-daemon"
+IMAGE_INSTALL += "selinux-labelall" 
+
 # The MSM Linux minimal boot image files.
 #IMAGE_INSTALL += "alsa-intf"
 IMAGE_INSTALL += "alsa-lib"

@@ -25,7 +25,7 @@ IMAGE_INIT_MANAGER ?= "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS ?= ""
 
 IMAGE_PREPROCESS_COMMAND_prepend = " gen_buildprop;"
-
+IMAGE_FEATURES = "${@base_contains('DISTRO_FEATURES','ro-rootfs','read-only-rootfs','',d)}"
 gen_buildprop() {
    mkdir -p ${IMAGE_ROOTFS}/cache
    echo ro.build.version.release=`cat ${IMAGE_ROOTFS}/etc/version ` >> ${IMAGE_ROOTFS}/build.prop
