@@ -29,6 +29,27 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
+#following function is just for debugging not enabled by default
+timestamp()
+{
+   seconds="$(date +%s)"
+}
+
+#following function is just for debugging not enabled by default
+RESTORECON()
+{
+    timestamp
+    echo "$seconds $2 start" > /dev/console
+    context_check="$(matchpathcon -V $2)"
+    if test "${context_check#*verified}" == "$context_check"
+    then
+       # Only do a restorecon if necessary
+        /sbin/restorecon $1 $2
+    fi
+    timestamp
+    echo "$seconds $2 end" > /dev/console
+}
+
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
@@ -37,12 +58,14 @@ FindAndMountEXT4 () {
    mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
 }
 
+#For now we only have firmware with VFAT and which need protection ( selinux)
+# It mounted with secontext as firmware_t
 FindAndMountVFAT () {
    partition=$1
    dir=$2
    mmc_block_device=/dev/block/bootdevice/by-name/$partition
    mkdir -p $dir
-   mount -t vfat $mmc_block_device $dir
+   mount -t vfat $mmc_block_device $dir -o context=system_u:object_r:firmware_t:s0
 }
 
 
@@ -50,5 +73,10 @@ FindAndMountEXT4 userdata /data
 FindAndMountVFAT modem   /firmware
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 dsp /dsp
+
+/sbin/restorecon -RF /persist
+#/sbin/restorecon -RF /data
+/sbin/restorecon -RF /persist
+/sbin/restorecon -RF /dsp
 
 exit 0
