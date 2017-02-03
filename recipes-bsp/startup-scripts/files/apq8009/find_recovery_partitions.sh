@@ -100,7 +100,12 @@ FindAndMountEXT4 () {
       mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
       echo "EMMC : Mounting of $mmc_block_device on $dir done"
    fi
-   UpdateRecoveryVolume $1 $2 "ext4" $mmc_block_device
+
+   if [ "$partition" == "misc" ]; then
+      UpdateRecoveryVolume $1 $2 "emmc" $mmc_block_device
+   else
+      UpdateRecoveryVolume $1 $2 "ext4" $mmc_block_device
+   fi
 }
 
 FindAndMountMTD () {
@@ -124,6 +129,7 @@ then
     eval FindAndMountEXT4 system   /system   1
     eval FindAndMountEXT4 userdata /data     1
     eval FindAndMountEXT4 cache    /cache
+    eval FindAndMountEXT4 misc     /misc     1
 else
     fstype="UBI"
     eval FindAndAttachUBI modem
@@ -133,7 +139,6 @@ else
     eval FindAndMountUBI cachefs /cache
 fi
 
-FindAndMountMTD misc /misc
 eval FindAndMount${fstype} modem /firmware
 
 exit
