@@ -29,6 +29,23 @@
 # find_partitions        init.d script to dynamically find partitions
 #
 
+timestamp()
+{
+	seconds="$(date +%s)"
+}
+RESTORECON()
+{
+	timestamp
+	echo "$seconds $2 start" > /dev/console
+	context_check="$(matchpathcon -V $2)"
+	if test "${context_check#*verified}" == "$context_check"
+	then
+		/sbin/restorecon $1 $2
+	fi
+	timestamp
+	echo "$seconds $2 end" > /dev/console
+}
+
 FindAndMountEXT4 () {
    partition=$1
    dir=$2
@@ -41,4 +58,5 @@ FindAndMountEXT4 userdata /data
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 cache  /cache
 
+/sbin/restorecon -RF /data
 exit 0
