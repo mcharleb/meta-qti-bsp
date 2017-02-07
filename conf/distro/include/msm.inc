@@ -17,7 +17,7 @@ INHERIT += "recipe_sanity"
 PREFERRED_VERSION_autoconf = "2.68"
 ARM_INSTRUCTION_SET       ?= "arm"
 FULL_OPTIMIZATION          = "-O2 -fexpensive-optimizations -frename-registers -fomit-frame-pointer -ftree-vectorize "
-
+FULL_OPTIMIZATION          += " -Wno-error=maybe-uninitialized -finline-functions -finline-limit=64 "
 # NLS
 USE_NLS = "no"
 USE_NLS_glib-2.0 = "yes"
