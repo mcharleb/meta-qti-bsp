@@ -4,7 +4,7 @@ DESCRIPTION = "QuIC Linux Kernel"
 LICENSE = "GPLv2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d7810fab7487fb0aad327b76f1be7cd7"
 
-COMPATIBLE_MACHINE = "(mdm9607|mdmcalifornium|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
+COMPATIBLE_MACHINE = "(mdm9607|mdm9650|apq8009|apq8096|apq8053|apq8017|msm8909w|sdxhedgehog)"
 
 # Default image type is zImage, change it in machine conf if needed.
 KERNEL_IMAGETYPE ?= "zImage"

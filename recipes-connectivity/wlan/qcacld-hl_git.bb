@@ -4,11 +4,11 @@ DESCRIPTION = "Qualcomm Atheros WLAN CLD high latency driver"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/${LICENSE};md5=f3b90e78ea0cffb20bf5cca7947a896d"
 
-# Targets - mdmcalifornium and sdxhedgehog: modulename = wlan_sdio.ko, chip name - qca9377
+# Targets - mdm9650 and sdxhedgehog: modulename = wlan_sdio.ko, chip name - qca9377
 # Other targets : modulename = wlan.ko, chip name -
 
 python __anonymous () {
-     if d.getVar('BASEMACHINE', True) == 'mdmcalifornium':
+     if d.getVar('BASEMACHINE', True) == 'mdm9650':
          d.setVar('WLAN_MODULE_NAME', 'wlan_sdio')
          d.setVar('CHIP_NAME', 'qca9377')
      elif d.getVar('BASEMACHINE', True) == 'sdxhedgehog':
