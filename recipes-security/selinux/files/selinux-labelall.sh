@@ -8,7 +8,8 @@ RESTORECON()
     if test "${context_check#*verified}" == "$context_check"
     then
         # Only do a restorecon if necessary
-        /sbin/restorecon $1 $2
+        #/sbin/restorecon $1 $2
+        echo "WARNING: $2 not labelled" > /dev/console
     fi
 }
 
