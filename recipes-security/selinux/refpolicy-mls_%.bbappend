@@ -6,6 +6,7 @@ SRCREV_refpolicy-contrib = "RELEASE_2_20161023"
 SRC_URI += "file://Remove-MLS-constraints.patch \ 
             file://0001-add-monolithic-policy.patch \
             file://0001-Remove-mls-relabelto.patch \
+            file://Assign-proc_t-to-proc-dir.patch \
             file://policy/ \
             file://append/ \
 "
