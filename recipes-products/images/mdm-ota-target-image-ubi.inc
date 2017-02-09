@@ -96,8 +96,9 @@ echo default_system_dev_certificate=build/abcd >> ${OTA_TARGET_IMAGE_ROOTFS_UBI}
 #delete old files
 rm -rf ${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}
 # Pack the files into the deploy dir
-cp -r ${OTA_TARGET_IMAGE_ROOTFS_UBI} ${DEPLOY_DIR_IMAGE}
-cd  ${DEPLOY_DIR_IMAGE}/${OTA_TARGET_BASENAME_UBI}/SYSTEM
+cd  ${OTA_TARGET_IMAGE_ROOTFS_UBI}/SYSTEM
 rm -rf var/run
 ln -snf ../run var/run
+cp -r ${OTA_TARGET_IMAGE_ROOTFS_UBI} ${DEPLOY_DIR_IMAGE}
+
 }
