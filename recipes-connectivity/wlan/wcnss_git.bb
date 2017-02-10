@@ -7,6 +7,7 @@ PR = "r1"
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI = "file://qcom-opensource/wlan/prima/firmware_bin \
            file://set_wcnss_mode"
+SRC_URI += "file://wcnss_wlan.service"
 
 S = "${WORKDIR}/qcom-opensource/wlan/firmware_bin"
 
@@ -16,6 +17,15 @@ do_install() {
     install -d ${D}/etc
     install -d ${D}/etc/init.d
     install "${WORKDIR}"/set_wcnss_mode ${D}/etc/init.d
+
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+		install -d ${D}/etc/systemd/system/
+		install -m 0644 ${WORKDIR}/wcnss_wlan.service -D ${D}/etc/systemd/system/wcnss_wlan.service
+		install -d ${D}/etc/systemd/system/multi-user.target.wants/
+		# enable the service for multi-user.target
+		ln -sf /etc/systemd/wcnss_wlan.service \
+		${D}/etc/systemd/system/multi-user.target.wants/wcnss_wlan.service
+	fi
 
     mkdir -p ${D}/lib/firmware/wlan/prima
     cp -pP ${WORKSPACE}/android_compat/device/qcom/${SOC_FAMILY}/WCNSS_qcom_cfg.ini ${D}/lib/firmware/wlan/prima
