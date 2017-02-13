@@ -1,4 +1,4 @@
-inherit autotools pkgconfig
+inherit autotools pkgconfig update-rc.d
 
 DESCRIPTION = "QMMF SDK"
 LICENSE = "BSD"
@@ -35,8 +35,13 @@ EXTRA_OECONF_append = " --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/
 FILESPATH =+ "${WORKSPACE}/vendor/qcom/opensource/:"
 SRC_URI  := "file://qmmf-sdk"
 SRC_URI  += "file://qmmf-server.service"
+SRC_URI  += "file://recorder_boottest.sh"
+SRC_URI  += "file://boottime_config.txt"
 
 S = "${WORKDIR}/qmmf-sdk"
+
+INITSCRIPT_NAME = "recorder_boottest.sh"
+INITSCRIPT_PARAMS = "start 21 5 ."
 
 do_install_append () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
@@ -47,6 +52,19 @@ do_install_append () {
         ln -sf /etc/systemd/qmmf-server.service \
            ${D}/etc/systemd/system/multi-user.target.wants/qmmf-server.service
     fi
+    install -m 0755 ${WORKDIR}/recorder_boottest.sh -D ${D}/${sysconfdir}/init.d/recorder_boottest.sh
+    install -m 0755 ${WORKDIR}/boottime_config.txt -D ${D}/${sysconfdir}/boottime_config.txt
+}
+
+pkg_postinst_${PN} () {
+  update-alternatives --install ${sysconfdir}/init.d/$(INITSCRIPT_NAME) recorder_test $(INITSCRIPT_NAME) 60
+    [ -n "$D" ] && OPT="-r $D" || OPT="-s"
+    # remove all rc.d-links potentially created from alternatives
+    update-rc.d $OPT -f $(INITSCRIPT_NAME) remove
+    update-rc.d $OPT $(INITSCRIPT_NAME) $(INITSCRIPT_PARAMS)
+}
+
+do_package_qa () {
 }
 
 FILES_${PN}-qmmf-server-dbg = "${bindir}/.debug/qmmf-server"
