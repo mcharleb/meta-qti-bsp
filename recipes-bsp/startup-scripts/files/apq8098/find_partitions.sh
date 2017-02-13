@@ -48,5 +48,6 @@ FindAndMountEXT4 userdata /data
 FindAndMountVFAT modem   /firmware
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 dsp /dsp
+FindAndMountEXT4 bt_firmware /bt_firmware/
 
 exit 0
