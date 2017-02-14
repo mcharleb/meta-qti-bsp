@@ -1,5 +1,5 @@
 # List of packages installed onto the root file system as specified by the user.
-include ${BASEMACHINE}/${BASEMACHINE}-recovery-image.inc
+include include/machine-recovery-image.inc
 
 IMAGE_LINGUAS = ""
 
