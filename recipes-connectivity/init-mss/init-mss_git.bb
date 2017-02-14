@@ -16,6 +16,7 @@ EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8009', '--enable-indefinit
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8017', '--enable-indefinite-sleep', '', d)}"
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8053', '--enable-indefinite-sleep', '', d)}"
 EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8096', '--enable-indefinite-sleep', '', d)}"
+EXTRA_OECONF += " ${@base_contains('BASEMACHINE', 'apq8098', '--enable-indefinite-sleep', '', d)}"
 
 FILES_${PN} += "${systemd_unitdir}/system/"
 
