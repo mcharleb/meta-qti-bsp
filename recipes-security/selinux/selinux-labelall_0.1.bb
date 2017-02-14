@@ -9,7 +9,7 @@ LICENSE = "BSD"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/\
 BSD;md5=3775480a712fc46a69647678acb234cb"
 
-FILESPATH =+ "${THISDIR}/files"
+FILESPATH =+ "${THISDIR}/files/:"
 SRC_URI = "file://selinux-labelall.sh"
 INITSCRIPT_NAME = "selinux-labelall"
 INITSCRIPT_PARAMS = "start 06 S ."
