@@ -44,7 +44,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   =  "file://kernel"
-SRC_URI   +=  "file://0001-Revert-msm-cpp-Add-support-pagefault-handler-in-CPP.patch"
 
 SRC_DIR   =  "${WORKSPACE}/kernel/msm-3.18"
 S         =  "${WORKDIR}/kernel/msm-3.18"
