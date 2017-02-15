@@ -18,7 +18,8 @@ IMAGE_INSTALL += "rmtstorage"
 # AUDIO HAL
 IMAGE_INSTALL += "lib32-tinyalsa"
 IMAGE_INSTALL += "lib32-audiohal"
-
+IMAGE_INSTALL += "lib32-encoders"
+IMAGE_INSTALL += "lib32-media"
 
 #IMAGE_INSTALL += "alx"
 #IMAGE_INSTALL += "avahi-systemd"

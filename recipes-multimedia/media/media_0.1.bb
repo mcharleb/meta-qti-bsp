@@ -15,6 +15,7 @@ DEPENDS += "mm-video-noship"
 
 # 8909 don't need dispaly-ha to compile. 
 DEPENDS_remove_msm8909 = "display-hal mm-video-noship"
+DEPENDS_remove_apq8017 = "display-hal mm-video-noship adreno200"
 
 # configure features
 EXTRA_OECONF_append =" --enable-use-glib="yes""
