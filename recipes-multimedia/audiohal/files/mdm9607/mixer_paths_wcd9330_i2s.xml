@@ -332,7 +332,7 @@
 
     <path name="voice-call">
         <ctl name="PRI_MI2S_RX_Voice Mixer CSVoice" value="1" />
-        <ctl name="Voice_Tx Mixer TERT_MI2S_TX_Voice" value="1" />
+        <ctl name="Voice_Tx Mixer PRI_MI2S_TX_Voice" value="1" />
     </path>
 
     <path name="voice-call bt-sco">
@@ -552,25 +552,38 @@
     </path>
 
     <path name="speaker">
-        <ctl name="RX3 MIX1 INP1" value="RX1" />
-        <ctl name="SPK DAC Switch" value="1" />
+        <ctl name="SLIM RX1 MUX" value="AIF1_PB" />
+        <ctl name="MI2S_RX Channels" value="One" />
+        <ctl name="RX7 MIX1 INP1" value="RX1" />
+        <ctl name="RX7 Digital Volume" value="67" />
+        <ctl name="COMPO Switch" value="1" />
     </path>
 
     <path name="speaker-mic">
-        <path name="adc1" />
-        <ctl name="IIR1 INP1 MUX" value="DEC1" />
+        <ctl name="AIF1_CAP Mixer SLIM TX7" value="1" />
+        <ctl name="MI2S_TX Channels" value="One" />
+        <ctl name="SLIM TX7 MUX" value="DEC8" />
+        <ctl name="DEC8 MUX" value="ADC5" />
+        <ctl name="DEC8 Volume" value="67" />
+        <ctl name="ADC5 Volume" value="67" />
     </path>
 
     <path name="handset">
+        <ctl name="MI2S_RX Channels" value="One" />
+        <ctl name="SLIM RX1 MUX" value="AIF1_PB" />
         <ctl name="RX1 MIX1 INP1" value="RX1" />
-        <ctl name="RDAC2 MUX" value="RX1" />
-        <ctl name="RX1 Digital Volume" value="84" />
-        <ctl name="EAR PA Gain" value="POS_6_DB" />
-        <ctl name="EAR_S" value="Switch" />
+        <ctl name="CLASS_H_DSM MUX" value="DSM_HPHL_RX1" />
+        <ctl name="DAC1 Switch" value="1" />
+        <ctl name="RX1 Digital Volume" value="67" />
     </path>
 
     <path name="handset-mic">
-        <path name="adc1" />
+        <ctl name="AIF1_CAP Mixer SLIM TX7" value="1" />
+        <ctl name="MI2S_TX Channels" value="One" />
+        <ctl name="SLIM TX7 MUX" value="DEC8" />
+        <ctl name="DEC8 MUX" value="ADC5" />
+        <ctl name="DEC8 Volume" value="67" />
+        <ctl name="ADC5 Volume" value="67" />
     </path>
 
     <path name="headphones">
@@ -588,9 +601,14 @@
     </path>
 
     <path name="headset-mic">
-        <path name="adc2" />
         <ctl name="ADC2 MUX" value="INP2" />
         <ctl name="IIR1 INP1 MUX" value="DEC1" />
+        <ctl name="MI2S_TX Channels" value="One" />
+        <ctl name="AIF1_CAP Mixer SLIM TX7" value="1" />
+        <ctl name="SLIM TX7 MUX" value="DEC5" />
+        <ctl name="DEC5 MUX" value="ADC2" />
+        <ctl name="DEC5 Volume" value="67" />
+        <ctl name="ADC2 Volume" value="100" />
     </path>
 
     <path name="sidetone-iir">
@@ -603,8 +621,9 @@
 
     <path name="sidetone-handset">
         <path name="sidetone-iir" />
-        <ctl name="IIR1 INP1 Volume" value="53" />
+        <ctl name="IIR1 INP1 Volume" value="65" />
         <ctl name="RX1 MIX2 INP1" value="IIR1" />
+        <ctl name="IIR1 INP1 MUX" value="DEC8" />
     </path>
 
     <path name="sidetone-headphone">

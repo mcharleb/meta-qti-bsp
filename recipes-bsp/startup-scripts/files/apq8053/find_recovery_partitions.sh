@@ -120,7 +120,7 @@ FindAndMountMTD () {
 
    UpdateRecoveryVolume $1 $2 "mtd" /dev/$mtd_block_device
 }
-
+mount -o remount,rw /
 echo -n > $fstab_file
 
 if [ -d $emmc_dir ]
