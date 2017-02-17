@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -27,16 +27,14 @@
 
 
 [Unit]
-Description=Wlan Service
-SourcePath=/etc/init.d/wlan
-Requires=wcnss_wlan.service
-After=persist.mount firmware-links.service wcnss_wlan.service
+Description=WCNSS platform
+SourcePath=/etc/init.d/set_wcnss_mode
+After=persist.mount firmware-links.service
 
 [Service]
 Restart=no
 RemainAfterExit=yes
-ExecStart=/etc/init.d/wlan start
-ExecStop=/etc/init.d/wlan stop
+ExecStart=/etc/init.d/set_wcnss_mode
 
 [Install]
 WantedBy=multi-user.target
