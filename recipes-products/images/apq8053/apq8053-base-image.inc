@@ -1,4 +1,5 @@
 # Rootfs creation.
+require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 
 DEPENDS_append += "lib32-lk"
 # The OE-Core minimal boot image files.
@@ -55,7 +56,6 @@ IMAGE_INSTALL += "glib-2.0"
 #IMAGE_INSTALL += "initscripts-msm"
 IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
-IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "iptables"
 #IMAGE_INSTALL += "iw"
 #IMAGE_INSTALL += "jquery"
@@ -90,7 +90,6 @@ IMAGE_INSTALL += "loc-hal"
 #IMAGE_INSTALL += "perl"
 #IMAGE_INSTALL += "qcacld-ll"
 #IMAGE_INSTALL += "qrngd"
-IMAGE_INSTALL += "reboot-daemon"
 #IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-firmware-links"

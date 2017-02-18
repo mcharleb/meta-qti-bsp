@@ -1,5 +1,5 @@
 # Rootfs creation.
-
+require ../../../recipes-ss-mgr/packagegroup/ss-mgr.inc
 DEPENDS_append += "lk"
 IMAGE_INSTALL += "packagegroup-core-boot"
 IMAGE_INSTALL += "${ROOTFS_PKGMANAGE_BOOTSTRAP}"
@@ -41,7 +41,6 @@ IMAGE_INSTALL += "hostap-daemon-qcacld"
 #IMAGE_INSTALL += "initscripts-msm"
 #IMAGE_INSTALL += "init-audio"
 IMAGE_INSTALL += "iproute2"
-#IMAGE_INSTALL += "init-mss"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "iw"
 IMAGE_INSTALL += "jquery"
@@ -76,7 +75,6 @@ IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "qcacld-hl"
 #IMAGE_INSTALL += "qrngd"
-IMAGE_INSTALL += "reboot-daemon"
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sigma-dut"
 IMAGE_INSTALL += "start-scripts-find-partitions"
