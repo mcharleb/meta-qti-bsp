@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -27,7 +27,6 @@
 
 ## <summary> devices interface </summary>
 
-
 ########################################
 ## <summary>
 ##      Read and write the subsys_modem device.
@@ -46,3 +45,133 @@ interface(`rw_subsys_modem_dev',`
     rw_chr_files_pattern($1, device_t, subsys_modem_device_t)
 ')
 
+########################################
+## <summary>
+##      Read and write  audio device nodes
+##      which are starting with msm_*
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_audio_dev',`
+    gen_require(`
+        type device_t, audio_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, audio_device_t)
+')
+
+########################################
+## <summary>
+##      Read and write the /dev/v4l-subdev*
+##      or  /dev/media[0-9]device.
+##      or /dev/video[0-99] device
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_video_dev',`
+    gen_require(`
+        type device_t, video_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, video_device_t)
+')
+
+########################################
+## <summary>
+##      Read and write the shared_memory_log
+##      pointing to /dev/smem_log
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_shared_memory_dev',`
+    gen_require(`
+        type device_t, shared_log_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, shared_log_device_t)
+')
+
+########################################
+## <summary>
+##      Read and write the smd_dev
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_smd_dev',`
+    gen_require(`
+        type device_t, smd_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, smd_device_t)
+')
+
+########################################
+## <summary>
+##      Read and write the diag_dev
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_diag_dev',`
+    gen_require(`
+        type device_t, diag_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, diag_device_t)
+')
+
+########################################
+## <summary>
+##      Read and write the logd_socket
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`rw_logd_sock',`
+    gen_require(`
+        type device_t, log_socket_t;
+    ')
+
+    write_sock_files_pattern($1, device_t, log_socket_t)
+')
+
+
+########################################
+## <summary>
+##      Read and wpa_sup file
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+# TODO : need to clean up
+interface(`r_wpa_sup_file',`
+    gen_require(`
+        type unlabeled_t, wpa_sup_t;
+    ')
+
+    read_files_pattern($1, unlabeled_t,  wpa_sup_t)
+')

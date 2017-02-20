@@ -25,31 +25,10 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-policy_module(device, 1.0)
-
-########################################
-#
-# Declarations
-#
-
-type subsys_modem_device_t;
-dev_node(subsys_modem_device_t)
-
-type audio_device_t;
-dev_node(audio_device_t)
-
-type video_device_t;
-dev_node(video_device_t)
-
-type shared_log_device_t;
-dev_node(shared_log_device_t)
-
-type smd_device_t;
-dev_node(smd_device_t);
-
-type logd_socket_t;
-dev_node(logd_socket_t);
-
-#TODO : need to clean up this
-type wpa_sup_t;
-files_type(wpa_sup_t)
+# this rules are for wpa_supplicant which run
+# in NetworkManger context
+#allow NetworkManager_t shared_log_device_t:chr_file { read write ioctl open };
+rw_shared_memory_dev(NetworkManager_t)
+#rw_logd_sock(NetworkManager_t)
+#r_wpa_sup_file(NetworkManager_t)
+allow NetworkManager_t initrc_t:unix_dgram_socket sendto;

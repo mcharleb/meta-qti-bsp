@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -36,6 +36,29 @@ type thermal-engine_t;
 type thermal-engine_exec_t;
 
 init_daemon_domain(thermal-engine_t, thermal-engine_exec_t)
+
+# named socket type
+type thermal_sock_t;
+files_type(thermal_sock_t)
+
+# configuration files
+type thermal_etc_t;
+files_type(thermal_etc_t)
+
+# configuration files
+type thermal_device_t;
+dev_node(thermal_device_t)
+
 allow thermal-engine_t self:capability sys_nice;
 allow thermal-engine_t self:unix_dgram_socket create;
+allow thermal-engine_t initrc_t:unix_dgram_socket sendto;
+allow thermal-engine_t self:process setsched;
+allow thermal-engine_t self:unix_dgram_socket { write connect };
+allow thermal-engine_t initrc_t:unix_dgram_socket sendto;
+allow thermal-engine_t self:capability2 block_suspend;
+
 dev_read_sysfs(thermal-engine_t)
+rw_shared_memory_dev(thermal-engine_t)
+rw_thermal_dev(thermal-engine_t)
+read_thermal_config(thermal-engine_t)
+create_sock_files_pattern(thermal-engine_t, device_t, device_t)

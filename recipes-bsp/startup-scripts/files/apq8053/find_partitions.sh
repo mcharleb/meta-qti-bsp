@@ -61,7 +61,9 @@ FindAndMountEXT4 dsp /dsp
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 cache  /cache
 
-/sbin/restorecon -RF /persist
-/sbin/restorecon -RF /data
+# TODO: Static assigment is not full functional
+# till that time we need this
+/sbin/restorecon -RF /dev
+#/sbin/restorecon -RF /data
 
 exit 0
