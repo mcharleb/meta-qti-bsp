@@ -1,4 +1,4 @@
-BASEMACHINE ?= "mdmcalifornium"
+BASEMACHINE ?= "mdm9650"
 require conf/machine/include/basemachine.inc
 
 SOC_FAMILY ?= "mdm9x50"
