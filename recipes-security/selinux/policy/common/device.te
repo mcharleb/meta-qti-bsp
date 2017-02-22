@@ -51,5 +51,5 @@ type logd_socket_t;
 dev_node(logd_socket_t);
 
 #TODO : need to clean up this
-type wpa_sup_t;
-files_type(wpa_sup_t)
+type wifi_data_file_t;
+files_type(wifi_data_file_t)

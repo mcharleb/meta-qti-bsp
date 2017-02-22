@@ -168,10 +168,10 @@ interface(`rw_logd_sock',`
 ##      </summary>
 ## </param>
 # TODO : need to clean up
-interface(`r_wpa_sup_file',`
+interface(`r_wifi_data_file',`
     gen_require(`
-        type unlabeled_t, wpa_sup_t;
+        type unlabeled_t, wifi_data_file_t;
     ')
 
-    read_files_pattern($1, unlabeled_t,  wpa_sup_t)
+    read_files_pattern($1, unlabeled_t,  wifi_data_file_t)
 ')

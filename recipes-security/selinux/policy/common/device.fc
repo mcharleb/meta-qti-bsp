@@ -36,4 +36,4 @@
 /dev/smd([0-44])+     -c    gen_context(system_u:object_r:smd_device_t,s0)
 #/dev/logd                   gen_context(system_u:object_r:devlog_t,s0)d
 #TODO need to cleanup this
-/data/misc/wifi/wpa_supplicant.conf  -- gen_context(system_u:object_r:wpa_sup_t,s0)
+/data/misc/wifi(/.*)?  -- gen_context(system_u:object_r:wifi_data_file_t,s0)
