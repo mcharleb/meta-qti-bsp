@@ -11,8 +11,8 @@ IMAGE_DEV_MANAGER ?= "busybox-static-mdev"
 IMAGE_INIT_MANAGER ?= "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS ?= ""
 
-include mdm-ota-target-image-ubi.inc
-include mdm-ota-target-image-ext4.inc
+include include/mdm-ota-target-image-ubi.inc
+include include/mdm-ota-target-image-ext4.inc
 
 inherit core-image
 
