@@ -9,7 +9,7 @@ IMAGE_INSTALL += "${CORE_IMAGE_EXTRA_INSTALL}"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-intf"
-#IMAGE_INSTALL += "avahi-systemd"
+
 IMAGE_INSTALL += "avahi-daemon"
 IMAGE_INSTALL += "avahi-dnsconfd"
 IMAGE_INSTALL += "avahi-autoipd"
@@ -17,8 +17,7 @@ IMAGE_INSTALL += "avahi-utils"
 IMAGE_INSTALL += "alx"
 IMAGE_INSTALL += "base-files"
 IMAGE_INSTALL += "base-passwd"
-#IMAGE_INSTALL += "bridge-utils"
-#IMAGE_INSTALL += "compat-wireless-ath6kl"
+
 IMAGE_INSTALL += "conntrack-tools"
 IMAGE_INSTALL += "data-ipa-cfg-mgr"
 IMAGE_INSTALL += "data-oss"
@@ -27,16 +26,12 @@ IMAGE_INSTALL += "dnsmasq"
 IMAGE_INSTALL += "ddclient"
 IMAGE_INSTALL += "ebtables"
 IMAGE_INSTALL += "ethtool"
-#DEPENDS += "gdb-cross"
+
 IMAGE_INSTALL += "gdbserver"
 IMAGE_INSTALL += "gdb"
 IMAGE_INSTALL += "glib-2.0"
 IMAGE_INSTALL += "hostap-daemon-qcacld"
-# FIXME - This has a conflict with the task-core-boot.  You'll probably want to specify
-# bbappend-s to things there or come up with a new task set that involves this recipe's
-# work.
-#IMAGE_INSTALL += "initscripts-msm"
-#IMAGE_INSTALL += "init-audio"
+
 IMAGE_INSTALL += "iproute2"
 IMAGE_INSTALL += "iptables"
 IMAGE_INSTALL += "iw"
@@ -69,7 +64,7 @@ IMAGE_INSTALL += "ppp"
 IMAGE_INSTALL += "perl"
 IMAGE_INSTALL += "qcacld-ll"
 IMAGE_INSTALL += "qcacld-hl"
-#IMAGE_INSTALL += "qrngd"
+
 IMAGE_INSTALL += "rtsp-alg"
 IMAGE_INSTALL += "sfe"
 IMAGE_INSTALL += "sigma-dut"
@@ -91,11 +86,6 @@ IMAGE_INSTALL += "fluoride"
 IMAGE_INSTALL += "libbt-vendor"
 
 IMAGE_PREPROCESS_COMMAND += "echo ${MACHINE} >> ${IMAGE_ROOTFS}/target;"
-
-# Below packages are open source packages that depend on proprietary packages
-
-QMI_DIR_PRESENT = "${@os.path.exists('${WORKSPACE}/qmi')}"
-#IMAGE_INSTALL += "${@base_conditional('QMI_DIR_PRESENT', 'True', 'wpa-supplicant-qcacld', '', d)}"
 
 # Below is to generate sparse ext4 system image (OE by default supports raw ext4 images)
 
