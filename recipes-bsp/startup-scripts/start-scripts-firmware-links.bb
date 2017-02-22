@@ -28,7 +28,10 @@ do_install() {
             ${D}${systemd_unitdir}/system/sysinit.target.wants/firmware-links.service
     fi
 }
-
+do_install_append_apq8017() {
+ln -s /firmware/image/btfw32.tlv ${D}/lib/firmware/
+ln -s /firmware/image/btnv32.bin ${D}/lib/firmware/
+}
 pkg_postinst_${PN} () {
         update-alternatives --install ${sysconfdir}/init.d/firmware-links.sh firmware-links.sh firmware-links.sh 60
         [ -n "$D" ] && OPT="-r $D" || OPT="-s"
