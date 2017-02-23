@@ -50,6 +50,9 @@ dev_node(smd_device_t);
 type logd_socket_t;
 dev_node(logd_socket_t);
 
+type diag_device_t;
+dev_node(diag_device_t);
+
 #TODO : need to clean up this
 type wifi_data_file_t;
 files_type(wifi_data_file_t)

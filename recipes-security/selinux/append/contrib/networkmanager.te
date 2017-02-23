@@ -27,8 +27,9 @@
 
 # this rules are for wpa_supplicant which run
 # in NetworkManger context
-#allow NetworkManager_t shared_log_device_t:chr_file { read write ioctl open };
 rw_shared_memory_dev(NetworkManager_t)
 #rw_logd_sock(NetworkManager_t)
 r_wifi_data_file(NetworkManager_t)
+#This need to be removed later
+rw_diag_dev(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;

@@ -38,4 +38,3 @@ allow init_t self:capability2 audit_read;
 
 systemd_start_power_units(init_t)
 init_stream_connect(sysadm_t)
-#init_telinit(systemd_cgroups_t)
