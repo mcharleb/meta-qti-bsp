@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -26,3 +26,8 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /usr/bin/thermal-engine       --      gen_context(system_u:object_r:thermal-engine_exec_t,s0)
+/dev/socket/thermal-recv-client         -s      gen_context(system_u:object_r:thermal_sock_t,s0)
+/dev/socket/thermal-recv-passive-client -s      gen_context(system_u:object_r:thermal_sock_t,s0)
+/dev/socket/thermal-send-client         -s      gen_context(system_u:object_r:thermal_sock_t,s0)
+/dev/msm_thermal_query                  -c      gen_context(system_u:object_r:thermal_device_t,s0)
+/etc/thermal-engine.conf                        gen_context(system_u:object_r:thermal_etc_t,s0)

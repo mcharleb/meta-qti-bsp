@@ -1,4 +1,4 @@
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,4 +25,15 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/dev/subsys_modem  gen_context(system_u:object_r:subsys_modem_device_t,s0)
+/dev/subsys_modem    gen_context(system_u:object_r:subsys_modem_device_t,s0)
+
+#/dev/msm_.*                gen_context(system_u:object_r:audio_device_t,s0)
+/dev/media([0-9])+    -c    gen_context(system_u:object_r:video_device_t,s0)
+#/dev/v4l-subdev.*          gen_context(system_u:object_r:video_device_t,s0)
+/dev/video([0-44])+   -c    gen_context(system_u:object_r:video_device_t,s0)
+/dev/smem_log         -c    gen_context(system_u:object_r:shared_log_device_t,s0)
+/dev/socket/logd      -s    gen_context(system_u:object_r:logd_socket_t,s0)
+/dev/smd([0-44])+     -c    gen_context(system_u:object_r:smd_device_t,s0)
+#/dev/logd                   gen_context(system_u:object_r:devlog_t,s0)d
+#TODO need to cleanup this
+/data/misc/wifi/wpa_supplicant.conf  -- gen_context(system_u:object_r:wpa_sup_t,s0)
