@@ -1,4 +1,4 @@
-# Copyright (c) 2016-17, The Linux Foundation. All rights reserved.
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,13 +25,7 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# this rules are for wpa_supplicant which run
-# in NetworkManger context
-rw_shared_memory_dev(NetworkManager_t)
-#rw_logd_sock(NetworkManager_t)
-r_wifi_data_file(NetworkManager_t)
-#This need to be removed later
-rw_diag_dev(NetworkManager_t)
-allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
-allow NetworkManager_t unlabeled_t:file { read getattr open };
-auditallow NetworkManager_t unlabeled_t:file { read getattr open };
+
+# Appended to modules/system/init.te in meta-selinux
+#============= mount_t ==============
+allow mount_t init_t:unix_stream_socket { read write };

@@ -27,3 +27,6 @@
 
 init_udgram_socket_set(systemd_cgroups_t)
 init_use_script_ptys(systemd_passwd_agent_t)
+
+allow systemd_passwd_agent_t init_var_run_t:dir { create open read add_name write getattr search };
+allow systemd_passwd_agent_t proc_t:file { read open };
