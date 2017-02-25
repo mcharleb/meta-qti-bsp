@@ -13,6 +13,7 @@ inherit update-rc.d
 
 INITSCRIPT_NAME = "find_partitions.sh"
 INITSCRIPT_PARAMS = "start 36 S ."
+INITSCRIPT_PARAMS_mdm = "start 30 S ."
 
 do_install() {
     install -m 0755 ${WORKDIR}/${BASEMACHINE}/find_partitions.sh -D ${D}${sysconfdir}/init.d/find_partitions.sh
