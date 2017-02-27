@@ -82,9 +82,11 @@ do_shared_workdir () {
         cp .config $kerneldir/
         cp -fR usr $kerneldir/
 
+        mkdir -p $kerneldir/certs
+
         # Signing keys may not be present
-        [ -f signing_key.priv ] && cp signing_key.priv $kerneldir/
-        [ -f signing_key.x509 ] && cp signing_key.x509 $kerneldir/
+        [ -f certs/signing_key.pem ] && cp certs/signing_key.pem $kerneldir/certs
+        [ -f certs/signing_key.x509 ] && cp certs/signing_key.x509 $kerneldir/certs
 
         # include/config
         mkdir -p $kerneldir/include/config
@@ -172,3 +174,10 @@ do_deploy () {
         ${extra_mkbootimg_params} --output ${DEPLOY_DIR_IMAGE}/${MACHINE}-boot.img
 }
 
+do_module_signing() {
+    for i in $(find ${PKGDEST} -name "*.ko"); do
+    ${STAGING_KERNEL_BUILDDIR}/scripts/sign-file sha512 ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.pem ${STAGING_KERNEL_BUILDDIR}/certs/signing_key.x509 ${i}
+    done
+}
+
+addtask do_module_signing after do_package before do_package_write_ipk

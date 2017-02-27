@@ -25,17 +25,13 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/dev/subsys_modem    gen_context(system_u:object_r:subsys_modem_device_t,s0)
-
-#/dev/msm_.*                gen_context(system_u:object_r:audio_device_t,s0)
-/dev/media([0-9])+    -c    gen_context(system_u:object_r:video_device_t,s0)
-#/dev/v4l-subdev.*          gen_context(system_u:object_r:video_device_t,s0)
-/dev/video([0-44])+   -c    gen_context(system_u:object_r:video_device_t,s0)
-/dev/smem_log         -c    gen_context(system_u:object_r:shared_log_device_t,s0)
-/dev/socket/logd      -s    gen_context(system_u:object_r:logd_socket_t,s0)
-/dev/smd([0-44])+     -c    gen_context(system_u:object_r:smd_device_t,s0)
-/dev/diag             -c    gen_context(system_u:object_r:diag_device_t,s0)
-#/dev/log              -s     gen_context(system_u:object_r:logd_socket_t,s0)
-
-#TODO need to cleanup this
-/data/misc/wifi/*.conf  -- gen_context(system_u:object_r:wifi_data_file_t,s0)
+# this rules are for wpa_supplicant which run
+# in NetworkManger context
+rw_shared_memory_dev(NetworkManager_t)
+#rw_logd_sock(NetworkManager_t)
+r_wifi_data_file(NetworkManager_t)
+#This need to be removed later
+rw_diag_dev(NetworkManager_t)
+allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
+allow NetworkManager_t unlabeled_t:file { read getattr open };
+auditallow NetworkManager_t unlabeled_t:file { read getattr open };

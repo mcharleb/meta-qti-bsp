@@ -18,6 +18,7 @@ SRC_URI += "\
             file://busybox_klogd.patch;patchdir=.. \
             file://iio.sh \
             file://0001-Support-MTP-function.patch \
+            file://0001-Fix-file-synchronization-in-mdev.patch \
 "
 
 prefix = ""

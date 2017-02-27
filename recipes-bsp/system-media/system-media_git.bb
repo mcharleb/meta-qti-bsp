@@ -12,7 +12,9 @@ FILESPATH =+ "${WORKSPACE}:"
 SRC_URI   = "file://system/media/"
 S = "${WORKDIR}/system/media"
 
-PR = "r1"
+EXTRA_OECONF += " --with-glib"
+
+PR = "r2"
 
 FILES_${PN}-dbg    = "${libdir}/.debug/lib*.*"
 FILES_${PN}        = "${libdir}/lib*.so.* ${libdir}/pkgconfig/*"

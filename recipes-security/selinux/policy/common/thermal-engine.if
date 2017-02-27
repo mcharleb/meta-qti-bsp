@@ -27,8 +27,41 @@
 
 ## <summary>thermal-engine daemon</summary>
 
-#######################################
+
+########################################
 ## <summary>
-##	thermal-engine daemon interface
+##      Read and write to thermal_device_t
 ## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
 #
+interface(`rw_thermal_dev',`
+    gen_require(`
+        type device_t, thermal_device_t;
+    ')
+
+    rw_chr_files_pattern($1, device_t, thermal_device_t)
+')
+
+########################################
+## <summary>
+##      Read thermal_config file
+##      that is located in /etc folder
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+#
+interface(`read_thermal_config',`
+    gen_require(`
+        type etc_t, thermal_etc_t;
+    ')
+
+    allow $1 etc_t:dir list_dir_perms;
+    read_files_pattern($1, etc_t, thermal_etc_t)
+')

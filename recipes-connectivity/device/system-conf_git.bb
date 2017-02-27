@@ -49,7 +49,7 @@ EXTRA_OECONF += "${@base_conditional('BASEPRODUCT', 'qsap', '--enable-qsap-wlan=
 
 INITSCRIPT_NAME   = "wlan_daemon"
 INITSCRIPT_PARAMS = "remove"
-INITSCRIPT_PARAMS_apq8009 = "start 98 5 . stop 2 0 1 6 ."
+INITSCRIPT_PARAMS_apq8009 = "${@base_conditional('BASEPRODUCT', 'drone', 'start 01 2 3 4 5 . stop 2 0 1 6 .', 'start 98 5 . stop 2 0 1 6 .', d)}"
 INITSCRIPT_PARAMS_apq8053 = "start 98 5 . stop 2 0 1 6 ."
 INITSCRIPT_PARAMS_apq8017 = "start 98 5 . stop 2 0 1 6 ."
-INITSCRIPT_PARAMS_apq8096 = "${@base_conditional('BASEPRODUCT', 'drone', 'start 01 5 . stop 2 0 1 6 .', 'start 98 5 . stop 2 0 1 6 .', d)}"
+INITSCRIPT_PARAMS_apq8096 = "${@base_conditional('BASEPRODUCT', 'drone', 'start 01 2 3 4 5 . stop 2 0 1 6 .', 'start 98 5 . stop 2 0 1 6 .', d)}"
