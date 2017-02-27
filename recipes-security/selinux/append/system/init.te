@@ -35,7 +35,10 @@ allow initrc_t self:system module_load;
 allow init_t initrc_t:binder { transfer call };
 allow init_t self:binder { transfer call set_context_mgr };
 allow init_t self:capability2 audit_read;
+allow initrc_t power_unit_t:service { start status };
+allow init_t self:system reboot;
 
 systemd_start_power_units(init_t)
+systemd_status_power_units(init_t)
 init_stream_connect(sysadm_t)
-#init_telinit(systemd_cgroups_t)
+init_get_generic_units_status(init_t)
