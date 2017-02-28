@@ -46,3 +46,23 @@ interface(`init_udgram_socket_set',`
                 allow $1 init_t:unix_dgram_socket sendto;
         ')
 ')
+
+########################################
+## <summary>
+##      Binder call and transfer support
+## </summary>
+## <param name="domain">
+##      <summary>
+##      Domain allowed access.
+##      </summary>
+## </param>
+## <rolecap/>
+#
+interface(`binder_call_transfer',`
+                gen_require(`
+                        type init_t;
+                ')
+
+                allow $1 init_t:binder  { transfer call };
+        ')
+')
