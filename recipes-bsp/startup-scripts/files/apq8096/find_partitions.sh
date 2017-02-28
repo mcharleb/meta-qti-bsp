@@ -74,9 +74,8 @@ FindAndMountVFAT modem   /firmware
 FindAndMountEXT4 persist /persist
 FindAndMountEXT4 dsp /dsp
 
-/sbin/restorecon -RF /persist
-#/sbin/restorecon -RF /data
+/sbin/restorecon -RF /data/misc/wifi
 /sbin/restorecon -RF /persist
 /sbin/restorecon -RF /dsp
-
+/sbin/restorecon -RF /dev
 exit 0
