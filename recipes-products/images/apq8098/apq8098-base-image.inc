@@ -100,6 +100,7 @@ IMAGE_INSTALL += "wpa-supplicant-qcacld"
 IMAGE_INSTALL += "wayland"
 IMAGE_INSTALL += "pixman"
 IMAGE_INSTALL += "weston"
+IMAGE_INSTALL += "weston-init"
 IMAGE_INSTALL += "libinput"
 IMAGE_INSTALL += "libdrm"
 
