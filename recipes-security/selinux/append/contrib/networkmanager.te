@@ -32,6 +32,10 @@ rw_shared_memory_dev(NetworkManager_t)
 r_wifi_data_file(NetworkManager_t)
 #This need to be removed later
 rw_diag_dev(NetworkManager_t)
+dev_rw_null(NetworkManager_t)
+#read_files_pattern(NetworkManager_t, default_t)
+#read_files_pattern(NetworkManager_t, tmpfs_t)
+files_read_default_files(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
 allow NetworkManager_t unlabeled_t:file { read getattr open };
 auditallow NetworkManager_t unlabeled_t:file { read getattr open };
