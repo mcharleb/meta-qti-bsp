@@ -40,4 +40,7 @@
     <pcm_ids>
         <usecase name="USECASE_AUDIO_PLAYBACK_OFFLOAD2" type="out" id="24"/>
     </pcm_ids>
+    <acdb_metainfo_key>
+        <param name="aptx" value="456"/>
+    </acdb_metainfo_key>
 </audio_platform_info>
