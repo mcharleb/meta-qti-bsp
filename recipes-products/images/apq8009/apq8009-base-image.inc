@@ -12,7 +12,6 @@ IMAGE_INSTALL += "packagegroup-core-selinux"
 IMAGE_INSTALL += "selinux-config"
 IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
-IMAGE_INSTALL += "selinux-labelall"
 
 # The MSM Linux minimal boot image files.
 

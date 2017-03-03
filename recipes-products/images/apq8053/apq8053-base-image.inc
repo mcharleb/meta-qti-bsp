@@ -14,7 +14,6 @@ IMAGE_INSTALL += "start-scripts-firmware-links"
 IMAGE_INSTALL += "refpolicy-mls"
 IMAGE_INSTALL += "start-scripts-find-partitions"
 IMAGE_INSTALL += "start-scripts-misc-daemon"
-IMAGE_INSTALL += "selinux-labelall"
 
 # The MSM Linux minimal boot image files.
 IMAGE_INSTALL += "alsa-lib"
