@@ -5,8 +5,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/net/${BPN}/${BPN}-${PV}.tar.xz \
            file://iproute2_config_to_data.patch \
           "
 
-SRC_URI[md5sum] = "fd9db28e4f411a1e74de65c919ae590f"
-SRC_URI[sha256sum] = "16f027af432a05085813a2f859b7d42dafd29b8c035ead830d37565b7397592d"
+SRC_URI[md5sum] = "6c823b40fdcfa7b8120743349a52ac18"
+SRC_URI[sha256sum] = "1f0a8a6c0e872166f75433f5cbf9766f3002b5c2f13501b3bb8c51846a127b79"
 
 # CFLAGS are computed in Makefile and reference CCOPTS
 #

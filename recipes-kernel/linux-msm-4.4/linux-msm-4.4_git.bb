@@ -124,6 +124,7 @@ do_shared_workdir () {
                 scripts/kconfig/conf \
                 scripts/mod/mk_elfconfig \
                 scripts/mod/modpost \
+                scripts/recordmcount \
                 scripts/sign-file \
                 scripts/sortextable;
             do

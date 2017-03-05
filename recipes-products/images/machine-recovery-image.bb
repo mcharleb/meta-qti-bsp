@@ -1,5 +1,5 @@
 # List of packages installed onto the root file system as specified by the user.
-include ${BASEMACHINE}/${BASEMACHINE}-recovery-image.inc
+include include/machine-recovery-image.inc
 
 IMAGE_LINGUAS = ""
 
@@ -11,8 +11,8 @@ IMAGE_DEV_MANAGER ?= "busybox-static-mdev"
 IMAGE_INIT_MANAGER ?= "sysvinit sysvinit-pidof"
 IMAGE_INITSCRIPTS ?= ""
 
-include include/mdm-ota-target-image-ubi.inc
-include include/mdm-ota-target-image-ext4.inc
+require include/mdm-ota-target-image-ubi.inc
+require include/mdm-ota-target-image-ext4.inc
 
 inherit core-image
 
