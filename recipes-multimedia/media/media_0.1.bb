@@ -17,7 +17,7 @@ DEPENDS += "av-frameworks"
 DEPENDS += "glib-2.0"
 DEPENDS += "mm-video-noship"
 
-# 8909 don't need dispaly-ha to compile. 
+# 8909 don't need dispaly-ha to compile.
 DEPENDS_remove_msm8909 = "display-hal mm-video-noship"
 DEPENDS_remove_apq8017 = "display-hal mm-video-noship adreno200"
 
@@ -30,10 +30,13 @@ EXTRA_OECONF_append_msm8909 =" --enable-targets-that-use-flag-msm8226="yes""
 EXTRA_OECONF_append_msm8916 =" --enable-targets-that-use-flag-msm8226="yes""
 EXTRA_OECONF_append_msm8953 =" --enable-build-mm-video="yes""
 EXTRA_OECONF_append_msm8953 =" --enable-targets-that-support-pq="yes""
+EXTRA_OECONF_append_msm8953 =" --enable-targets-that-support-vqzip="yes""
 EXTRA_OECONF_append_msm8996 =" --enable-build-mm-video="yes""
 EXTRA_OECONF_append_msm8996 =" --enable-is-ubwc-supported="yes""
 EXTRA_OECONF_append_msm8996 =" --enable-targets-that-support-pq="yes""
 EXTRA_OECONF_append_msm8996 =" --enable-master-side-cp-target-list="yes""
+EXTRA_OECONF_append_msm8996 =" --enable-targets-that-support-vqzip="yes""
+EXTRA_OECONF_append_msm8998 =" --enable-targets-that-support-vqzip="yes""
 EXTRA_OECONF_append_msmcobalt =" --enable-is-ubwc-supported="yes""
 
 # configure headers
@@ -49,6 +52,7 @@ EXTRA_OECONF_append =" --with-glib-lib-dir=${STAGING_LIBDIR}/glib-2.0/include"
 EXTRA_OECONF_append =" --with-gralloc-headers=${STAGING_INCDIR}/libgralloc/"
 EXTRA_OECONF_append =" --with-qdutils-headers=${STAGING_INCDIR}/libqdutils/"
 EXTRA_OECONF_append =" --with-libgpustats-headers=${STAGING_INCDIR}/libgpustats/"
+EXTRA_OECONF_append =" --with-libpqstats-headers=${STAGING_INCDIR}/libvqzip/"
 EXTRA_OECONF_append =" --with-sanitized-headers=${STAGING_KERNEL_BUILDDIR}/usr/include"
 EXTRA_OECONF_append =" --with-display-headers=${STAGING_INCDIR}/qcom/display"
 
