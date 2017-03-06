@@ -15,8 +15,6 @@ SRC_URI = " \
     file://0001-audioringbuffer-do-not-require-4-byte-multiple-for-e.patch \
     file://0001-audioringbuffer-Also-support-raw-AAC.patch \
     file://Add-Flac.patch \
-    file://Add-Vorbis.patch \
-    file://0001-audioringbuffer-add-wma-and-alac-to-encoded-audio-fo.patch \
 "
 SRC_URI[md5sum] = "8efa9e9ad9a841a900359604da82fb8b"
 SRC_URI[sha256sum] = "fbc0d40fcb746d2efe2ea47444674029912f66e6107f232766d33b722b97de20"

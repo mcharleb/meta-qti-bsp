@@ -2,7 +2,7 @@ require gstreamer1.0-plugins.inc
 
 LICENSE = "GPLv2+ & LGPLv2.1+"
 
-DEPENDS += "gstreamer1.0-plugins-base libcap zlib bzip2 gstreamer-core-patch"
+DEPENDS += "gstreamer1.0-plugins-base libcap zlib bzip2"
 
 inherit gettext
 
@@ -51,4 +51,3 @@ EXTRA_OECONF += " \
 "
 
 FILES_${PN}-equalizer += "${datadir}/gstreamer-1.0/presets/*.prs"
-do_fetch[depends] = " gstreamer-core-patch:do_fetch"

@@ -5,7 +5,7 @@ SECTION = "multimedia"
 LICENSE = "GPLv2+ & LGPLv2+ & ( (GPLv2+ & LGPLv2.1+) | (GPLv3+ & LGPLv3+) )"
 LICENSE_FLAGS = "commercial"
 
-DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base zlib bzip2 xz gstreamer-core-patch"
+DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base zlib bzip2 xz"
 
 inherit autotools pkgconfig upstream-version-is-even gtk-doc
 
@@ -49,4 +49,3 @@ ARM_INSTRUCTION_SET_armv5 = "arm"
 
 # ffmpeg/libav disables PIC on some platforms (e.g. x86-32)
 INSANE_SKIP_${PN} = "textrel"
-do_fetch[depends] = " gstreamer-core-patch:do_fetch"
