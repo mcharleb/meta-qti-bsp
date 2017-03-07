@@ -56,9 +56,12 @@ allow thermal-engine_t self:process setsched;
 allow thermal-engine_t self:unix_dgram_socket { write connect };
 allow thermal-engine_t initrc_t:unix_dgram_socket sendto;
 allow thermal-engine_t self:capability2 block_suspend;
+allow thermal-engine_t self:netlink_kobject_uevent_socket create_socket_perms;
 
 dev_read_sysfs(thermal-engine_t)
 rw_shared_memory_dev(thermal-engine_t)
 rw_thermal_dev(thermal-engine_t)
 read_thermal_config(thermal-engine_t)
 create_sock_files_pattern(thermal-engine_t, device_t, device_t)
+dev_rw_null(thermal-engine_t)
+#allow thermal-engine_t sysfs_t:file write

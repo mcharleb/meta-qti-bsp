@@ -26,11 +26,10 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#============= ifconfig_t ==============
 rw_diag_dev(ifconfig_t)
+dev_rw_null(ifconfig_t)
 allow ifconfig_t initrc_t:netlink_route_socket { read write };
 allow ifconfig_t initrc_t:packet_socket { read write };
 allow ifconfig_t initrc_t:udp_socket { read write };
 allow ifconfig_t init_t:unix_stream_socket { read write };
 rw_shared_memory_dev(ifconfig_t)
-

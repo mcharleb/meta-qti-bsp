@@ -43,3 +43,4 @@ rw_subsys_modem_dev(mss_t)
 
 #Read firmware
 read_firmware_file(mss_t)
+dev_rw_null(mss_t)
