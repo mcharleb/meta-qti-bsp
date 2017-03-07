@@ -30,7 +30,7 @@
 Description=Wlan Service
 SourcePath=/etc/init.d/wlan
 Requires=wcnss_wlan.service
-After=persist.mount firmware-links.service wcnss_wlan.service
+After=persist.mount firmware-links.service wcnss_wlan.service usb.service
 
 [Service]
 Restart=no

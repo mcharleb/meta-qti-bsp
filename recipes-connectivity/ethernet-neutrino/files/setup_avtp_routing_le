@@ -1,5 +1,6 @@
-#!/bin/sh
-# Copyright (c) 2016, The Linux Foundation. All rights reserved.
+#! /bin/sh
+#
+# Copyright (c) 2017, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -25,57 +26,38 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# find_partitions        init.d script to dynamically find partitions
-#
+# Neutrino Ethernet Driver init.d script to load ethernet driver
 
-#following function is just for debugging not enabled by default
-timestamp()
-{
-   seconds="$(date +%s)"
-}
+# Create rule in ebtables to receive AVTP (802.1Q type) packets only on eth0 interface.
+# This will cause all 802.1Q packets to be received on eth0 and not on bridge0.
 
-#following function is just for debugging not enabled by default
-RESTORECON()
-{
-    timestamp
-    echo "$seconds $2 start" > /dev/console
-    context_check="$(matchpathcon -V $2)"
-    if test "${context_check#*verified}" == "$context_check"
-    then
-       # Only do a restorecon if necessary
-        /sbin/restorecon $1 $2
-    fi
-    timestamp
-    echo "$seconds $2 end" > /dev/console
-}
+set -e
 
-FindAndMountEXT4 () {
-   partition=$1
-   dir=$2
-   mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   mkdir -p $dir
-   mount -t ext4 $mmc_block_device $dir -o relatime,data=ordered,noauto_da_alloc,discard
-}
+case "$1" in
+  start)
+        echo -n "Creating ebtables rule for 802.1Q packets: "
+        if [ -e /sys/class/net/bridge0/bridge ]; then
+          ebtables -t broute -A BROUTING -i eth0 -p 802_1Q -j DROP
+        fi
+        echo "Done creating routing rule"
+        echo "802.1Q packets will be received on eth0"
+        ;;
+  stop)
+        echo -n "Removing ebtables rule for 802.1Q packets: "
+        if [ -e /sys/class/net/bridge0/bridge ]; then
+          ebtables -t broute -D BROUTING -i eth0 -p 802_1Q -j DROP
+        fi
+        echo "Done removing routing rule"
+        echo "802.1Q packets will be received on bridge0"
+        ;;
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage { start | stop | restart}" >&2
+        exit 1
+        ;;
+esac
 
-#For now we only have firmware with VFAT and which need protection ( selinux)
-# It mounted with secontext as firmware_t
-FindAndMountVFAT () {
-   partition=$1
-   dir=$2
-   mmc_block_device=/dev/block/bootdevice/by-name/$partition
-   mkdir -p $dir
-   mount -t vfat $mmc_block_device $dir -o context=system_u:object_r:firmware_t:s0
-}
-
-
-FindAndMountEXT4 userdata /data
-FindAndMountVFAT modem   /firmware
-FindAndMountEXT4 persist /persist
-FindAndMountEXT4 dsp /dsp
-
-/sbin/restorecon -RF /data/misc/wifi
-/sbin/restorecon -RF /persist
-/sbin/restorecon -RF /dsp
-/sbin/restorecon -RF /dev
 exit 0
