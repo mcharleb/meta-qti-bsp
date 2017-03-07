@@ -64,6 +64,6 @@ FindAndMountEXT4 cache  /cache
 # TODO: Static assigment is not full functional
 # till that time we need this
 /sbin/restorecon -RF /dev
-#/sbin/restorecon -RF /data
+/sbin/restorecon -RF /data/misc/wifi
 
 exit 0
