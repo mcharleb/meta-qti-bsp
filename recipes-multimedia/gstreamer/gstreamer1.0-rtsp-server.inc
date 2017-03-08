@@ -3,7 +3,7 @@ HOMEPAGE = "http://cgit.freedesktop.org/gstreamer/gst-rtsp-server/"
 SECTION = "multimedia"
 LICENSE = "LGPLv2"
 
-DEPENDS = "gstreamer1.0 libcgroup gstreamer1.0-plugins-base gstreamer-core-patch"
+DEPENDS = "gstreamer1.0 libcgroup gstreamer1.0-plugins-base"
 
 PNREAL = "gst-rtsp-server"
 
@@ -18,7 +18,7 @@ inherit autotools pkgconfig upstream-version-is-even gobject-introspection gtk-d
 # Starting with 1.8.0 gst-rtsp-server includes dependency-less plugins as well
 LIBV = "1.0"
 require gst-plugins-package.inc
-do_fetch[depends] = " gstreamer-core-patch:do_fetch"
+
 delete_pkg_m4_file() {
         # This m4 file is out of date and is missing PKG_CONFIG_SYSROOT_PATH tweaks which we need for introspection
         rm "${S}/common/m4/pkg.m4" || true
