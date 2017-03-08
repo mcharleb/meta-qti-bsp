@@ -39,3 +39,4 @@ files_read_default_files(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
 allow NetworkManager_t unlabeled_t:file { read getattr open };
 auditallow NetworkManager_t unlabeled_t:file { read getattr open };
+create_sock_files_pattern(NetworkManager_t, device_t, device_t)
