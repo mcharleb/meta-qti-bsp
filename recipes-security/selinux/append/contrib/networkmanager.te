@@ -33,10 +33,13 @@ r_wifi_data_file(NetworkManager_t)
 #This need to be removed later
 rw_diag_dev(NetworkManager_t)
 dev_rw_null(NetworkManager_t)
-#read_files_pattern(NetworkManager_t, default_t)
-#read_files_pattern(NetworkManager_t, tmpfs_t)
+allow NetworkManager_t tmpfs_t:dir create;
+allow NetworkManager_t var_t:dir { write add_name };
+allow NetworkManager_t var_t:file { read write create open };
+
+manage_sock_files_pattern(NetworkManager_t, tmpfs_t, tmpfs_t)
+manage_sock_files_pattern(NetworkManager_t, device_t, device_t)
+files_search_default(NetworkManager_t)
 files_read_default_files(NetworkManager_t)
 allow NetworkManager_t initrc_t:unix_dgram_socket sendto;
-allow NetworkManager_t unlabeled_t:file { read getattr open };
-auditallow NetworkManager_t unlabeled_t:file { read getattr open };
-create_sock_files_pattern(NetworkManager_t, device_t, device_t)
+init_stream_connect_script(NetworkManager_t)
