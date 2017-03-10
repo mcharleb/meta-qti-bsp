@@ -22,6 +22,7 @@ qcam:2345:respawn:/system/bin/mm-qcamera-daemon
 srvm:2345:respawn:/usr/bin/servicemanager
 qmfs:2345:respawn:/usr/bin/qmmf-server
 qmfw:2345:respawn:/usr/bin/qmmf-webserver
+sns:2345:respawn:/usr/bin/sensors.qcom
 
 #Set the storage daemons to respawn
 rmts:2345:respawn:/sbin/rmt_storage

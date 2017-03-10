@@ -6,7 +6,7 @@ BUGTRACKER = "https://bugzilla.gnome.org/enter_bug.cgi?product=Gstreamer"
 SECTION = "multimedia"
 LICENSE = "LGPLv2+"
 
-DEPENDS = "glib-2.0 glib-2.0-native libcap libxml2 bison-native flex-native gstreamer-core-patch"
+DEPENDS = "glib-2.0 glib-2.0-native libcap libxml2 bison-native flex-native"
 
 inherit autotools pkgconfig gettext upstream-version-is-even gobject-introspection gtk-doc
 
@@ -65,7 +65,6 @@ patch_gtk_doc_makefiles() {
            ${S}/common/gtk-doc*mak
 }
 
-do_fetch[depends] = " gstreamer-core-patch:do_fetch"
 do_configure[prefuncs] += " delete_pkg_m4_file patch_gtk_doc_makefiles"
 
 do_compile_prepend() {
