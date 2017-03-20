@@ -62,6 +62,7 @@ dev_read_sysfs(thermal-engine_t)
 rw_shared_memory_dev(thermal-engine_t)
 rw_thermal_dev(thermal-engine_t)
 read_thermal_config(thermal-engine_t)
-create_sock_files_pattern(thermal-engine_t, device_t, device_t)
+manage_sock_files_pattern(thermal-engine_t, device_t, device_t)
 dev_rw_null(thermal-engine_t)
-#allow thermal-engine_t sysfs_t:file write
+read_proc_enrty(thermal-engine_t)
+allow thermal-engine_t sysfs_t:file write;
