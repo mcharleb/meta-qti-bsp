@@ -70,6 +70,9 @@ export TARGET_LIBRARY_SUPPRESS_LIST="libcamera_client libhardware \
 do_compile () {
     # Current support is limited to msm8996 32-bit build
     #
+    if [ "${PRODUCT}" == "drone" ] && [ "${MACHINE}" == "apq8096" ]; then
+        export DRONE_TARGET=true
+    fi
     if [ "${MLPREFIX}" == "lib32-" ]; then
         androidmk_setenv
         export TARGET_SUPPORT_HAL1=false
